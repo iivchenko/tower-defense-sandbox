@@ -329,6 +329,9 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 
-#Paket dependency manager
+# Paket dependency manager
 .paket/
 paket-files/
+
+# VS Code
+.ionide/ 
