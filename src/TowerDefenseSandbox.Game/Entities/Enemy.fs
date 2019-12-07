@@ -10,6 +10,8 @@ type Enemy (life : int, spriteBatch : SpriteBatch, texture : Texture2D, position
     let max x y =
         if x > y then x else y
 
+    member this.Position = position
+
     member this.ApplyDamage (damage : int) = 
         life <- max 0 life - damage
 

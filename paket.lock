@@ -2,4 +2,7 @@ STORAGE: NONE
 RESTRICTION: || (== netcoreapp3.0) (== netstandard2.0) (== netstandard2.1)
 NUGET
   remote: https://api.nuget.org/v3/index.json
+    Monogame.Extended (3.7)
+      Newtonsoft.Json (>= 11.0.2)
     MonoGame.Framework.DesktopGL.Core (3.8.0.1)
+    Newtonsoft.Json (12.0.3)
