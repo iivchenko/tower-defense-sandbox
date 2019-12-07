@@ -13,19 +13,21 @@ type TheGame () as this =
     let mutable turret = Unchecked.defaultof<Turret>
 
     override this.LoadContent() =
-        spriteBatch <- new SpriteBatch(this.GraphicsDevice)        
+        spriteBatch <- new SpriteBatch(this.GraphicsDevice)
 
     override this.Initialize () =
         base.Initialize()
 
-        enemy <- Enemy (100, spriteBatch, Vector2(200.0f, 0.0f))
+        enemy <- Enemy (100, spriteBatch, Vector2(400.0f, 0.0f))
         let enemies = new List<Enemy>()
-        enemies.Add(enemy);
-        turret <- Turret (spriteBatch, Vector2(300.0f, 300.0f), enemies)
+        enemies.Add(enemy)
+        turret <- Turret (spriteBatch, Vector2(300.0f, 300.0f), enemy)
 
     override this.Update (gameTime : GameTime) =
         enemy.Update()
         turret.Update()
+
+        base.Update(gameTime)
 
     override this.Draw (gameTime : GameTime) =
         

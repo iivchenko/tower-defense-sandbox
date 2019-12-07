@@ -14,11 +14,14 @@ type Enemy (life : int, spriteBatch : SpriteBatch, center : Vector2) =
 
     member this.Position = center
 
+    member this.Radius = radius
+
     member this.ApplyDamage (damage : int) = 
         life <- max 0 life - damage
 
     member this.Update () =
         center.Y <- center.Y + 1.0f
+
 
     member this.Draw () =
         spriteBatch.DrawCircle(center, radius, 100, Color.Red, radius)
