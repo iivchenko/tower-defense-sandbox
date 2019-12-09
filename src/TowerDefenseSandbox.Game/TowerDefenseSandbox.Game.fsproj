@@ -1,9 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Winexe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Engine\EntityProvider.fs" />
+    <Compile Include="Entities\Bullet.fs" />
     <Compile Include="Entities/Enemy.fs" />
     <Compile Include="Entities\Turret.fs" />
     <Compile Include="Program.fs" />

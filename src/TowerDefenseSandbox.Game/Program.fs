@@ -2,15 +2,15 @@
 open System
 open TowerDefenseSandbox.Game.Entities
 open Microsoft.Xna.Framework.Graphics
-open System.Collections.Generic
+open TowerDefenseSandbox.Game.Engine
+open Microsoft.FSharp.Collections
 
 type TheGame () as this =
     inherit Microsoft.Xna.Framework.Game()
 
     let graphics = new GraphicsDeviceManager(this)
+    let entityProvider = EntityProvider() :> IEntityProvider
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch> 
-    let mutable enemy = Unchecked.defaultof<Enemy>
-    let mutable turret = Unchecked.defaultof<Turret>
 
     override this.LoadContent() =
         spriteBatch <- new SpriteBatch(this.GraphicsDevice)
@@ -18,14 +18,11 @@ type TheGame () as this =
     override this.Initialize () =
         base.Initialize()
 
-        enemy <- Enemy (100, spriteBatch, Vector2(400.0f, 0.0f))
-        let enemies = new List<Enemy>()
-        enemies.Add(enemy)
-        turret <- Turret (spriteBatch, Vector2(300.0f, 300.0f), enemy)
+        Enemy (100, spriteBatch, Vector2(400.0f, 0.0f), entityProvider) |> ignore
+        Turret (spriteBatch, Vector2(300.0f, 300.0f), entityProvider) |> ignore
 
     override this.Update (gameTime : GameTime) =
-        enemy.Update()
-        turret.Update()
+        entityProvider.GetEntities() |> List.iter (fun x -> x.Update())
 
         base.Update(gameTime)
 
@@ -35,8 +32,7 @@ type TheGame () as this =
 
         spriteBatch.Begin()
 
-        enemy.Draw()
-        turret.Draw()
+        entityProvider.GetEntities() |> List.iter (fun x -> x.Draw())
 
         spriteBatch.End()
 
