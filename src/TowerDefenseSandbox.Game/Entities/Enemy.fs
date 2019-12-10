@@ -4,29 +4,29 @@ open Microsoft.Xna.Framework
 open MonoGame.Extended
 open TowerDefenseSandbox.Game.Engine
 
-type Enemy (life : int, spriteBatch : SpriteBatch, center : Vector2, entityProvider : IEntityProvider) as this =    
+type Enemy (life : int, spriteBatch : SpriteBatch, center : Vector2, entityProvider : IEntityProvider) =
 
     let mutable life = life
     let mutable center = center
     let radius = 10.0f
-     
-    do
-        entityProvider.RegisterEntity this
 
-    let max x y =
-        if x > y then x else y
+    let limit = Mathx.max 0
 
     interface IEntity with
 
-        member this.Position = center
+        member _.Position
+            with get () = center
+            and set (value) = center <- value
 
-        member this.Radius = radius
+        member _.Radius = radius
 
-        member this.Update () =
+        member _.Update () =
             center.Y <- center.Y + 1.0f
 
-        member this.Draw () =
+        member _.Draw () =
             spriteBatch.DrawCircle(center, radius, 100, Color.Red, radius)
 
     member this.ApplyDamage (damage : int) = 
-        life <- max 0 life - damage
+        life <- life - damage |> limit
+
+        if life = 0 then entityProvider.RemoveEntity this else ()

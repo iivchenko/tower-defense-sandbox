@@ -4,9 +4,10 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Engine\Mathx.fs" />
     <Compile Include="Engine\EntityProvider.fs" />
+    <Compile Include="Entities\Enemy.fs" />
     <Compile Include="Entities\Bullet.fs" />
-    <Compile Include="Entities/Enemy.fs" />
     <Compile Include="Entities\Turret.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
