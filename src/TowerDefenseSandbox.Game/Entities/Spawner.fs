@@ -15,13 +15,13 @@ type Spawner (spriteBatch : SpriteBatch, entityProvider : IEntityProvider) =
 
     interface ICell with 
             
-            member _.Update (gameTime : GameTime) (position : Vector2) =
-                if time < 0.0f
-                    then 
-                        new Enemy(100, spriteBatch, position, entityProvider) |> entityProvider.RegisterEntity
-                        time <- spawnTime 
-                    else
-                        time <- time - gameTime.GetElapsedSeconds()
+        member _.Update (gameTime : GameTime) (position : Vector2) =
+            if time < 0.0f
+                then 
+                    new Enemy(100, spriteBatch, position, entityProvider) |> entityProvider.RegisterEntity
+                    time <- spawnTime 
+                else
+                    time <- time - gameTime.GetElapsedSeconds()
             
-            member _.Draw (gameTime : GameTime) (position : Vector2) =
-                spriteBatch.DrawCircle(position, radius, 100, Color.Aquamarine)
+        member _.Draw (gameTime : GameTime) (position : Vector2) =
+            spriteBatch.DrawCircle(position, radius, 100, Color.Aquamarine)

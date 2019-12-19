@@ -4,6 +4,7 @@ open TowerDefenseSandbox.Game.Entities
 open Microsoft.Xna.Framework.Graphics
 open TowerDefenseSandbox.Game.Engine
 open Microsoft.FSharp.Collections
+open MonoGame.Extended
 
 type TheGame () as this =
     inherit Microsoft.Xna.Framework.Game()
@@ -19,6 +20,12 @@ type TheGame () as this =
     override this.Initialize () =
         
         base.Initialize()
+        grid.[0, 0] <- Road (spriteBatch, Size2(75.0f, 75.0f)) :> ICell |> Some
+        grid.[0, 1] <- Road (spriteBatch, Size2(75.0f, 75.0f)) :> ICell |> Some
+        grid.[0, 2] <- Road (spriteBatch, Size2(75.0f, 75.0f)) :> ICell |> Some
+
+        grid.[1, 1] <- Road (spriteBatch, Size2(75.0f, 75.0f)) :> ICell |> Some
+        grid.[1, 2] <- Road (spriteBatch, Size2(75.0f, 75.0f)) :> ICell |> Some
 
         grid.[4, 1] <- Spawner (spriteBatch, entityProvider) :> ICell |> Some
         grid.[3, 1] <- Spawner (spriteBatch, entityProvider) :> ICell |> Some
