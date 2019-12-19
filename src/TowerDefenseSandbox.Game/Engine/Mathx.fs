@@ -2,7 +2,7 @@
 
 open Microsoft.Xna.Framework
 
-let max x y = if x > y then x else y
+let public max x y = if x > y then x else y
 
 let public sqr x = x * x
 

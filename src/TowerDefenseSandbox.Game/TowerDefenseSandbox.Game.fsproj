@@ -6,7 +6,9 @@
   <ItemGroup>
     <Compile Include="Engine\Mathx.fs" />
     <Compile Include="Engine\EntityProvider.fs" />
+    <Compile Include="Engine\Grid.fs" />
     <Compile Include="Entities\Enemy.fs" />
+    <Compile Include="Entities\Spawner.fs" />
     <Compile Include="Entities\Bullet.fs" />
     <Compile Include="Entities\Turret.fs" />
     <Compile Include="Program.fs" />

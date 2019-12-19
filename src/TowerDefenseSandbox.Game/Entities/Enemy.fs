@@ -20,10 +20,10 @@ type Enemy (life : int, spriteBatch : SpriteBatch, center : Vector2, entityProvi
 
         member _.Radius = radius
 
-        member _.Update () =
+        member _.Update (gameTime : GameTime) =
             center.Y <- center.Y + 1.0f
 
-        member _.Draw () =
+        member _.Draw (gameTime : GameTime) =
             spriteBatch.DrawCircle(center, radius, 100, Color.Red, radius)
 
     member this.ApplyDamage (damage : int) = 

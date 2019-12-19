@@ -14,13 +14,13 @@ type Bullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider : IEnti
 
     interface IEntity with
         
-        member this.Radius = radius
+        member _.Radius = radius
 
-        member this.Position
+        member _.Position
             with get () = center
             and set (value) = center <- value
 
-        member this.Update () =
+        member this.Update (gameTime : GameTime) =
             let entity = target :> IEntity
             let tx = entity.Position.X - center.X
             let ty = entity.Position.Y - center.Y
@@ -38,5 +38,5 @@ type Bullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider : IEnti
                     ()
 
 
-        member this.Draw () =
+        member _.Draw (gameTime : GameTime) =
              spriteBatch.DrawCircle(center, radius, 100, Color.Black)

@@ -5,8 +5,8 @@ open Microsoft.Xna.Framework
 type IEntity =
     abstract member Radius : float32 with get
     abstract member Position : Vector2 with get, set
-    abstract member Update : unit -> unit
-    abstract member Draw : unit -> unit
+    abstract member Update : GameTime -> unit
+    abstract member Draw : GameTime -> unit
 
 type IEntityProvider =
     abstract member GetEntities : unit -> IEntity list

@@ -10,22 +10,27 @@ type TheGame () as this =
 
     let graphics = new GraphicsDeviceManager(this)
     let entityProvider = EntityProvider() :> IEntityProvider
+    let grid = Grid (10, 10, 75.0f, 75.0f)
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch> 
 
     override this.LoadContent() =
         spriteBatch <- new SpriteBatch(this.GraphicsDevice)
 
     override this.Initialize () =
+        
         base.Initialize()
 
-        [
-            Enemy (100, spriteBatch, Vector2(400.0f, 0.0f), entityProvider) :> IEntity; 
-            Turret (spriteBatch, Vector2(300.0f, 300.0f), entityProvider) :> IEntity
-        ] |> List.iter entityProvider.RegisterEntity
-
+        grid.[4, 1] <- Spawner (spriteBatch, entityProvider) :> ICell |> Some
+        grid.[3, 1] <- Spawner (spriteBatch, entityProvider) :> ICell |> Some
+        grid.[3, 2] <- Spawner (spriteBatch, entityProvider) :> ICell |> Some
+        
+        grid.[2, 2] <- Turret (spriteBatch, entityProvider) :> ICell |> Some
+        grid.[4, 2] <- Turret (spriteBatch, entityProvider) :> ICell |> Some
+        grid.[4, 4] <- Turret (spriteBatch, entityProvider) :> ICell |> Some
 
     override this.Update (gameTime : GameTime) =
-        entityProvider.GetEntities() |> List.iter (fun x -> x.Update())
+        entityProvider.GetEntities() |> List.iter (fun x -> x.Update(gameTime))
+        grid.Update(gameTime)
 
         base.Update(gameTime)
 
@@ -35,7 +40,8 @@ type TheGame () as this =
 
         spriteBatch.Begin()
 
-        entityProvider.GetEntities() |> List.iter (fun x -> x.Draw())
+        entityProvider.GetEntities() |> List.iter (fun x -> x.Draw(gameTime))
+        grid.Draw(gameTime)
 
         spriteBatch.End()
 
