@@ -5,7 +5,7 @@ open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework
 open MonoGame.Extended
 
-type Spawner (zindex : int, spriteBatch : SpriteBatch, entityProvider : IEntityProvider) =
+type Spawner (zindex : int, spriteBatch : SpriteBatch, entityProvider : IEntityProvider, path : Vector2 list) =
 
     [<Literal>] 
     let spawnTime = 1.0f
@@ -22,7 +22,7 @@ type Spawner (zindex : int, spriteBatch : SpriteBatch, entityProvider : IEntityP
         member _.Update (gameTime : GameTime) (position : RectangleF) =
             if time < 0.0f
                 then 
-                    new Enemy(100, spriteBatch, center position, entityProvider) |> entityProvider.RegisterEntity
+                    Enemy(100, spriteBatch, center position, entityProvider, path) |> entityProvider.RegisterEntity
                     time <- spawnTime 
                 else
                     time <- time - gameTime.GetElapsedSeconds()

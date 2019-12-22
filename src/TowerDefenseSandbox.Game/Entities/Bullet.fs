@@ -37,6 +37,5 @@ type Bullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider : IEnti
                 else 
                     ()
 
-
         member _.Draw (gameTime : GameTime) =
              spriteBatch.DrawCircle(center, radius, 100, Color.Black)
