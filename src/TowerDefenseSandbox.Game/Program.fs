@@ -30,6 +30,8 @@ type TheGame () as this =
         grid.[2, 2] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
         grid.[0, 3] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
 
+        grid.[1, 4] <- Receiver (spriteBatch, entityProvider, 1) :> ICell |> Some
+
     override this.Update (gameTime : GameTime) =
         entityProvider.GetEntities() |> List.iter (fun x -> x.Update(gameTime))
         grid.Update(gameTime)
