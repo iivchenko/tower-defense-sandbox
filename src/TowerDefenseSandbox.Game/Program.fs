@@ -34,14 +34,16 @@ type TheGame () as this =
         grid.[5, 4] <- Receiver (spriteBatch, entityProvider, 1) :> ICell |> Some
         
         grid.[0, 1] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
-        //grid.[2, 2] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
-        //grid.[0, 3] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
+        grid.[2, 2] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
+        grid.[0, 3] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
 
     override this.Update (gameTime : GameTime) =
 
         grid.Update(gameTime)
 
-        entityProvider.GetEntities() |> List.iter (fun x -> x.Update(gameTime))
+        entityProvider.GetEntities() |> Seq.iter (fun x -> x.Update(gameTime))
+
+        entityProvider.Flush ()
 
         base.Update(gameTime)
 
@@ -52,7 +54,7 @@ type TheGame () as this =
         spriteBatch.Begin()
 
         grid.Draw(gameTime)
-        entityProvider.GetEntities() |> List.iter (fun x -> x.Draw(gameTime))
+        entityProvider.GetEntities() |> Seq.iter (fun x -> x.Draw(gameTime))
 
         spriteBatch.End()
 

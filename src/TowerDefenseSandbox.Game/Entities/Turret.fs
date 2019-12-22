@@ -21,9 +21,9 @@ type Turret (zindex : int, spriteBatch : SpriteBatch, entityProvider : IEntityPr
             let c = center position
             let target =
                 entityProvider.GetEntities()
-                |> List.filter (fun x -> x.GetType() = typeof<Enemy>)
-                |> List.filter (fun x -> (Mathx.distance c x.Position) - x.Radius < viewRadius)
-                |> List.tryHead
+                |> Seq.filter (fun x -> x.GetType() = typeof<Enemy>)
+                |> Seq.filter (fun x -> (Mathx.distance c x.Position) - x.Radius < viewRadius)
+                |> Seq.tryHead
 
             match target with 
             | None -> ()

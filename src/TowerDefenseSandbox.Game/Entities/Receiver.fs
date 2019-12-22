@@ -21,9 +21,9 @@ type Receiver (spriteBatch : SpriteBatch, entityProvider : IEntityProvider, zind
 
             let enemy =
                 entityProvider.GetEntities()
-                |> List.filter (fun x -> x.GetType() = typeof<Enemy>)
-                |> List.filter (fun x -> (Mathx.distance c x.Position) - x.Radius < radius)
-                |> List.tryHead
+                |> Seq.filter (fun x -> x.GetType() = typeof<Enemy>)
+                |> Seq.filter (fun x -> (Mathx.distance c x.Position) - x.Radius < radius)
+                |> Seq.tryHead
 
             match enemy with 
             | None -> ()

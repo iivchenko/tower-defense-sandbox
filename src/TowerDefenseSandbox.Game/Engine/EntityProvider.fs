@@ -1,5 +1,6 @@
 ﻿namespace TowerDefenseSandbox.Game.Engine
 
+open System.Collections.Generic
 open Microsoft.Xna.Framework
 
 type IEntity =
@@ -9,27 +10,29 @@ type IEntity =
     abstract member Draw : GameTime -> unit
 
 type IEntityProvider =
-    abstract member GetEntities : unit -> IEntity list
+    abstract member GetEntities : unit -> IEntity seq
     abstract member RegisterEntity : IEntity -> unit
     abstract member RemoveEntity : IEntity -> unit
+    abstract member Flush : unit -> unit
 
 type EntityProvider() = 
-    
-    let mutable entities = list.Empty
+    let addEntities = List<IEntity>()
+    let removeEntities = List<IEntity>()
+    let entities = List<IEntity>()
     
     interface IEntityProvider with
         member this.GetEntities () =
-            entities
+            entities :> IEnumerable<IEntity>
 
         member this.RegisterEntity (entity : IEntity) = 
-            entities <- entity :: entities
+            addEntities.Add(entity)
 
         member this.RemoveEntity(entity: IEntity): unit = 
-            let rec remove entity list =
-                match list with
-                | [] -> []
-                | head :: tail when LanguagePrimitives.PhysicalEquality entity head -> tail
-                | head :: body :: tail when LanguagePrimitives.PhysicalEquality entity body -> head :: tail
-                | head :: tail -> head :: remove entity tail
+            removeEntities.Add(entity)
 
-            entities <- remove entity entities
+        member _.Flush() =
+            removeEntities |> Seq.iter (fun x -> entities.Remove(x) |> ignore)
+            addEntities |> Seq.iter (fun x -> entities.Add(x) |> ignore)
+
+            removeEntities.Clear()
+            addEntities.Clear()
