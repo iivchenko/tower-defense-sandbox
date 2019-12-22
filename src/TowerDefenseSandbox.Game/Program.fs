@@ -11,7 +11,7 @@ type TheGame () as this =
 
     let graphics = new GraphicsDeviceManager(this)
     let entityProvider = EntityProvider() :> IEntityProvider
-    let grid = Grid (10, 10, 75.0f, 75.0f)
+    let mutable grid = Unchecked.defaultof<Grid> 
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch> 
 
     override this.LoadContent() =
@@ -20,20 +20,15 @@ type TheGame () as this =
     override this.Initialize () =
         
         base.Initialize()
-        grid.[0, 0] <- Road (spriteBatch, Size2(75.0f, 75.0f)) :> ICell |> Some
-        grid.[0, 1] <- Road (spriteBatch, Size2(75.0f, 75.0f)) :> ICell |> Some
-        grid.[0, 2] <- Road (spriteBatch, Size2(75.0f, 75.0f)) :> ICell |> Some
-
-        grid.[1, 1] <- Road (spriteBatch, Size2(75.0f, 75.0f)) :> ICell |> Some
-        grid.[1, 2] <- Road (spriteBatch, Size2(75.0f, 75.0f)) :> ICell |> Some
-
-        grid.[4, 1] <- Spawner (spriteBatch, entityProvider) :> ICell |> Some
-        grid.[3, 1] <- Spawner (spriteBatch, entityProvider) :> ICell |> Some
-        grid.[3, 2] <- Spawner (spriteBatch, entityProvider) :> ICell |> Some
+        grid <- Grid (spriteBatch, 10, 10, 75.0f, 75.0f)
+        grid.[1, 0] <- Spawner (1, spriteBatch, entityProvider) :> ICell |> Some
+        grid.[1, 1] <- Road (spriteBatch, 0) :> ICell |> Some
+        grid.[1, 2] <- Road (spriteBatch, 0) :> ICell |> Some
+        grid.[1, 3] <- Road (spriteBatch, 0) :> ICell |> Some
         
-        grid.[2, 2] <- Turret (spriteBatch, entityProvider) :> ICell |> Some
-        grid.[4, 2] <- Turret (spriteBatch, entityProvider) :> ICell |> Some
-        grid.[4, 4] <- Turret (spriteBatch, entityProvider) :> ICell |> Some
+        grid.[0, 1] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
+        grid.[2, 2] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
+        grid.[0, 3] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
 
     override this.Update (gameTime : GameTime) =
         entityProvider.GetEntities() |> List.iter (fun x -> x.Update(gameTime))
@@ -47,8 +42,8 @@ type TheGame () as this =
 
         spriteBatch.Begin()
 
-        entityProvider.GetEntities() |> List.iter (fun x -> x.Draw(gameTime))
         grid.Draw(gameTime)
+        entityProvider.GetEntities() |> List.iter (fun x -> x.Draw(gameTime))
 
         spriteBatch.End()
 
