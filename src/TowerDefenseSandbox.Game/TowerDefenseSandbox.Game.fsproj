@@ -13,7 +13,7 @@
     <Compile Include="Entities\Spawner.fs" />
     <Compile Include="Entities\Bullet.fs" />
     <Compile Include="Entities\Turret.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="TheGame.fs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\" />

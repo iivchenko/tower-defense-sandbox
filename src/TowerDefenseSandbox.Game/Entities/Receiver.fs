@@ -15,7 +15,7 @@ type Receiver (spriteBatch : SpriteBatch, entityProvider : IEntityProvider, zind
 
         member _.ZIndex = zindex
             
-        member _.Update (gameTime : GameTime) (position : RectangleF) =
+        member _.Update (_ : GameTime) (position : RectangleF) =
             let c = center position
             let radius = position.Width / 2.0f * life
 
@@ -33,8 +33,7 @@ type Receiver (spriteBatch : SpriteBatch, entityProvider : IEntityProvider, zind
 
             if life <= 0.0f then raise (System.Exception("Game Over")) else ()
             
-        member _.Draw (gameTime : GameTime) (position : RectangleF) =
+        member _.Draw (_ : GameTime) (position : RectangleF) =
             let radius = position.Width / 2.0f * life
             
             spriteBatch.DrawCircle(center position, radius, 100, Color.Coral)
-

@@ -4,25 +4,42 @@ open TowerDefenseSandbox.Game.Entities
 open Microsoft.Xna.Framework.Graphics
 open TowerDefenseSandbox.Game.Engine
 open Microsoft.FSharp.Collections
-open MonoGame.Extended
+open Microsoft.Xna.Framework.Input
 
 type TheGame () as this =
     inherit Microsoft.Xna.Framework.Game()
 
     let graphics = new GraphicsDeviceManager(this)
     let entityProvider = EntityProvider() :> IEntityProvider
+    let screenWith = 1920 
+    let screenHeight = 1080
+    let cellWidth = 48.0f
+    let cellHeight = 45.0f
+
     let mutable grid = Unchecked.defaultof<Grid> 
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch> 
+    let mutable previousButtonState = ButtonState.Released
 
     override this.LoadContent() =
         spriteBatch <- new SpriteBatch(this.GraphicsDevice)
 
-    override this.Initialize () =
+    override _.Initialize () =
         
         base.Initialize()
-        grid <- Grid (spriteBatch, 10, 10, 75.0f, 75.0f)
+       
+        let raws = screenWith / int cellWidth
+        let columns = screenHeight / int cellHeight
 
-        let path = [Vector2 (1.0f * 75.0f + 75.0f/2.0f, 4.0f * 75.0f + 75.0f/2.0f); Vector2(5.0f * 75.0f + 75.0f/2.0f, 4.0f * 75.0f + 75.0f/2.0f)]
+        graphics.PreferredBackBufferWidth <- screenWith
+        graphics.PreferredBackBufferHeight <- screenHeight
+        graphics.IsFullScreen <- true;
+        graphics.ApplyChanges();
+
+        base.IsMouseVisible <- true
+
+        grid <- Grid (spriteBatch, raws, columns, cellWidth, cellHeight)
+
+        let path = [Vector2 (1.0f * cellWidth + cellWidth/2.0f, 4.0f * cellHeight + cellHeight/2.0f); Vector2(5.0f * cellWidth + cellWidth/2.0f, 4.0f * cellHeight + cellHeight/2.0f)]
         grid.[1, 0] <- Spawner (1, spriteBatch, entityProvider, path) :> ICell |> Some
         grid.[1, 1] <- Road (spriteBatch, 0) :> ICell |> Some
         grid.[1, 2] <- Road (spriteBatch, 0) :> ICell |> Some
@@ -32,14 +49,24 @@ type TheGame () as this =
         grid.[3, 4] <- Road (spriteBatch, 0) :> ICell |> Some
         grid.[4, 4] <- Road (spriteBatch, 0) :> ICell |> Some
         grid.[5, 4] <- Receiver (spriteBatch, entityProvider, 1) :> ICell |> Some
-        
-        grid.[0, 1] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
-        grid.[2, 2] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
-        grid.[0, 3] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
 
-    override this.Update (gameTime : GameTime) =
+    override _.Update (gameTime : GameTime) =
 
         grid.Update(gameTime)
+
+        let state = Mouse.GetState()
+
+        if Keyboard.GetState().IsKeyDown(Keys.Escape) then this.Exit() else ()
+
+        if previousButtonState = ButtonState.Pressed && state.LeftButton = ButtonState.Released then
+            let x = state.X / int cellWidth
+            let y = state.Y / int cellHeight
+
+            grid.[x, y] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
+        else 
+            ()
+
+        previousButtonState <- state.LeftButton
 
         entityProvider.GetEntities() |> Seq.iter (fun x -> x.Update(gameTime))
 
@@ -47,7 +74,7 @@ type TheGame () as this =
 
         base.Update(gameTime)
 
-    override this.Draw (gameTime : GameTime) =
+    override _.Draw (gameTime : GameTime) =
         
         graphics.GraphicsDevice.Clear(Color.CornflowerBlue)
 
