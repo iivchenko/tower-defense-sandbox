@@ -15,10 +15,36 @@ type TheGame () as this =
     let screenHeight = 1080
     let cellWidth = 48.0f
     let cellHeight = 45.0f
+    let columns = screenWith / int cellWidth
+    let raws = screenHeight / int cellHeight
 
     let mutable grid = Unchecked.defaultof<Grid> 
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch> 
     let mutable previousButtonState = ButtonState.Released
+
+    let createPath (grid : Grid) =
+        let rec findSpawner (grid : Grid) x y raws columns =
+            match grid.[x, y] with
+            | Some t when t.GetType() = typeof<Spawner> -> Some (x, y)
+            | _ when x = columns - 1 -> findSpawner grid 0 (y + 1) raws columns
+            | _ when x = columns - 1 && y = raws - 1 -> None
+            | _ -> findSpawner grid (x + 1) y raws columns
+
+        let isPath (grid : Grid) (x, y) =
+            match grid.[x, y] with 
+             | Some x when x.GetType() = typeof<Road> || x.GetType() = typeof<Receiver> -> true
+             | _ -> false
+
+        let rec findPath (grid : Grid) (x, y) (raws : int) (columns : int) path = 
+            if 0 <= y - 1 && y - 1 < raws && List.contains (x, y - 1) path |> not && isPath grid (x, y - 1) then findPath grid (x, y - 1) raws columns ((x, y - 1)::path)
+            else if 0 <= x + 1 && x + 1 < columns && List.contains (x + 1, y) path |> not && isPath grid (x + 1, y) then findPath grid (x + 1, y) raws columns ((x + 1, y)::path)
+            else if 0 <= y + 1 && y + 1 < raws && List.contains (x, y + 1) path |> not && isPath grid (x, y + 1) then findPath grid (x, y + 1) raws columns ((x, y + 1)::path)
+            else if 0 <= x - 1 && x - 1 < columns && List.contains (x - 1, y) path |> not && isPath grid (x - 1, y) then findPath grid (x - 1, y) raws columns ((x - 1, y)::path)
+            else path
+
+        match findSpawner grid 0 0 raws columns with 
+        | Some (x, y) -> findPath grid (x, y) raws columns ((x, y)::[])
+        | _ -> raise (System.Exception("Spawner not found!"))
 
     override this.LoadContent() =
         spriteBatch <- new SpriteBatch(this.GraphicsDevice)
@@ -26,21 +52,23 @@ type TheGame () as this =
     override _.Initialize () =
         
         base.Initialize()
-       
-        let raws = screenWith / int cellWidth
-        let columns = screenHeight / int cellHeight
 
         graphics.PreferredBackBufferWidth <- screenWith
         graphics.PreferredBackBufferHeight <- screenHeight
+        
+        #if RELEASE 
         graphics.IsFullScreen <- true;
+        #endif
+
         graphics.ApplyChanges();
 
         base.IsMouseVisible <- true
 
-        grid <- Grid (spriteBatch, raws, columns, cellWidth, cellHeight)
+        grid <- Grid (spriteBatch, columns, raws, cellWidth, cellHeight)
 
-        let path = [Vector2 (1.0f * cellWidth + cellWidth/2.0f, 4.0f * cellHeight + cellHeight/2.0f); Vector2(5.0f * cellWidth + cellWidth/2.0f, 4.0f * cellHeight + cellHeight/2.0f)]
-        grid.[1, 0] <- Spawner (1, spriteBatch, entityProvider, path) :> ICell |> Some
+        let factory = EnemyFactory (spriteBatch, entityProvider)
+
+        grid.[1, 0] <- Spawner (1, spriteBatch, factory) :> ICell |> Some
         grid.[1, 1] <- Road (spriteBatch, 0) :> ICell |> Some
         grid.[1, 2] <- Road (spriteBatch, 0) :> ICell |> Some
         grid.[1, 3] <- Road (spriteBatch, 0) :> ICell |> Some
@@ -49,6 +77,8 @@ type TheGame () as this =
         grid.[3, 4] <- Road (spriteBatch, 0) :> ICell |> Some
         grid.[4, 4] <- Road (spriteBatch, 0) :> ICell |> Some
         grid.[5, 4] <- Receiver (spriteBatch, entityProvider, 1) :> ICell |> Some
+
+        createPath grid |> List.rev |> List.map (fun (x, y) -> Vector2 (float32 x * cellWidth + cellWidth / 2.0f, float32 y * cellHeight + cellHeight / 2.0f)) |> factory.UpdatePath
 
     override _.Update (gameTime : GameTime) =
 
@@ -84,7 +114,6 @@ type TheGame () as this =
         entityProvider.GetEntities() |> Seq.iter (fun x -> x.Draw(gameTime))
 
         spriteBatch.End()
-
 [<STAThread>]
 [<EntryPoint>]
 let main argv =
