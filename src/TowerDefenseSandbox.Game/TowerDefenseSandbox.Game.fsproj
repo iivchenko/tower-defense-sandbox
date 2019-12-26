@@ -13,10 +13,16 @@
     <Compile Include="Entities\Spawner.fs" />
     <Compile Include="Entities\Bullet.fs" />
     <Compile Include="Entities\Turret.fs" />
+    <Compile Include="Screens\IScreen.fs" />
+    <Compile Include="Screens\MainMenuScreen.fs" />
+    <Compile Include="Screens\GamePlayScreen.fs" />
     <Compile Include="TheGame.fs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Myra" Version="0.9.7.185" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
