@@ -4,7 +4,7 @@ open Microsoft.Xna.Framework
 open MonoGame.Extended
 open TowerDefenseSandbox.Game.Engine
 
-type Turret (zindex : int, spriteBatch : SpriteBatch, entityProvider : IEntityProvider) =
+type SlowTurret (zindex : int, spriteBatch : SpriteBatch, entityProvider : IEntityProvider) =
 
     let viewRadius = 100.0f
     let radius = 25.0f
@@ -37,4 +37,6 @@ type Turret (zindex : int, spriteBatch : SpriteBatch, entityProvider : IEntityPr
         member this.Draw (gameTime : GameTime) (position : RectangleF) =
             
             spriteBatch.DrawCircle(center position, radius, 100, Color.Blue, radius)
+            #if DEBUG
             spriteBatch.DrawCircle(center position, viewRadius, 100, Color.GreenYellow)
+            #endif

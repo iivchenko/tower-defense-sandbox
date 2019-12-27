@@ -5,6 +5,9 @@ open TowerDefenseSandbox.Game.Engine
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Input
 open TowerDefenseSandbox.Game.Entities
+open System.IO
+open Newtonsoft.Json
+open MonoGame.Extended
 
 type GamePlayScreen (spriteBatch : SpriteBatch, screenWith : int, screenHeight : int) =
 
@@ -41,35 +44,44 @@ type GamePlayScreen (spriteBatch : SpriteBatch, screenWith : int, screenHeight :
         | Some (x, y) -> findPath grid (x, y) raws columns ((x, y)::[])
         | _ -> raise (System.Exception("Spawner not found!"))
 
+    let createEntity (t : int) (spriteBatch : SpriteBatch) (entityProvider : IEntityProvider) (factory : EnemyFactory) =
+        match t with 
+        | 0 -> Spawner (1, spriteBatch, factory) :> ICell |> Some
+        | 1 -> Road (spriteBatch, 0) :> ICell |> Some
+        | 2 -> Receiver (spriteBatch, entityProvider, 1) :> ICell |> Some
+
     do
         grid <- Grid (spriteBatch, columns, raws, cellWidth, cellHeight)
 
         let factory = EnemyFactory (spriteBatch, entityProvider)
+        let data = JsonConvert.DeserializeObject<(int*int*int) list>(File.ReadAllText("level.json"));
 
-        grid.[1, 0] <- Spawner (1, spriteBatch, factory) :> ICell |> Some
-        grid.[1, 1] <- Road (spriteBatch, 0) :> ICell |> Some
-        grid.[1, 2] <- Road (spriteBatch, 0) :> ICell |> Some
-        grid.[1, 3] <- Road (spriteBatch, 0) :> ICell |> Some
-        grid.[1, 4] <- Road (spriteBatch, 0) :> ICell |> Some
-        grid.[2, 4] <- Road (spriteBatch, 0) :> ICell |> Some
-        grid.[3, 4] <- Road (spriteBatch, 0) :> ICell |> Some
-        grid.[4, 4] <- Road (spriteBatch, 0) :> ICell |> Some
-        grid.[5, 4] <- Receiver (spriteBatch, entityProvider, 1) :> ICell |> Some
+        data 
+            |> List.iter (fun (x, y, t) ->  grid.[x, y] <- createEntity t spriteBatch entityProvider factory)
 
-        createPath grid |> List.rev |> List.map (fun (x, y) -> Vector2 (float32 x * cellWidth + cellWidth / 2.0f, float32 y * cellHeight + cellHeight / 2.0f)) |> factory.UpdatePath
+        grid 
+            |> createPath 
+            |> List.rev 
+            |> List.map (fun (x, y) -> Vector2 (float32 x * cellWidth + cellWidth / 2.0f, float32 y * cellHeight + cellHeight / 2.0f)) 
+            |> factory.UpdatePath
        
     interface IScreen with 
         member _.Update (gameTime : GameTime) =
 
             grid.Update(gameTime)
 
-            let state = Mouse.GetState()
+            let state = Mouse.GetState ()
 
             if previousButtonState = ButtonState.Pressed && state.LeftButton = ButtonState.Released then
                 let x = state.X / int cellWidth
                 let y = state.Y / int cellHeight
 
-                grid.[x, y] <- Turret (1, spriteBatch, entityProvider) :> ICell |> Some
+                match grid.[x, y] with
+                | None -> grid.[x, y] <- TurretPicker(1, spriteBatch, grid, entityProvider, x, y) :> ICell |> Some
+                | Some cell ->
+                    match cell with 
+                    | :? TurretPicker as picker -> picker.Click(RectangleF(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight), Vector2(float32 state.X, float32 state.Y))
+                    | _ -> ()                
             else 
                 ()
 

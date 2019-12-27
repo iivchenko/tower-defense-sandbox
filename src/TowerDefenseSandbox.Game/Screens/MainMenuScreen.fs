@@ -3,7 +3,7 @@
 open Myra.Graphics2D.UI
 open Microsoft.Xna.Framework
 
-type MainMenuScreen (startGame) =
+type MainMenuScreen (startGame, editGame) =
 
     do
         let panel = new VerticalStackPanel()
@@ -12,13 +12,13 @@ type MainMenuScreen (startGame) =
         
         let newGameButton = new TextButton()
         newGameButton.Text <- "New Game"
-        newGameButton.Id <- "";
-
+        newGameButton.Id <- ""
         newGameButton.Click.Add(startGame)
 
         let createLevelButton = new TextButton()
         createLevelButton.Text <- "Create Level"
-        createLevelButton.Id <- "";
+        createLevelButton.Id <- ""
+        createLevelButton.Click.Add(editGame)
 
         panel.Widgets.Add(newGameButton)
         panel.Widgets.Add(createLevelButton)
@@ -26,8 +26,8 @@ type MainMenuScreen (startGame) =
         Desktop.Widgets.Add(panel)
 
     interface IScreen with 
-        member this.Update (gameTime : GameTime) =
+        member _.Update (_ : GameTime) =
             ()
 
-        member this.Draw (gameTime : GameTime) =
+        member _.Draw (_ : GameTime) =
             Desktop.Render ()

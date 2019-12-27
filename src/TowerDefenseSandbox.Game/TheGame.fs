@@ -15,7 +15,7 @@ type TheGame () as this =
 
     let mutable screen : IScreen = Unchecked.defaultof<IScreen>
 
-    override this.LoadContent() =
+    override _.LoadContent() =
         spriteBatch <- new SpriteBatch(this.GraphicsDevice)
 
     override this.Initialize () =
@@ -35,7 +35,9 @@ type TheGame () as this =
 
         MyraEnvironment.Game <- this
 
-        screen <- MainMenuScreen (fun args -> screen <- GamePlayScreen(spriteBatch, screenWith, screenHeight))
+        screen <- MainMenuScreen (
+            (fun _ -> screen <- GamePlayScreen(spriteBatch, screenWith, screenHeight)), 
+            (fun _ -> screen <- GameEditorScreen(spriteBatch, screenWith, screenHeight)))
 
     override _.Update (gameTime : GameTime) =
 
