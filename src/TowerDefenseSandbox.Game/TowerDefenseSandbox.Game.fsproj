@@ -25,8 +25,5 @@
   <ItemGroup>
     <Folder Include="Content\" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Myra" Version="0.9.7.185" />
-  </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
