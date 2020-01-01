@@ -28,7 +28,7 @@ type RegularTurret (zindex : int, spriteBatch : SpriteBatch, entityProvider : IE
             match target with 
             | None -> ()
             | Some x when reload > 8 ->
-                Bullet(spriteBatch, c, entityProvider, x :?> Enemy) |> entityProvider.RegisterEntity
+                RegularBullet(spriteBatch, c, entityProvider, x :?> Enemy) |> entityProvider.RegisterEntity
                 reload <- 0
             | _ -> ()
 

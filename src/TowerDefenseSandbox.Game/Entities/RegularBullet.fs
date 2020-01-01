@@ -5,7 +5,7 @@ open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 open MonoGame.Extended
 
-type Bullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider : IEntityProvider, target : Enemy) =
+type RegularBullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider : IEntityProvider, target : Enemy) =
 
     let speed = 5.0f
     let radius = 2.0f

@@ -33,7 +33,7 @@ type Spawner (zindex : int, spriteBatch : SpriteBatch, factory : EnemyFactory) =
             if time < 0.0f
                 then 
                     factory.Create (center position)
-                    time <- spawnTime 
+                    time <- spawnTime
                 else
                     time <- time - gameTime.GetElapsedSeconds()
             

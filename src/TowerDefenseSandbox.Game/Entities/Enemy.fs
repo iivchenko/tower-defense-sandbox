@@ -53,8 +53,9 @@ type Enemy (life : int, spriteBatch : SpriteBatch, center : Vector2, entityProvi
                     | e -> e)
 
             match path with 
-            | h::tail when h.X = center.X && h.Y = center.Y -> path <- tail
-            | h::_ -> center <- center + currentSpeed * direction h center
+            | h::tail when Mathx.distance center h < radius -> path <- tail
+            | h::_ ->
+                center <- center + currentSpeed * (direction h center)
             | _ -> ()
 
         member _.Draw (gameTime : GameTime) =
