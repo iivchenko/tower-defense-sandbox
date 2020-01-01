@@ -5,7 +5,7 @@ open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 open MonoGame.Extended
 
-type RegularBullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider : IEntityProvider, target : Enemy) =
+type RegularBullet (spriteBatch: SpriteBatch, center: Vector2, entityProvider: IEntityProvider, target: Enemy) =
 
     let speed = 5.0f
     let radius = 2.5f
@@ -20,7 +20,7 @@ type RegularBullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider 
             with get () = center
             and set (value) = center <- value
 
-        member this.Update (gameTime : GameTime) =
+        member this.Update (gameTime: GameTime) =
             let entity = target :> IEntity
             let tx = entity.Position.X - center.X
             let ty = entity.Position.Y - center.Y
@@ -37,5 +37,5 @@ type RegularBullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider 
                 else 
                     ()
 
-        member _.Draw (gameTime : GameTime) =
+        member _.Draw (gameTime: GameTime) =
              spriteBatch.DrawCircle(center, radius, 100, Color.Black)

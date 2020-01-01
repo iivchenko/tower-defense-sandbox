@@ -3,5 +3,5 @@
 open System
 
 type Effect = 
-| DamageEffect of amount : int
-| SlowDownEffect of period : TimeSpan * koefficient : float32
+| DamageEffect of amount: int
+| SlowDownEffect of period: TimeSpan * koefficient: float32

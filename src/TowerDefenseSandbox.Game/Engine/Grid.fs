@@ -5,15 +5,15 @@ open MonoGame.Extended
 open Microsoft.Xna.Framework.Graphics
 
 type ICell =
-    abstract member ZIndex : int with get
-    abstract member Update : GameTime -> RectangleF -> unit
-    abstract member Draw : GameTime -> RectangleF -> unit
+    abstract member ZIndex: int with get
+    abstract member Update: GameTime -> RectangleF -> unit
+    abstract member Draw: GameTime -> RectangleF -> unit
 
-type Grid (spriteBatch : SpriteBatch, width : int, height : int, cellWidth : float32, cellHeight : float32) = 
+type Grid (spriteBatch: SpriteBatch, width: int, height: int, cellWidth: float32, cellHeight: float32) = 
 
-    let mutable grid : ICell option [,] = Array2D.init width height (fun _ _ -> Option.None)
+    let mutable grid: ICell option [,] = Array2D.init width height (fun _ _ -> Option.None)
     
-    let apply action (entity : ICell option) (x : int) (y : int) (time : GameTime) = 
+    let apply action (entity: ICell option) (x: int) (y: int) (time: GameTime) = 
         match entity with 
         | Some e -> action e x y time
         | None -> ()
@@ -35,10 +35,10 @@ type Grid (spriteBatch : SpriteBatch, width : int, height : int, cellWidth : flo
            with get(x, y) = grid.[x, y]
            and set (x, y) value = grid.[x, y] <- value
 
-    member _.Update (gameTime : GameTime) =
+    member _.Update (gameTime: GameTime) =
         grid |> Array2D.iteri (fun x y e -> update e x y gameTime)
 
-    member _.Draw (gameTime : GameTime) =
+    member _.Draw (gameTime: GameTime) =
         grid 
             |> Array2D.mapi (fun x y e -> x, y, e) 
             |> flaten 

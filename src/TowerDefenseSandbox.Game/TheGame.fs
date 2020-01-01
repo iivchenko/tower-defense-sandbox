@@ -13,7 +13,7 @@ type TheGame () as this =
 
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch>
 
-    let mutable screen : IScreen = Unchecked.defaultof<IScreen>
+    let mutable screen: IScreen = Unchecked.defaultof<IScreen>
 
     override _.LoadContent() =
         spriteBatch <- new SpriteBatch(this.GraphicsDevice)
@@ -26,7 +26,7 @@ type TheGame () as this =
         graphics.PreferredBackBufferHeight <- screenHeight
         
         #if RELEASE 
-        graphics.IsFullScreen <- true;
+        graphics.IsFullScreen <- true
         #endif
 
         graphics.ApplyChanges();
@@ -39,7 +39,7 @@ type TheGame () as this =
             (fun _ -> screen <- GamePlayScreen(spriteBatch, screenWith, screenHeight)), 
             (fun _ -> screen <- GameEditorScreen(spriteBatch, screenWith, screenHeight)))
 
-    override _.Update (gameTime : GameTime) =
+    override _.Update (gameTime: GameTime) =
 
         if Keyboard.GetState().IsKeyDown(Keys.Escape) then this.Exit() else ()
 
@@ -47,7 +47,7 @@ type TheGame () as this =
 
         base.Update(gameTime)
 
-    override _.Draw (gameTime : GameTime) =
+    override _.Draw (gameTime: GameTime) =
         
         graphics.GraphicsDevice.Clear(Color.CornflowerBlue)
 

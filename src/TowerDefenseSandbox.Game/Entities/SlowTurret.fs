@@ -4,20 +4,20 @@ open Microsoft.Xna.Framework
 open MonoGame.Extended
 open TowerDefenseSandbox.Game.Engine
 
-type SlowTurret (zindex : int, spriteBatch : SpriteBatch, entityProvider : IEntityProvider) =
+type SlowTurret (zindex: int, spriteBatch: SpriteBatch, entityProvider: IEntityProvider) =
 
     let mutable affectedEnemies = []
     let viewRadius = 100.0f
     let radius = 25.0f
     let mutable reload = 0
 
-    let center (position : RectangleF) = Vector2 (position.X + position.Width / 2.0f, position.Y + position.Height / 2.0f)
+    let center (position: RectangleF) = Vector2 (position.X + position.Width / 2.0f, position.Y + position.Height / 2.0f)
 
     interface ICell with
 
         member _.ZIndex = zindex
 
-        member this.Update (gameTime : GameTime) (position : RectangleF) =
+        member this.Update (gameTime: GameTime) (position: RectangleF) =
     
             let c = center position
             let target =
@@ -42,7 +42,7 @@ type SlowTurret (zindex : int, spriteBatch : SpriteBatch, entityProvider : IEnti
 
             reload <- reload + 1
 
-        member this.Draw (gameTime : GameTime) (position : RectangleF) =
+        member this.Draw (gameTime: GameTime) (position: RectangleF) =
             
             spriteBatch.DrawCircle(center position, radius, 100, Color.Blue, radius)
             #if DEBUG

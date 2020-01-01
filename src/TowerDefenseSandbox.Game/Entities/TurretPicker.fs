@@ -5,9 +5,9 @@ open Microsoft.Xna.Framework
 open MonoGame.Extended
 open Microsoft.Xna.Framework.Graphics
 
-type TurretPicker (zindex : int, spriteBatch : SpriteBatch, parent : Grid, entityProvider : IEntityProvider, x : int, y : int) =
+type TurretPicker (zindex: int, spriteBatch: SpriteBatch, parent: Grid, entityProvider: IEntityProvider, x: int, y: int) =
 
-    member this.Click (cellPosition : RectangleF, clickPosition : Vector2) = 
+    member this.Click (cellPosition: RectangleF, clickPosition: Vector2) = 
         let d = clickPosition.Y - cellPosition.Position.Y
 
         match y with 
@@ -19,10 +19,10 @@ type TurretPicker (zindex : int, spriteBatch : SpriteBatch, parent : Grid, entit
 
         member _.ZIndex = zindex 
 
-        member _.Update(gameTime : GameTime) (position : RectangleF) = 
+        member _.Update(gameTime: GameTime) (position: RectangleF) = 
             ()
         
-        member _.Draw(gameTime : GameTime) (position : RectangleF) =
+        member _.Draw(gameTime: GameTime) (position: RectangleF) =
 
             let size = Size2(position.Size.Width, position.Size.Height / 3.0f)
             let rec1 = RectangleF(position.Position, size)

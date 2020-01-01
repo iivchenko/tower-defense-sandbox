@@ -9,7 +9,7 @@ open System.IO
 open Newtonsoft.Json
 open MonoGame.Extended
 
-type GamePlayScreen (spriteBatch : SpriteBatch, screenWith : int, screenHeight : int) =
+type GamePlayScreen (spriteBatch: SpriteBatch, screenWith: int, screenHeight: int) =
 
     let entityProvider = EntityProvider() :> IEntityProvider
     let cellWidth = 48.0f
@@ -20,20 +20,20 @@ type GamePlayScreen (spriteBatch : SpriteBatch, screenWith : int, screenHeight :
     let mutable grid = Unchecked.defaultof<Grid> 
     let mutable previousButtonState = ButtonState.Released
 
-    let createPath (grid : Grid) =
-        let rec findSpawner (grid : Grid) x y raws columns =
+    let createPath (grid: Grid) =
+        let rec findSpawner (grid: Grid) x y raws columns =
             match grid.[x, y] with
             | Some t when t.GetType() = typeof<Spawner> -> Some (x, y)
             | _ when x = columns - 1 -> findSpawner grid 0 (y + 1) raws columns
             | _ when x = columns - 1 && y = raws - 1 -> None
             | _ -> findSpawner grid (x + 1) y raws columns
 
-        let isPath (grid : Grid) (x, y) =
+        let isPath (grid: Grid) (x, y) =
             match grid.[x, y] with 
              | Some x when x.GetType() = typeof<Road> || x.GetType() = typeof<Receiver> -> true
              | _ -> false
 
-        let rec findPath (grid : Grid) (x, y) (raws : int) (columns : int) path = 
+        let rec findPath (grid: Grid) (x, y) (raws: int) (columns: int) path = 
             if 0 <= y - 1 && y - 1 < raws && List.contains (x, y - 1) path |> not && isPath grid (x, y - 1) then findPath grid (x, y - 1) raws columns ((x, y - 1)::path)
             else if 0 <= x + 1 && x + 1 < columns && List.contains (x + 1, y) path |> not && isPath grid (x + 1, y) then findPath grid (x + 1, y) raws columns ((x + 1, y)::path)
             else if 0 <= y + 1 && y + 1 < raws && List.contains (x, y + 1) path |> not && isPath grid (x, y + 1) then findPath grid (x, y + 1) raws columns ((x, y + 1)::path)
@@ -44,7 +44,7 @@ type GamePlayScreen (spriteBatch : SpriteBatch, screenWith : int, screenHeight :
         | Some (x, y) -> findPath grid (x, y) raws columns ((x, y)::[])
         | _ -> raise (System.Exception("Spawner not found!"))
 
-    let createEntity (t : int) (spriteBatch : SpriteBatch) (entityProvider : IEntityProvider) (factory : EnemyFactory) =
+    let createEntity (t: int) (spriteBatch: SpriteBatch) (entityProvider: IEntityProvider) (factory: EnemyFactory) =
         match t with 
         | 0 -> Spawner (1, spriteBatch, factory) :> ICell |> Some
         | 1 -> Road (spriteBatch, 0) :> ICell |> Some
@@ -66,7 +66,7 @@ type GamePlayScreen (spriteBatch : SpriteBatch, screenWith : int, screenHeight :
             |> factory.UpdatePath
        
     interface IScreen with 
-        member _.Update (gameTime : GameTime) =
+        member _.Update (gameTime: GameTime) =
 
             grid.Update(gameTime)
 
@@ -91,7 +91,7 @@ type GamePlayScreen (spriteBatch : SpriteBatch, screenWith : int, screenHeight :
 
             entityProvider.Flush ()
 
-        member _.Draw (gameTime : GameTime) =
+        member _.Draw (gameTime: GameTime) =
 
             grid.Draw(gameTime)
             entityProvider.GetEntities() |> Seq.iter (fun x -> x.Draw(gameTime))

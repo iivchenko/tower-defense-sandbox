@@ -4,16 +4,16 @@ open System.Collections.Generic
 open Microsoft.Xna.Framework
 
 type IEntity =
-    abstract member Radius : float32 with get
-    abstract member Position : Vector2 with get, set
-    abstract member Update : GameTime -> unit
-    abstract member Draw : GameTime -> unit
+    abstract member Radius: float32 with get
+    abstract member Position: Vector2 with get, set
+    abstract member Update: GameTime -> unit
+    abstract member Draw: GameTime -> unit
 
 type IEntityProvider =
-    abstract member GetEntities : unit -> IEntity seq
-    abstract member RegisterEntity : IEntity -> unit
-    abstract member RemoveEntity : IEntity -> unit
-    abstract member Flush : unit -> unit
+    abstract member GetEntities: unit -> IEntity seq
+    abstract member RegisterEntity: IEntity -> unit
+    abstract member RemoveEntity: IEntity -> unit
+    abstract member Flush: unit -> unit
 
 type EntityProvider() = 
     let addEntities = List<IEntity>()
@@ -24,7 +24,7 @@ type EntityProvider() =
         member this.GetEntities () =
             entities :> IEnumerable<IEntity>
 
-        member this.RegisterEntity (entity : IEntity) = 
+        member this.RegisterEntity (entity: IEntity) = 
             addEntities.Add(entity)
 
         member this.RemoveEntity(entity: IEntity): unit = 

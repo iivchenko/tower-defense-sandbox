@@ -8,7 +8,7 @@ open TowerDefenseSandbox.Game.Entities
 open System.IO
 open Newtonsoft.Json
 
-type GameEditorScreen(spriteBatch : SpriteBatch, screenWith : int, screenHeight : int) =
+type GameEditorScreen(spriteBatch: SpriteBatch, screenWith: int, screenHeight: int) =
 
     let cellWidth = 48.0f
     let cellHeight = 45.0f
@@ -22,14 +22,14 @@ type GameEditorScreen(spriteBatch : SpriteBatch, screenWith : int, screenHeight 
 
     let mutable currentEdit = 0
 
-    let mapTo (e : ICell) = 
+    let mapTo (e: ICell) = 
         match e with 
         | :? Spawner -> 0
         | :? Road -> 1
         | :? Receiver -> 2
 
     interface IScreen with 
-        member _.Update(gameTime : GameTime) =
+        member _.Update(gameTime: GameTime) =
             let state = Mouse.GetState()
             
             if middleButtonPreviousState = ButtonState.Pressed && state.MiddleButton = ButtonState.Released then
@@ -78,5 +78,5 @@ type GameEditorScreen(spriteBatch : SpriteBatch, screenWith : int, screenHeight 
             else
                 ()
 
-        member _.Draw(gameTime : GameTime) = 
+        member _.Draw(gameTime: GameTime) = 
             grid.Draw gameTime

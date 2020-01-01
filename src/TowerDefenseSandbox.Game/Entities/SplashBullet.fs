@@ -6,7 +6,7 @@ open Microsoft.Xna.Framework.Graphics
 open MonoGame.Extended
 open System
 
-type SplashBullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider : IEntityProvider, target : Vector2) =
+type SplashBullet (spriteBatch: SpriteBatch, center: Vector2, entityProvider: IEntityProvider, target: Vector2) =
 
     let speed = 2.0f
     let radius = 5.0f
@@ -23,7 +23,7 @@ type SplashBullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider :
             with get () = center
             and set (value) = center <- value
 
-        member this.Update (gameTime : GameTime) =
+        member this.Update (gameTime: GameTime) =
             let tx = target.X - center.X
             let ty = target.Y - center.Y
             let dist = Mathx.distance target center
@@ -51,7 +51,7 @@ type SplashBullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider :
                     else 
                         ()
 
-        member _.Draw (gameTime : GameTime) =
+        member _.Draw (gameTime: GameTime) =
              match isBoom with 
              | false -> spriteBatch.DrawCircle(center, radius, 100, Color.Red, radius)
              | true ->  spriteBatch.DrawCircle(center, radius, 100, Color.Red, boomRadius)

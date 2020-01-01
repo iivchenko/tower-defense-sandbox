@@ -26,8 +26,8 @@ type MainMenuScreen (startGame, editGame) =
         Desktop.Widgets.Add(panel)
 
     interface IScreen with 
-        member _.Update (_ : GameTime) =
+        member _.Update (_: GameTime) =
             ()
 
-        member _.Draw (_ : GameTime) =
+        member _.Draw (_: GameTime) =
             Desktop.Render ()

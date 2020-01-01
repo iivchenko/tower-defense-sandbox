@@ -6,7 +6,7 @@ open Microsoft.Xna.Framework.Graphics
 open MonoGame.Extended
 open System
 
-type SlowBullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider : IEntityProvider, target : Enemy) =
+type SlowBullet (spriteBatch: SpriteBatch, center: Vector2, entityProvider: IEntityProvider, target: Enemy) =
 
     let speed = 2.0f
     let radius = 7.0f
@@ -21,7 +21,7 @@ type SlowBullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider : I
             with get () = center
             and set (value) = center <- value
 
-        member this.Update (gameTime : GameTime) =
+        member this.Update (gameTime: GameTime) =
             let entity = target :> IEntity
             let tx = entity.Position.X - center.X
             let ty = entity.Position.Y - center.Y
@@ -38,5 +38,5 @@ type SlowBullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider : I
                 else 
                     ()
 
-        member _.Draw (gameTime : GameTime) =
+        member _.Draw (gameTime: GameTime) =
              spriteBatch.FillRectangle(center.X - radius, center.Y - radius, radius, radius, Color.Blue)

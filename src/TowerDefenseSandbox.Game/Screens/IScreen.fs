@@ -3,6 +3,6 @@
 open Microsoft.Xna.Framework
 
 type IScreen =
-    abstract member Update : GameTime -> unit
-    abstract member Draw : GameTime -> unit
+    abstract member Update: GameTime -> unit
+    abstract member Draw: GameTime -> unit
 
