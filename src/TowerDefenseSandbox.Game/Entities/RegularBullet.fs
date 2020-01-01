@@ -8,7 +8,7 @@ open MonoGame.Extended
 type RegularBullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider : IEntityProvider, target : Enemy) =
 
     let speed = 5.0f
-    let radius = 2.0f
+    let radius = 2.5f
 
     let mutable center = center
 
@@ -30,7 +30,7 @@ type RegularBullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider 
             let velY = (ty/dist)*speed
             center <- Vector2(center.X + velX, center.Y + velY)
 
-            if (Mathx.distance center entity.Position) < radius 
+            if (Mathx.distance center entity.Position) <= radius 
                 then
                     target.ApplyEffect (DamageEffect 15)
                     entityProvider.RemoveEntity this
