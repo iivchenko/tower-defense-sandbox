@@ -14,6 +14,7 @@
     <Compile Include="Entities\Spawner.fs" />
     <Compile Include="Entities\RegularBullet.fs" />
     <Compile Include="Entities\SlowBullet.fs" />
+    <Compile Include="Entities\SplashBullet.fs" />
     <Compile Include="Entities\RegularTurret.fs" />
     <Compile Include="Entities\SlowTurret.fs" />
     <Compile Include="Entities\SplashTurret.fs" />

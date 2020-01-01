@@ -27,8 +27,8 @@ type SplashTurret (zindex : int, spriteBatch : SpriteBatch, entityProvider : IEn
 
             match target with 
             | None -> ()
-            | Some x when reload > 8 ->
-                RegularBullet(spriteBatch, c, entityProvider, x :?> Enemy) |> entityProvider.RegisterEntity
+            | Some x when reload > 70 ->
+                SplashBullet(spriteBatch, c, entityProvider, x.Position) |> entityProvider.RegisterEntity
                 reload <- 0
             | _ -> ()
 
