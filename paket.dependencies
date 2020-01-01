@@ -5,6 +5,7 @@ nuget Monogame.Extended
 nuget MonoGame.Framework.DesktopGL.Core
 nuget Myra
 nuget nunit
+nuget FsUnit
 nuget NUnit3TestAdapter
 nuget Microsoft.NET.Test.Sdk
 
