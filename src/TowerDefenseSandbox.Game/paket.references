@@ -1,3 +1,4 @@
+nuget FSharp.Core
 nuget Monogame.Extended
 nuget MonoGame.Framework.DesktopGL.Core
 nuget Myra

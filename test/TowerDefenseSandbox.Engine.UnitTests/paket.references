@@ -1,0 +1,4 @@
+nuget FSharp.Core
+nuget nunit
+nuget NUnit3TestAdapter
+nuget Microsoft.NET.Test.Sdk
