@@ -31,8 +31,8 @@ type Bullet (spriteBatch : SpriteBatch, center : Vector2, entityProvider : IEnti
             center <- Vector2(center.X + velX, center.Y + velY)
 
             if (Mathx.distance center entity.Position) < radius 
-                then 
-                    target.ApplyDamage(15)
+                then
+                    target.ApplyEffect (DamageEffect 15)
                     entityProvider.RemoveEntity this
                 else 
                     ()

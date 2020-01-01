@@ -8,6 +8,7 @@
     <Compile Include="Engine\EntityProvider.fs" />
     <Compile Include="Engine\Grid.fs" />
     <Compile Include="Entities\Road.fs" />
+    <Compile Include="Entities\Effects.fs" />
     <Compile Include="Entities\Enemy.fs" />
     <Compile Include="Entities\Receiver.fs" />
     <Compile Include="Entities\Spawner.fs" />

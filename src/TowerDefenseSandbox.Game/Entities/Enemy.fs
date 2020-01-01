@@ -3,6 +3,7 @@ open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework
 open MonoGame.Extended
 open TowerDefenseSandbox.Game.Engine
+open System
 
 type Enemy (life : int, spriteBatch : SpriteBatch, center : Vector2, entityProvider : IEntityProvider, path : Vector2 list) =
 
@@ -10,6 +11,8 @@ type Enemy (life : int, spriteBatch : SpriteBatch, center : Vector2, entityProvi
     let mutable center = center
     let mutable path = path
     let radius = 10.0f
+    let mutable effects : TowerDefenseSandbox.Game.Entities.Effect list = []
+    let speed = 1.0f
 
     let limit = Mathx.max 0
 
@@ -27,17 +30,36 @@ type Enemy (life : int, spriteBatch : SpriteBatch, center : Vector2, entityProvi
 
         member _.Radius = radius
 
-        member _.Update (gameTime : GameTime) =
+        member this.Update (gameTime : GameTime) =
+
+            let mutable currentSpeed = speed
+            effects 
+            |> List.iter (fun effect -> 
+                match effect with
+                | DamageEffect amount -> 
+                    life <- life - amount |> limit
+                    if life = 0 then entityProvider.RemoveEntity this else ()
+                | SlowDownEffect (_, koefficient) -> currentSpeed <- currentSpeed * ( 1.0f - koefficient))
+                
+            effects <- 
+                effects 
+                |> List.filter (fun effect -> 
+                           match effect with
+                           | DamageEffect _ -> false
+                           | SlowDownEffect (period, _) -> period.TotalMilliseconds > 0.0)
+                |> List.map (fun effect -> 
+                    match effect with
+                    | SlowDownEffect (period, koefficient) -> SlowDownEffect(period.Subtract(gameTime.ElapsedGameTime), koefficient)
+                    | e -> e)
 
             match path with 
             | h::tail when h.X = center.X && h.Y = center.Y -> path <- tail
-            | h::_ -> center <- center + direction h center
+            | h::_ -> center <- center + currentSpeed * direction h center
             | _ -> ()
 
         member _.Draw (gameTime : GameTime) =
             spriteBatch.DrawCircle(center, radius, 100, Color.Red, radius)
 
-    member this.ApplyDamage (damage : int) = 
-        life <- life - damage |> limit
+    member this.ApplyEffect (effect : TowerDefenseSandbox.Game.Entities.Effect) =
 
-        if life = 0 then entityProvider.RemoveEntity this else ()
+        effects <- effect::effects
