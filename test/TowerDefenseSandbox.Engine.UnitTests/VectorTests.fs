@@ -6,7 +6,7 @@ open NUnit.Framework
 open FsUnit
 
 [<TestFixture>]
-module PointTests =
+module VectorTests =
 
     [<TestCase(0.0f, 0.0f)>]
     [<TestCase(1.0f, 0.0f)>]
@@ -18,7 +18,7 @@ module PointTests =
     let ``init: test cases.``(x: float32, y: float32) = 
 
         // Arrange + Act
-        let (Point.Point (x', y')) = Point.init x y
+        let (Vector (x', y')) = Vector.init x y
 
         // Assert
         x' |> should equal x
@@ -32,11 +32,11 @@ module PointTests =
     let ``distance: test cases.`` (x1: float32, y1: float32, x2: float32, y2: float32, expectedDistance: float32) =
 
         // Arrange
-        let point1 = Point.init x1 y1
-        let point2 = Point.init x2 y2
+        let point1 = Vector.init x1 y1
+        let point2 = Vector.init x2 y2
 
         // Act
-        let actualDistance = Point.distance point1 point2
+        let actualDistance = Vector.distance point1 point2
 
         // Assert
         actualDistance |> should equal expectedDistance

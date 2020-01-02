@@ -7,7 +7,7 @@
   </PropertyGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
   <ItemGroup>
-    <Compile Include="PointTests.fs" />
+    <Compile Include="VectorTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\TowerDefenseSandbox.Engine\TowerDefenseSandbox.Engine.fsproj" />
