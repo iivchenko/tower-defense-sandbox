@@ -1,8 +1,11 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
+
+open TowerDefenseSandbox.Engine
+open TowerDefenseSandbox.Game.Engine
+
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework
 open MonoGame.Extended
-open TowerDefenseSandbox.Game.Engine
 
 type SlowTurret (zindex: int, spriteBatch: SpriteBatch, entityProvider: IEntityProvider) =
 
@@ -11,7 +14,8 @@ type SlowTurret (zindex: int, spriteBatch: SpriteBatch, entityProvider: IEntityP
     let radius = 25.0f
     let mutable reload = 0
 
-    let center (position: RectangleF) = Vector2 (position.X + position.Width / 2.0f, position.Y + position.Height / 2.0f)
+    let center (position: RectangleF) = Vector.init (position.X + position.Width / 2.0f) (position.Y + position.Height / 2.0f)
+    let toVector2 (Vector(x, y)) = Vector2 (x, y)
 
     interface ICell with
 
@@ -23,7 +27,7 @@ type SlowTurret (zindex: int, spriteBatch: SpriteBatch, entityProvider: IEntityP
             let target =
                 entityProvider.GetEntities()
                 |> Seq.filter (fun x -> x.GetType() = typeof<Enemy>)
-                |> Seq.filter (fun x -> (Mathx.distance c x.Position) - x.Radius < viewRadius)
+                |> Seq.filter (fun x -> (Vector.distance c x.Position) - x.Radius < viewRadius)
                 |> Seq.except affectedEnemies
                 |> Seq.tryHead
 
@@ -37,14 +41,14 @@ type SlowTurret (zindex: int, spriteBatch: SpriteBatch, entityProvider: IEntityP
 
             affectedEnemies <-
                 affectedEnemies
-                |> List.filter (fun x -> (Mathx.distance c x.Position) - x.Radius < viewRadius)
+                |> List.filter (fun x -> (Vector.distance c x.Position) - x.Radius < viewRadius)
                 |> List.filter (fun x -> entityProvider.GetEntities() |> Seq.contains x)
 
             reload <- reload + 1
 
         member this.Draw (gameTime: GameTime) (position: RectangleF) =
             
-            spriteBatch.DrawCircle(center position, radius, 100, Color.Blue, radius)
+            spriteBatch.DrawCircle(center position |> toVector2, radius, 100, Color.Blue, radius)
             #if DEBUG
-            spriteBatch.DrawCircle(center position, viewRadius, 100, Color.GreenYellow)
+            spriteBatch.DrawCircle(center position |> toVector2, viewRadius, 100, Color.GreenYellow)
             #endif

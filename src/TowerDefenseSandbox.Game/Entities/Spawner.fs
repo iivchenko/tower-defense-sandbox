@@ -1,6 +1,8 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
+open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
+
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework
 open MonoGame.Extended
@@ -9,10 +11,10 @@ type EnemyFactory (spriteBatch: SpriteBatch, entityProvider: IEntityProvider) =
     
     let mutable _path = []
 
-    member public this.Create (center: Vector2) =
+    member public this.Create (center: Vector) =
         Enemy(100, spriteBatch, center, entityProvider, _path) |> entityProvider.RegisterEntity
 
-    member public this.UpdatePath (path: Vector2 list) =
+    member public this.UpdatePath (path: Vector list) =
         _path <- path
 
 type Spawner (zindex: int, spriteBatch: SpriteBatch, factory: EnemyFactory) =
@@ -23,7 +25,8 @@ type Spawner (zindex: int, spriteBatch: SpriteBatch, factory: EnemyFactory) =
     let radius = 15.0f
     let mutable time = spawnTime
 
-    let center (position: RectangleF) = Vector2 (position.X + position.Width / 2.0f, position.Y + position.Height / 2.0f)
+    let center (position: RectangleF) = Vector.init (position.X + position.Width / 2.0f) (position.Y + position.Height / 2.0f)
+    let toVector2 (Vector(x, y)) = Vector2 (x, y)
 
     interface ICell with 
 
@@ -38,4 +41,4 @@ type Spawner (zindex: int, spriteBatch: SpriteBatch, factory: EnemyFactory) =
                     time <- time - gameTime.GetElapsedSeconds()
             
         member _.Draw (gameTime: GameTime) (position: RectangleF) =
-            spriteBatch.DrawCircle(center position, radius, 100, Color.Aquamarine)
+            spriteBatch.DrawCircle(position |> center |> toVector2, radius, 100, Color.Aquamarine)

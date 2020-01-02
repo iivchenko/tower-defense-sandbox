@@ -1,7 +1,9 @@
 ﻿namespace TowerDefenseSandbox.Game.Screens
 
-open Microsoft.Xna.Framework
+open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
+
+open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Input
 open TowerDefenseSandbox.Game.Entities
@@ -62,7 +64,7 @@ type GamePlayScreen (spriteBatch: SpriteBatch, screenWith: int, screenHeight: in
         grid 
             |> createPath 
             |> List.rev 
-            |> List.map (fun (x, y) -> Vector2 (float32 x * cellWidth + cellWidth / 2.0f, float32 y * cellHeight + cellHeight / 2.0f)) 
+            |> List.map (fun (x, y) -> Vector.init (float32 x * cellWidth + cellWidth / 2.0f) (float32 y * cellHeight + cellHeight / 2.0f)) 
             |> factory.UpdatePath
        
     interface IScreen with 
@@ -80,8 +82,8 @@ type GamePlayScreen (spriteBatch: SpriteBatch, screenWith: int, screenHeight: in
                 | None -> grid.[x, y] <- TurretPicker(1, spriteBatch, grid, entityProvider, x, y) :> ICell |> Some
                 | Some cell ->
                     match cell with 
-                    | :? TurretPicker as picker -> picker.Click(RectangleF(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight), Vector2(float32 state.X, float32 state.Y))
-                    | _ -> ()                
+                    | :? TurretPicker as picker -> picker.Click(RectangleF(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight), Vector(float32 state.X, float32 state.Y))
+                    | _ -> ()
             else 
                 ()
 

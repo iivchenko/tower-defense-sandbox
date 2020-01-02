@@ -1,11 +1,13 @@
 namespace TowerDefenseSandbox.Game.Entities
+
+open TowerDefenseSandbox.Engine
+open TowerDefenseSandbox.Game.Engine
+
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework
 open MonoGame.Extended
-open TowerDefenseSandbox.Game.Engine
-open System
 
-type Enemy (life: int, spriteBatch: SpriteBatch, center: Vector2, entityProvider: IEntityProvider, path: Vector2 list) =
+type Enemy (life: int, spriteBatch: SpriteBatch, center: Vector, entityProvider: IEntityProvider, path: Vector list) =
 
     let mutable life = life
     let mutable center = center
@@ -14,13 +16,10 @@ type Enemy (life: int, spriteBatch: SpriteBatch, center: Vector2, entityProvider
     let mutable effects: TowerDefenseSandbox.Game.Entities.Effect list = []
     let speed = 1.0f
 
-    let limit = Mathx.max 0
+    let limit = max 0
 
-    let direction (v1: Vector2) (v2: Vector2) = 
-        let direction = (v1 - v2)
-        direction.Normalize()
-
-        direction
+    let direction (v1: Vector) (v2: Vector) = v2 - v1 |> Vector.normalize
+    let toVector2 (Vector(x, y)) = Vector2 (x, y)
 
     interface IEntity with
 
@@ -53,13 +52,13 @@ type Enemy (life: int, spriteBatch: SpriteBatch, center: Vector2, entityProvider
                     | e -> e)
 
             match path with 
-            | h::tail when Mathx.distance center h < radius -> path <- tail
+            | h::tail when Vector.distance center h < radius -> path <- tail
             | h::_ ->
                 center <- center + currentSpeed * (direction h center)
             | _ -> ()
 
         member _.Draw (gameTime: GameTime) =
-            spriteBatch.DrawCircle(center, radius, 100, Color.Red, radius)
+            spriteBatch.DrawCircle(toVector2 center, radius, 100, Color.Red, radius)
 
     member this.ApplyEffect (effect: TowerDefenseSandbox.Game.Entities.Effect) =
 

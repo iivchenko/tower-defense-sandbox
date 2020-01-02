@@ -1,14 +1,17 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
+open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
+
 open Microsoft.Xna.Framework
 open MonoGame.Extended
 open Microsoft.Xna.Framework.Graphics
 
 type TurretPicker (zindex: int, spriteBatch: SpriteBatch, parent: Grid, entityProvider: IEntityProvider, x: int, y: int) =
 
-    member this.Click (cellPosition: RectangleF, clickPosition: Vector2) = 
-        let d = clickPosition.Y - cellPosition.Position.Y
+    member this.Click (cellPosition: RectangleF, clickPosition: Vector) = 
+        let (Vector(_, clickY)) = clickPosition
+        let d = clickY - cellPosition.Position.Y
 
         match y with 
         | _ when d > 0.0f && d <= cellPosition.Size.Height / 3.0f -> parent.[x, y] <- RegularTurret (1, spriteBatch, entityProvider) :> ICell |> Some

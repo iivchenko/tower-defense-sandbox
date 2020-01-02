@@ -1,12 +1,14 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
+open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
+
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 open MonoGame.Extended
 open System
 
-type SlowBullet (spriteBatch: SpriteBatch, center: Vector2, entityProvider: IEntityProvider, target: Enemy) =
+type SlowBullet (spriteBatch: SpriteBatch, center: Vector, entityProvider: IEntityProvider, target: Enemy) =
 
     let speed = 2.0f
     let radius = 7.0f
@@ -23,15 +25,17 @@ type SlowBullet (spriteBatch: SpriteBatch, center: Vector2, entityProvider: IEnt
 
         member this.Update (gameTime: GameTime) =
             let entity = target :> IEntity
-            let tx = entity.Position.X - center.X
-            let ty = entity.Position.Y - center.Y
-            let dist = Mathx.distance entity.Position center
+            let (Vector(x1, y1)) = center
+            let (Vector(x2, y2)) = entity.Position
+            let tx = x2 - x1
+            let ty = y2 - y1
+            let dist = Vector.distance entity.Position center
   
             let velX = (tx/dist)*speed
             let velY = (ty/dist)*speed
-            center <- Vector2(center.X + velX, center.Y + velY)
+            center <- Vector.init (x1 + velX) (y1 + velY)
 
-            if (Mathx.distance center entity.Position) < radius
+            if (Vector.distance center entity.Position) < radius
                 then
                     SlowDownEffect (TimeSpan (0, 0, 5), 0.5f) |> target.ApplyEffect
                     entityProvider.RemoveEntity this
@@ -39,4 +43,5 @@ type SlowBullet (spriteBatch: SpriteBatch, center: Vector2, entityProvider: IEnt
                     ()
 
         member _.Draw (gameTime: GameTime) =
-             spriteBatch.FillRectangle(center.X - radius, center.Y - radius, radius, radius, Color.Blue)
+             let (Vector(x, y)) = center
+             spriteBatch.FillRectangle(x - radius, y - radius, radius, radius, Color.Blue)
