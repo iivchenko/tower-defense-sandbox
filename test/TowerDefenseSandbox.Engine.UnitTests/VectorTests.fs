@@ -32,11 +32,33 @@ module VectorTests =
     let ``distance: test cases.`` (x1: float32, y1: float32, x2: float32, y2: float32, expectedDistance: float32) =
 
         // Arrange
-        let point1 = Vector.init x1 y1
-        let point2 = Vector.init x2 y2
+        let vector1 = Vector.init x1 y1
+        let vector2 = Vector.init x2 y2
 
         // Act
-        let actualDistance = Vector.distance point1 point2
+        let actualDistance = Vector.distance vector1 vector2
 
         // Assert
         actualDistance |> should equal expectedDistance
+
+    [<TestCase(3.0f, 4.0f, 5.0f)>]
+    let ``length: test cases.`` (x, y, expectedLength) =
+        
+        // Arrange + Act
+        let actualLength = Vector.init x y |> Vector.length
+
+        actualLength |> should equal expectedLength
+
+    [<TestCase(3.0f, 4.0f, 0.6f, 0.8f)>]
+    let ``normalize: test cases.`` (x, y, expectedX, expectedY) =
+    
+        // Arrange
+        let vector = Vector.init x y
+        let expectedVector = Vector.init expectedX expectedY
+
+        // Act
+        let actualVector = Vector.normalize vector
+
+        // Assert
+        actualVector |> should equal expectedVector
+
