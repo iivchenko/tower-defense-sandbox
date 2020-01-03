@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Engine\Screen.fs" />
     <Compile Include="Engine\EntityProvider.fs" />
     <Compile Include="Engine\Grid.fs" />
     <Compile Include="Entities\Road.fs" />
@@ -18,10 +19,9 @@
     <Compile Include="Entities\SlowTurret.fs" />
     <Compile Include="Entities\SplashTurret.fs" />
     <Compile Include="Entities\TurretPicker.fs" />
-    <Compile Include="Screens\IScreen.fs" />
-    <Compile Include="Screens\MainMenuScreen.fs" />
     <Compile Include="Screens\GameEditorScreen.fs" />
     <Compile Include="Screens\GamePlayScreen.fs" />
+    <Compile Include="Screens\MainMenuScreen.fs" />
     <Compile Include="TheGame.fs" />
   </ItemGroup>
   <ItemGroup>

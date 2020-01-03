@@ -3,7 +3,16 @@
 open Myra.Graphics2D.UI
 open Microsoft.Xna.Framework
 
-type MainMenuScreen (startGame, editGame) =
+open TowerDefenseSandbox.Engine
+open TowerDefenseSandbox.Game.Engine
+open Microsoft.Xna.Framework.Input
+
+type MainMenuScreen (manager: ScreenManager, exit: unit -> unit, draw: Shape -> unit, screenWith: int, screenHeight: int) =
+
+    let mutable isEscUpPrev = true
+
+    let startGame _ = manager.Next(GamePlayScreen(manager, draw, screenWith, screenHeight))
+    let editGame _ = manager.Next(GameEditorScreen(manager, draw, screenWith, screenHeight))
 
     do
         let panel = new VerticalStackPanel()
@@ -27,7 +36,9 @@ type MainMenuScreen (startGame, editGame) =
 
     interface IScreen with 
         member _.Update (_: GameTime) =
-            ()
+            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then exit() else ()
+
+            isEscUpPrev <- Keyboard.GetState().IsKeyUp(Keys.Escape)
 
         member _.Draw (_: GameTime) =
             Desktop.Render ()

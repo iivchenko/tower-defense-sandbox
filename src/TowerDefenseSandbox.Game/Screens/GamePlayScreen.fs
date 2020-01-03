@@ -11,7 +11,7 @@ open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Entities
 
-type GamePlayScreen (draw: Shape -> unit, screenWith: int, screenHeight: int) =
+type GamePlayScreen (manager: ScreenManager, draw: Shape -> unit, screenWith: int, screenHeight: int) =
 
     let entityProvider = EntityProvider() :> IEntityProvider
     let cellWidth = 48.0f
@@ -19,6 +19,7 @@ type GamePlayScreen (draw: Shape -> unit, screenWith: int, screenHeight: int) =
     let columns = screenWith / int cellWidth
     let raws = screenHeight / int cellHeight
 
+    let mutable isEscUpPrev = true
     let mutable grid = Unchecked.defaultof<Grid> 
     let mutable previousButtonState = ButtonState.Released
 
@@ -69,6 +70,10 @@ type GamePlayScreen (draw: Shape -> unit, screenWith: int, screenHeight: int) =
        
     interface IScreen with 
         member _.Update (gameTime: GameTime) =
+
+            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then manager.Back() else ()
+
+            isEscUpPrev <- Keyboard.GetState().IsKeyUp(Keys.Escape)
 
             grid.Update(gameTime)
 

@@ -1,10 +1,10 @@
 ﻿open Microsoft.Xna.Framework
-open Microsoft.Xna.Framework.Input
 open Microsoft.Xna.Framework.Graphics
 open Myra
 
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Engine.MonoGame
+open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Screens
 
 type TheGame () as this =
@@ -15,9 +15,9 @@ type TheGame () as this =
     let screenHeight = 1080
 
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch>
-    let mutable draw: Shape -> unit = (fun _ -> ()) 
+    let mutable draw: Shape -> unit = (fun _ -> ())
 
-    let mutable screen: IScreen = Unchecked.defaultof<IScreen>
+    let screenManager = ScreenManager ()
 
     override _.LoadContent() =
         spriteBatch <- new SpriteBatch(this.GraphicsDevice)
@@ -40,15 +40,11 @@ type TheGame () as this =
 
         MyraEnvironment.Game <- this
 
-        screen <- MainMenuScreen (
-            (fun _ -> screen <- GamePlayScreen(draw, screenWith, screenHeight)), 
-            (fun _ -> screen <- GameEditorScreen(draw, screenWith, screenHeight)))
+        screenManager.Next(MainMenuScreen(screenManager, this.Exit, draw, screenWith, screenHeight))
 
     override _.Update (gameTime: GameTime) =
 
-        if Keyboard.GetState().IsKeyDown(Keys.Escape) then this.Exit() else ()
-
-        screen.Update gameTime
+        screenManager.Screen.Update gameTime
 
         base.Update(gameTime)
 
@@ -58,7 +54,7 @@ type TheGame () as this =
 
         spriteBatch.Begin()
 
-        screen.Draw gameTime
+        screenManager.Screen.Draw gameTime
 
         spriteBatch.End()
 

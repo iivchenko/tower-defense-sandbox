@@ -10,7 +10,7 @@ open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Entities
 
-type GameEditorScreen(draw: Shape -> unit, screenWith: int, screenHeight: int) =
+type GameEditorScreen(manager: ScreenManager, draw: Shape -> unit, screenWith: int, screenHeight: int) =
 
     let cellWidth = 48.0f
     let cellHeight = 45.0f
@@ -18,6 +18,7 @@ type GameEditorScreen(draw: Shape -> unit, screenWith: int, screenHeight: int) =
     let raws = screenHeight / int cellHeight
     let grid = Grid (draw, columns, raws, cellWidth, cellHeight)
 
+    let mutable isEscUpPrev = true
     let mutable leftButtonPreviousState = ButtonState.Released
     let mutable rightButtonPreviousState = ButtonState.Released
     let mutable middleButtonPreviousState = ButtonState.Released
@@ -32,6 +33,10 @@ type GameEditorScreen(draw: Shape -> unit, screenWith: int, screenHeight: int) =
 
     interface IScreen with 
         member _.Update(gameTime: GameTime) =
+            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then manager.Back() else ()
+        
+            isEscUpPrev <- Keyboard.GetState().IsKeyUp(Keys.Escape)
+
             let state = Mouse.GetState()
             
             if middleButtonPreviousState = ButtonState.Pressed && state.MiddleButton = ButtonState.Released then
