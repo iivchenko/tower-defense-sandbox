@@ -37,7 +37,7 @@ NUGET
     MonoGame.Extended (3.7)
       Newtonsoft.Json (>= 11.0.2)
     MonoGame.Framework.DesktopGL.Core (3.8.0.1)
-    Myra (0.9.7.185)
+    Myra (0.9.8.188)
     NETStandard.Library (2.0.3)
       Microsoft.NETCore.Platforms (>= 1.1)
     Newtonsoft.Json (12.0.3)
