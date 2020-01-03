@@ -1,8 +1,11 @@
 ﻿open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Input
 open Microsoft.Xna.Framework.Graphics
-open TowerDefenseSandbox.Game.Screens
 open Myra
+
+open TowerDefenseSandbox.Engine
+open TowerDefenseSandbox.Engine.MonoGame
+open TowerDefenseSandbox.Game.Screens
 
 type TheGame () as this =
     inherit Microsoft.Xna.Framework.Game()
@@ -12,11 +15,13 @@ type TheGame () as this =
     let screenHeight = 1080
 
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch>
+    let mutable draw: Shape -> unit = (fun _ -> ()) 
 
     let mutable screen: IScreen = Unchecked.defaultof<IScreen>
 
     override _.LoadContent() =
         spriteBatch <- new SpriteBatch(this.GraphicsDevice)
+        draw <- Graphic.draw (MonoGameGraphic(spriteBatch))
 
     override this.Initialize () =
 
@@ -36,8 +41,8 @@ type TheGame () as this =
         MyraEnvironment.Game <- this
 
         screen <- MainMenuScreen (
-            (fun _ -> screen <- GamePlayScreen(spriteBatch, screenWith, screenHeight)), 
-            (fun _ -> screen <- GameEditorScreen(spriteBatch, screenWith, screenHeight)))
+            (fun _ -> screen <- GamePlayScreen(draw, screenWith, screenHeight)), 
+            (fun _ -> screen <- GameEditorScreen(draw, screenWith, screenHeight)))
 
     override _.Update (gameTime: GameTime) =
 
@@ -58,7 +63,7 @@ type TheGame () as this =
         spriteBatch.End()
 
 [<EntryPoint>]
-let main argv =
+let main _ =
     let game = new TheGame()
     game.Run()
 

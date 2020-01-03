@@ -1,13 +1,12 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
-open TowerDefenseSandbox.Engine
-open TowerDefenseSandbox.Game.Engine
-
-open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework
 open MonoGame.Extended
 
-type RegularTurret (zindex: int, spriteBatch: SpriteBatch, entityProvider: IEntityProvider) =
+open TowerDefenseSandbox.Engine
+open TowerDefenseSandbox.Game.Engine
+
+type RegularTurret (zindex: int, draw: Shape -> unit, entityProvider: IEntityProvider) =
 
     let viewRadius = 100.0f
     let radius = 25.0f
@@ -32,15 +31,15 @@ type RegularTurret (zindex: int, spriteBatch: SpriteBatch, entityProvider: IEnti
             match target with 
             | None -> ()
             | Some x when reload > 8 ->
-                RegularBullet(spriteBatch, c, entityProvider, x :?> Enemy) |> entityProvider.RegisterEntity
+                RegularBullet(draw, c, entityProvider, x :?> Enemy) |> entityProvider.RegisterEntity
                 reload <- 0
             | _ -> ()
 
             reload <- reload + 1
 
         member this.Draw (gameTime: GameTime) (position: RectangleF) =
-            
-            spriteBatch.DrawCircle(position |> center |> toVector2, radius, 100, Color.Black, radius)
+            let (Vector(x, y)) = center position
+            Circle(x, y, radius, true, Color.black) |> draw
             #if DEBUG
-            spriteBatch.DrawCircle(position |> center |> toVector2, viewRadius, 100, Color.GreenYellow)
+            Circle(x, y, viewRadius, false, Color.aquamarine) |> draw
             #endif

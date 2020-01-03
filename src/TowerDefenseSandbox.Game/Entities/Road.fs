@@ -1,11 +1,12 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
-open TowerDefenseSandbox.Game.Engine
 open Microsoft.Xna.Framework
-open Microsoft.Xna.Framework.Graphics
 open MonoGame.Extended
 
-type Road (spriteBatch: SpriteBatch, zindex: int) = 
+open TowerDefenseSandbox.Engine
+open TowerDefenseSandbox.Game.Engine
+
+type Road (draw: Shape -> unit, zindex: int) = 
     
     interface ICell with 
 
@@ -15,5 +16,5 @@ type Road (spriteBatch: SpriteBatch, zindex: int) =
             ()
             
         member _.Draw (gameTime: GameTime) (position: RectangleF) =
-            spriteBatch.FillRectangle(position, Color.Gray)
+            Rectangle(position.X, position.Y, position.Width, position.Height, true, Color.grey) |> draw
 

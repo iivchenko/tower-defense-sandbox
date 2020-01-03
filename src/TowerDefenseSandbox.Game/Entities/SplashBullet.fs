@@ -1,14 +1,13 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
+open Microsoft.Xna.Framework
+
+open System
+
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-open Microsoft.Xna.Framework
-open Microsoft.Xna.Framework.Graphics
-open MonoGame.Extended
-open System
-
-type SplashBullet (spriteBatch: SpriteBatch, center: Vector, entityProvider: IEntityProvider, target: Vector) =
+type SplashBullet (draw: Shape -> unit, center: Vector, entityProvider: IEntityProvider, target: Vector) =
 
     let speed = 2.0f
     let radius = 5.0f
@@ -16,8 +15,6 @@ type SplashBullet (spriteBatch: SpriteBatch, center: Vector, entityProvider: IEn
     let mutable isBoom = false
     let mutable ttl = TimeSpan (0, 0, 0, 0, 300)
     let mutable center = center
-
-    let toVector2 (Vector(x1, y1)) = Vector2 (x1, y1)
 
     interface IEntity with
         
@@ -58,6 +55,8 @@ type SplashBullet (spriteBatch: SpriteBatch, center: Vector, entityProvider: IEn
                         ()
 
         member _.Draw (gameTime: GameTime) =
-             match isBoom with 
-             | false -> spriteBatch.DrawCircle(center |> toVector2, radius, 100, Color.Red, radius)
-             | true ->  spriteBatch.DrawCircle(center |> toVector2, radius, 100, Color.Red, boomRadius)
+            let (Vector(x, y)) = center
+
+            match isBoom with 
+            | false -> Circle(x, y, radius, true, Color.red) |> draw
+            | true ->  Circle(x, y, boomRadius, true, Color(byte 255, byte 0, byte 0, byte 50)) |> draw

@@ -1,20 +1,16 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
+open Microsoft.Xna.Framework
+
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-open Microsoft.Xna.Framework
-open Microsoft.Xna.Framework.Graphics
-open MonoGame.Extended
-
-type RegularBullet (spriteBatch: SpriteBatch, center: Vector, entityProvider: IEntityProvider, target: Enemy) =
+type RegularBullet (draw: Shape -> unit, center: Vector, entityProvider: IEntityProvider, target: Enemy) =
 
     let speed = 5.0f
     let radius = 2.5f
 
     let mutable center = center
-
-    let toVector2 (Vector(x, y)) = Vector2 (x, y)
 
     interface IEntity with
         
@@ -44,4 +40,5 @@ type RegularBullet (spriteBatch: SpriteBatch, center: Vector, entityProvider: IE
                     ()
 
         member _.Draw (gameTime: GameTime) =
-             spriteBatch.DrawCircle(center |> toVector2, radius, 100, Color.Black)
+            let (Vector(x, y)) = center
+            Circle(x, y, radius, true, Color.black) |> draw

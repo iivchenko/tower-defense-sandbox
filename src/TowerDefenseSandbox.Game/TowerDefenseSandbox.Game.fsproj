@@ -4,7 +4,6 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Engine\Mathx.fs" />
     <Compile Include="Engine\EntityProvider.fs" />
     <Compile Include="Engine\Grid.fs" />
     <Compile Include="Entities\Road.fs" />
@@ -29,6 +28,7 @@
     <Folder Include="Content\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TowerDefenseSandbox.Engine.MonoGame\TowerDefenseSandbox.Engine.MonoGame.fsproj" />
     <ProjectReference Include="..\TowerDefenseSandbox.Engine\TowerDefenseSandbox.Engine.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

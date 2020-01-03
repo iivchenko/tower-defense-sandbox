@@ -1,11 +1,12 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
-open Microsoft.Xna.Framework.Graphics
+
 open Microsoft.Xna.Framework
 open MonoGame.Extended
-open TowerDefenseSandbox.Game.Engine
-open TowerDefenseSandbox.Engine
 
-type SplashTurret (zindex: int, spriteBatch: SpriteBatch, entityProvider: IEntityProvider) =
+open TowerDefenseSandbox.Engine
+open TowerDefenseSandbox.Game.Engine
+
+type SplashTurret (zindex: int, draw: Shape -> unit, entityProvider: IEntityProvider) =
 
     let viewRadius = 100.0f
     let radius = 25.0f
@@ -30,16 +31,15 @@ type SplashTurret (zindex: int, spriteBatch: SpriteBatch, entityProvider: IEntit
             match target with 
             | None -> ()
             | Some x when reload > 70 ->
-                SplashBullet(spriteBatch, c, entityProvider, x.Position) |> entityProvider.RegisterEntity
+                SplashBullet(draw, c, entityProvider, x.Position) |> entityProvider.RegisterEntity
                 reload <- 0
             | _ -> ()
 
             reload <- reload + 1
 
         member this.Draw (gameTime: GameTime) (position: RectangleF) =
-            
-            spriteBatch.DrawCircle(position |> center |> toVector2, radius, 100, Color.Red, radius)
-
+            let (Vector(x, y)) = center position
+            Circle(x, y, radius, true, Color.red) |> draw
             #if DEBUG
-            spriteBatch.DrawCircle(position |> center |> toVector2, viewRadius, 100, Color.GreenYellow)
+            Circle(x, y, viewRadius, false, Color.aquamarine) |> draw
             #endif

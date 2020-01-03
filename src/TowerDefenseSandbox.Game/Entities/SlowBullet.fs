@@ -1,14 +1,13 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
+open Microsoft.Xna.Framework
+
+open System
+
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-open Microsoft.Xna.Framework
-open Microsoft.Xna.Framework.Graphics
-open MonoGame.Extended
-open System
-
-type SlowBullet (spriteBatch: SpriteBatch, center: Vector, entityProvider: IEntityProvider, target: Enemy) =
+type SlowBullet (draw: Shape -> unit, center: Vector, entityProvider: IEntityProvider, target: Enemy) =
 
     let speed = 2.0f
     let radius = 7.0f
@@ -44,4 +43,4 @@ type SlowBullet (spriteBatch: SpriteBatch, center: Vector, entityProvider: IEnti
 
         member _.Draw (gameTime: GameTime) =
              let (Vector(x, y)) = center
-             spriteBatch.FillRectangle(x - radius, y - radius, radius, radius, Color.Blue)
+             Rectangle(x - radius, y - radius, radius, radius, true, Color.blue) |> draw

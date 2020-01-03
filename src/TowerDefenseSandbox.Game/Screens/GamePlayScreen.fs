@@ -1,17 +1,17 @@
 ﻿namespace TowerDefenseSandbox.Game.Screens
 
-open TowerDefenseSandbox.Engine
-open TowerDefenseSandbox.Game.Engine
-
 open Microsoft.Xna.Framework
-open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Input
-open TowerDefenseSandbox.Game.Entities
-open System.IO
-open Newtonsoft.Json
 open MonoGame.Extended
 
-type GamePlayScreen (spriteBatch: SpriteBatch, screenWith: int, screenHeight: int) =
+open System.IO
+open Newtonsoft.Json
+
+open TowerDefenseSandbox.Engine
+open TowerDefenseSandbox.Game.Engine
+open TowerDefenseSandbox.Game.Entities
+
+type GamePlayScreen (draw: Shape -> unit, screenWith: int, screenHeight: int) =
 
     let entityProvider = EntityProvider() :> IEntityProvider
     let cellWidth = 48.0f
@@ -46,20 +46,20 @@ type GamePlayScreen (spriteBatch: SpriteBatch, screenWith: int, screenHeight: in
         | Some (x, y) -> findPath grid (x, y) raws columns ((x, y)::[])
         | _ -> raise (System.Exception("Spawner not found!"))
 
-    let createEntity (t: int) (spriteBatch: SpriteBatch) (entityProvider: IEntityProvider) (factory: EnemyFactory) =
+    let createEntity (t: int) (draw: Shape -> unit) (entityProvider: IEntityProvider) (factory: EnemyFactory) =
         match t with 
-        | 0 -> Spawner (1, spriteBatch, factory) :> ICell |> Some
-        | 1 -> Road (spriteBatch, 0) :> ICell |> Some
-        | 2 -> Receiver (spriteBatch, entityProvider, 1) :> ICell |> Some
+        | 0 -> Spawner (1, draw, factory) :> ICell |> Some
+        | 1 -> Road (draw, 0) :> ICell |> Some
+        | 2 -> Receiver (draw, entityProvider, 1) :> ICell |> Some
 
     do
-        grid <- Grid (spriteBatch, columns, raws, cellWidth, cellHeight)
+        grid <- Grid (draw, columns, raws, cellWidth, cellHeight)
 
-        let factory = EnemyFactory (spriteBatch, entityProvider)
+        let factory = EnemyFactory (draw, entityProvider)
         let data = JsonConvert.DeserializeObject<(int*int*int) list>(File.ReadAllText("level.json"));
 
         data 
-            |> List.iter (fun (x, y, t) ->  grid.[x, y] <- createEntity t spriteBatch entityProvider factory)
+            |> List.iter (fun (x, y, t) ->  grid.[x, y] <- createEntity t draw entityProvider factory)
 
         grid 
             |> createPath 
@@ -79,7 +79,7 @@ type GamePlayScreen (spriteBatch: SpriteBatch, screenWith: int, screenHeight: in
                 let y = state.Y / int cellHeight
 
                 match grid.[x, y] with
-                | None -> grid.[x, y] <- TurretPicker(1, spriteBatch, grid, entityProvider, x, y) :> ICell |> Some
+                | None -> grid.[x, y] <- TurretPicker(1, draw, grid, entityProvider, x, y) :> ICell |> Some
                 | Some cell ->
                     match cell with 
                     | :? TurretPicker as picker -> picker.Click(RectangleF(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight), Vector(float32 state.X, float32 state.Y))

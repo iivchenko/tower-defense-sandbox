@@ -2,14 +2,15 @@
 
 open Microsoft.Xna.Framework
 open MonoGame.Extended
-open Microsoft.Xna.Framework.Graphics
+
+open TowerDefenseSandbox.Engine
 
 type ICell =
     abstract member ZIndex: int with get
     abstract member Update: GameTime -> RectangleF -> unit
     abstract member Draw: GameTime -> RectangleF -> unit
 
-type Grid (spriteBatch: SpriteBatch, width: int, height: int, cellWidth: float32, cellHeight: float32) = 
+type Grid (draw: Shape -> unit, width: int, height: int, cellWidth: float32, cellHeight: float32) = 
 
     let mutable grid: ICell option [,] = Array2D.init width height (fun _ _ -> Option.None)
     
@@ -19,7 +20,7 @@ type Grid (spriteBatch: SpriteBatch, width: int, height: int, cellWidth: float32
         | None -> ()
 
     let update = apply (fun entity x y time -> entity.Update time <| RectangleF(float32 x * cellWidth , float32 y * cellHeight, cellWidth, cellHeight))
-    let draw = apply (fun entity x y time -> entity.Draw time <| RectangleF(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight))
+    let drawAll = apply (fun entity x y time -> entity.Draw time <| RectangleF(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight))
 
     let isSome = 
         function
@@ -44,8 +45,8 @@ type Grid (spriteBatch: SpriteBatch, width: int, height: int, cellWidth: float32
             |> flaten 
             |> Seq.filter (fun (_, _, e) -> isSome e)
             |> Seq.sortBy (fun (_, _, Some e) -> e.ZIndex) 
-            |> Seq.iter (fun (x, y, e) -> draw e x y gameTime)
+            |> Seq.iter (fun (x, y, e) -> drawAll e x y gameTime)
 
         for x in [0..(Array2D.length1 grid) - 1] do 
             for y in [0..(Array2D.length2 grid) - 1] do 
-                spriteBatch.DrawRectangle(RectangleF(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight), Color.Black)
+                Rectangle(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight, false, Color.black) |> draw

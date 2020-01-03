@@ -1,20 +1,22 @@
 ﻿namespace TowerDefenseSandbox.Game.Screens
 
 open Microsoft.Xna.Framework
-open Microsoft.Xna.Framework.Graphics
-open TowerDefenseSandbox.Game.Engine
 open Microsoft.Xna.Framework.Input
-open TowerDefenseSandbox.Game.Entities
+
 open System.IO
 open Newtonsoft.Json
 
-type GameEditorScreen(spriteBatch: SpriteBatch, screenWith: int, screenHeight: int) =
+open TowerDefenseSandbox.Engine
+open TowerDefenseSandbox.Game.Engine
+open TowerDefenseSandbox.Game.Entities
+
+type GameEditorScreen(draw: Shape -> unit, screenWith: int, screenHeight: int) =
 
     let cellWidth = 48.0f
     let cellHeight = 45.0f
     let columns = screenWith / int cellWidth
     let raws = screenHeight / int cellHeight
-    let grid = Grid (spriteBatch, columns, raws, cellWidth, cellHeight)
+    let grid = Grid (draw, columns, raws, cellWidth, cellHeight)
 
     let mutable leftButtonPreviousState = ButtonState.Released
     let mutable rightButtonPreviousState = ButtonState.Released
@@ -44,9 +46,9 @@ type GameEditorScreen(spriteBatch: SpriteBatch, screenWith: int, screenHeight: i
                 let y = state.Y / int cellHeight
 
                 grid.[x, y] <- match currentEdit with
-                | 0 -> Spawner (0, spriteBatch, new EnemyFactory(spriteBatch, new EntityProvider())) :> ICell |> Some
-                | 1 -> Road (spriteBatch, 0) :> ICell |> Some
-                | 2 -> Receiver (spriteBatch, new EntityProvider(), 0) :> ICell |> Some
+                | 0 -> Spawner (0, draw, new EnemyFactory((fun _ -> ()), new EntityProvider())) :> ICell |> Some
+                | 1 -> Road (draw, 0) :> ICell |> Some
+                | 2 -> Receiver (draw, new EntityProvider(), 0) :> ICell |> Some
                 
             else 
                 ()

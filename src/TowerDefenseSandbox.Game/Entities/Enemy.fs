@@ -1,25 +1,22 @@
 namespace TowerDefenseSandbox.Game.Entities
 
+open Microsoft.Xna.Framework
+
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-open Microsoft.Xna.Framework.Graphics
-open Microsoft.Xna.Framework
-open MonoGame.Extended
-
-type Enemy (life: int, spriteBatch: SpriteBatch, center: Vector, entityProvider: IEntityProvider, path: Vector list) =
+type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEntityProvider, path: Vector list) =
 
     let mutable life = life
     let mutable center = center
     let mutable path = path
+    let mutable effects: Effect list = []
+
     let radius = 10.0f
-    let mutable effects: TowerDefenseSandbox.Game.Entities.Effect list = []
     let speed = 1.0f
 
     let limit = max 0
-
-    let direction (v1: Vector) (v2: Vector) = v2 - v1 |> Vector.normalize
-    let toVector2 (Vector(x, y)) = Vector2 (x, y)
+    let direction v1 v2 = v2 - v1 |> Vector.normalize
 
     interface IEntity with
 
@@ -38,7 +35,7 @@ type Enemy (life: int, spriteBatch: SpriteBatch, center: Vector, entityProvider:
                 | DamageEffect amount -> 
                     life <- life - amount |> limit
                     if life = 0 then entityProvider.RemoveEntity this else ()
-                | SlowDownEffect (_, koefficient) -> currentSpeed <- currentSpeed * ( 1.0f - koefficient))
+                | SlowDownEffect (_, koefficient) -> currentSpeed <- currentSpeed * (1.0f - koefficient))
                 
             effects <- 
                 effects 
@@ -58,7 +55,8 @@ type Enemy (life: int, spriteBatch: SpriteBatch, center: Vector, entityProvider:
             | _ -> ()
 
         member _.Draw (gameTime: GameTime) =
-            spriteBatch.DrawCircle(toVector2 center, radius, 100, Color.Red, radius)
+            let (Vector(x, y)) = center
+            Circle (x, y, radius, true, Color.red) |> draw
 
     member this.ApplyEffect (effect: TowerDefenseSandbox.Game.Entities.Effect) =
 

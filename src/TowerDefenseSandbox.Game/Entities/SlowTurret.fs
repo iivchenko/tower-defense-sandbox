@@ -1,13 +1,12 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
-open TowerDefenseSandbox.Engine
-open TowerDefenseSandbox.Game.Engine
-
-open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework
 open MonoGame.Extended
 
-type SlowTurret (zindex: int, spriteBatch: SpriteBatch, entityProvider: IEntityProvider) =
+open TowerDefenseSandbox.Engine
+open TowerDefenseSandbox.Game.Engine
+
+type SlowTurret (zindex: int, draw: Shape -> unit, entityProvider: IEntityProvider) =
 
     let mutable affectedEnemies = []
     let viewRadius = 100.0f
@@ -15,7 +14,6 @@ type SlowTurret (zindex: int, spriteBatch: SpriteBatch, entityProvider: IEntityP
     let mutable reload = 0
 
     let center (position: RectangleF) = Vector.init (position.X + position.Width / 2.0f) (position.Y + position.Height / 2.0f)
-    let toVector2 (Vector(x, y)) = Vector2 (x, y)
 
     interface ICell with
 
@@ -34,7 +32,7 @@ type SlowTurret (zindex: int, spriteBatch: SpriteBatch, entityProvider: IEntityP
             match target with 
             | None -> ()
             | Some x when reload > 50 ->
-                SlowBullet(spriteBatch, c, entityProvider, x :?> Enemy) |> entityProvider.RegisterEntity
+                SlowBullet(draw, c, entityProvider, x :?> Enemy) |> entityProvider.RegisterEntity
                 reload <- 0
                 affectedEnemies <- x::affectedEnemies
             | _ -> ()
@@ -47,8 +45,8 @@ type SlowTurret (zindex: int, spriteBatch: SpriteBatch, entityProvider: IEntityP
             reload <- reload + 1
 
         member this.Draw (gameTime: GameTime) (position: RectangleF) =
-            
-            spriteBatch.DrawCircle(center position |> toVector2, radius, 100, Color.Blue, radius)
+            let (Vector(x, y)) = center position
+            Circle(x, y, radius, true, Color.blue) |> draw
             #if DEBUG
-            spriteBatch.DrawCircle(center position |> toVector2, viewRadius, 100, Color.GreenYellow)
+            Circle(x, y, viewRadius, false, Color.aquamarine) |> draw
             #endif

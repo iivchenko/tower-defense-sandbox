@@ -1,23 +1,22 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
-open TowerDefenseSandbox.Engine
-open TowerDefenseSandbox.Game.Engine
-
-open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework
 open MonoGame.Extended
 
-type EnemyFactory (spriteBatch: SpriteBatch, entityProvider: IEntityProvider) = 
+open TowerDefenseSandbox.Engine
+open TowerDefenseSandbox.Game.Engine
+
+type EnemyFactory (draw: Shape -> unit, entityProvider: IEntityProvider) = 
     
-    let mutable _path = []
+    let mutable path = []
 
-    member public this.Create (center: Vector) =
-        Enemy(100, spriteBatch, center, entityProvider, _path) |> entityProvider.RegisterEntity
+    member _.Create (center: Vector) =
+        Enemy(100, draw, center, entityProvider, path) |> entityProvider.RegisterEntity
 
-    member public this.UpdatePath (path: Vector list) =
-        _path <- path
+    member _.UpdatePath (newPath: Vector list) =
+        path <- newPath
 
-type Spawner (zindex: int, spriteBatch: SpriteBatch, factory: EnemyFactory) =
+type Spawner (zindex: int, draw: Shape -> unit, factory: EnemyFactory) =
 
     [<Literal>] 
     let spawnTime = 1.0f
@@ -26,7 +25,6 @@ type Spawner (zindex: int, spriteBatch: SpriteBatch, factory: EnemyFactory) =
     let mutable time = spawnTime
 
     let center (position: RectangleF) = Vector.init (position.X + position.Width / 2.0f) (position.Y + position.Height / 2.0f)
-    let toVector2 (Vector(x, y)) = Vector2 (x, y)
 
     interface ICell with 
 
@@ -41,4 +39,5 @@ type Spawner (zindex: int, spriteBatch: SpriteBatch, factory: EnemyFactory) =
                     time <- time - gameTime.GetElapsedSeconds()
             
         member _.Draw (gameTime: GameTime) (position: RectangleF) =
-            spriteBatch.DrawCircle(position |> center |> toVector2, radius, 100, Color.Aquamarine)
+            let (Vector(x, y)) = center position
+            Circle(x, y, radius, false, Color.aquamarine) |> draw

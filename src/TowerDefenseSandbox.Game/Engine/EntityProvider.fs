@@ -1,8 +1,9 @@
 ﻿namespace TowerDefenseSandbox.Game.Engine
 
-open TowerDefenseSandbox.Engine
 open System.Collections.Generic
 open Microsoft.Xna.Framework
+
+open TowerDefenseSandbox.Engine
 
 type IEntity =
     abstract member Radius: float32 with get
@@ -22,13 +23,14 @@ type EntityProvider() =
     let entities = List<IEntity>()
     
     interface IEntityProvider with
-        member this.GetEntities () =
+        
+        member _.GetEntities () =
             entities :> IEnumerable<IEntity>
 
-        member this.RegisterEntity (entity: IEntity) = 
+        member _.RegisterEntity (entity: IEntity) = 
             addEntities.Add(entity)
 
-        member this.RemoveEntity(entity: IEntity): unit = 
+        member _.RemoveEntity(entity: IEntity): unit = 
             removeEntities.Add(entity)
 
         member _.Flush() =
