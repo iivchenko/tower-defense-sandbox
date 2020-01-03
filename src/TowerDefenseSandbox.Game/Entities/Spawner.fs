@@ -1,6 +1,7 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
-open Microsoft.Xna.Framework
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+
 open MonoGame.Extended
 
 open TowerDefenseSandbox.Engine
@@ -19,10 +20,10 @@ type EnemyFactory (draw: Shape -> unit, entityProvider: IEntityProvider) =
 type Spawner (zindex: int, draw: Shape -> unit, factory: EnemyFactory) =
 
     [<Literal>] 
-    let spawnTime = 1.0f
+    let spawnTime = 1.0f<second>
 
     let radius = 15.0f
-    let mutable time = spawnTime
+    let mutable nextSpawn = spawnTime
 
     let center (position: RectangleF) = Vector.init (position.X + position.Width / 2.0f) (position.Y + position.Height / 2.0f)
 
@@ -30,14 +31,14 @@ type Spawner (zindex: int, draw: Shape -> unit, factory: EnemyFactory) =
 
         member _.ZIndex = zindex
             
-        member _.Update (gameTime: GameTime) (position: RectangleF) =
-            if time < 0.0f
+        member _.Update (time: float32<second>) (position: RectangleF) =
+            if nextSpawn < 0.0f<second>
                 then 
                     factory.Create (center position)
-                    time <- spawnTime
+                    nextSpawn <- spawnTime
                 else
-                    time <- time - gameTime.GetElapsedSeconds()
+                    nextSpawn <- nextSpawn - time
             
-        member _.Draw (gameTime: GameTime) (position: RectangleF) =
+        member _.Draw (time: float32<second>) (position: RectangleF) =
             let (Vector(x, y)) = center position
             Circle(x, y, radius, false, Color.aquamarine) |> draw

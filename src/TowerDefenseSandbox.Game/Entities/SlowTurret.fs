@@ -1,6 +1,7 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
-open Microsoft.Xna.Framework
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+
 open MonoGame.Extended
 
 open TowerDefenseSandbox.Engine
@@ -19,7 +20,7 @@ type SlowTurret (zindex: int, draw: Shape -> unit, entityProvider: IEntityProvid
 
         member _.ZIndex = zindex
 
-        member this.Update (gameTime: GameTime) (position: RectangleF) =
+        member this.Update (time: float32<second>) (position: RectangleF) =
     
             let c = center position
             let target =
@@ -44,7 +45,7 @@ type SlowTurret (zindex: int, draw: Shape -> unit, entityProvider: IEntityProvid
 
             reload <- reload + 1
 
-        member this.Draw (gameTime: GameTime) (position: RectangleF) =
+        member this.Draw (time: float32<second>) (position: RectangleF) =
             let (Vector(x, y)) = center position
             Circle(x, y, radius, true, Color.blue) |> draw
             #if DEBUG

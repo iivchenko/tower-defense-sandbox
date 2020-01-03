@@ -1,6 +1,7 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
-open Microsoft.Xna.Framework
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+
 open MonoGame.Extended
 
 open TowerDefenseSandbox.Engine
@@ -12,9 +13,9 @@ type Road (draw: Shape -> unit, zindex: int) =
 
         member _.ZIndex = zindex
             
-        member _.Update (gameTime: GameTime) (position: RectangleF) =
+        member _.Update (time: float32<second>) (position: RectangleF) =
             ()
             
-        member _.Draw (gameTime: GameTime) (position: RectangleF) =
+        member _.Draw (time: float32<second>) (position: RectangleF) =
             Rectangle(position.X, position.Y, position.Width, position.Height, true, Color.grey) |> draw
 

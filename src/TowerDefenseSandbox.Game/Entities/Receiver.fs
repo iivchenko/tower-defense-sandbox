@@ -1,6 +1,7 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
-open Microsoft.Xna.Framework
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+
 open MonoGame.Extended
 
 open TowerDefenseSandbox.Engine
@@ -16,7 +17,7 @@ type Receiver (draw: Shape -> unit, entityProvider: IEntityProvider, zindex: int
 
         member _.ZIndex = zindex
             
-        member _.Update (_: GameTime) (position: RectangleF) =
+        member _.Update (_: float32<second>) (position: RectangleF) =
             let c = center position
             let radius = position.Width / 2.0f * life
             let enemy =
@@ -33,7 +34,7 @@ type Receiver (draw: Shape -> unit, entityProvider: IEntityProvider, zindex: int
 
             if life <= 0.0f then raise (System.Exception("Game Over")) else ()
             
-        member _.Draw (_: GameTime) (position: RectangleF) =
+        member _.Draw (_: float32<second>) (position: RectangleF) =
             let radius = position.Width / 2.0f * life
             let (Vector(x, y)) = center position
 

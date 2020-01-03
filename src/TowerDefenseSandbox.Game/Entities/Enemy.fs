@@ -1,6 +1,6 @@
 namespace TowerDefenseSandbox.Game.Entities
 
-open Microsoft.Xna.Framework
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
@@ -26,7 +26,7 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
 
         member _.Radius = radius
 
-        member this.Update (gameTime: GameTime) =
+        member this.Update (time: float32<second>) =
 
             let mutable currentSpeed = speed
             effects 
@@ -42,10 +42,10 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
                 |> List.filter (fun effect -> 
                            match effect with
                            | DamageEffect _ -> false
-                           | SlowDownEffect (period, _) -> period.TotalMilliseconds > 0.0)
+                           | SlowDownEffect (period, _) -> period > 0.0f<second>)
                 |> List.map (fun effect -> 
                     match effect with
-                    | SlowDownEffect (period, koefficient) -> SlowDownEffect(period.Subtract(gameTime.ElapsedGameTime), koefficient)
+                    | SlowDownEffect (period, koefficient) -> SlowDownEffect(period - time, koefficient)
                     | e -> e)
 
             match path with 
@@ -54,7 +54,7 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
                 center <- center + currentSpeed * (direction h center)
             | _ -> ()
 
-        member _.Draw (gameTime: GameTime) =
+        member _.Draw (time: float32<second>) =
             let (Vector(x, y)) = center
             Circle (x, y, radius, true, Color.red) |> draw
 

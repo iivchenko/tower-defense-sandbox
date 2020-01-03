@@ -1,6 +1,7 @@
 ﻿namespace TowerDefenseSandbox.Game.Screens
 
-open Microsoft.Xna.Framework
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+
 open Microsoft.Xna.Framework.Input
 
 open System.IO
@@ -32,7 +33,7 @@ type GameEditorScreen(manager: ScreenManager, draw: Shape -> unit, screenWith: i
         | :? Receiver -> 2
 
     interface IScreen with 
-        member _.Update(gameTime: GameTime) =
+        member _.Update(time: float32<second>) =
             if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then manager.Back() else ()
         
             isEscUpPrev <- Keyboard.GetState().IsKeyUp(Keys.Escape)
@@ -85,5 +86,5 @@ type GameEditorScreen(manager: ScreenManager, draw: Shape -> unit, screenWith: i
             else
                 ()
 
-        member _.Draw(gameTime: GameTime) = 
-            grid.Draw gameTime
+        member _.Draw(time: float32<second>) = 
+            grid.Draw time

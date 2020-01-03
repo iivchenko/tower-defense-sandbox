@@ -1,11 +1,12 @@
 ﻿namespace TowerDefenseSandbox.Game.Engine
 
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+
 open Microsoft.Xna.Framework
 
 type IScreen =
-    abstract member Update: GameTime -> unit
-    abstract member Draw: GameTime -> unit
-
+    abstract member Update: float32<second> -> unit
+    abstract member Draw: float32<second> -> unit
 
 type EmptyScreen () =
     interface IScreen with

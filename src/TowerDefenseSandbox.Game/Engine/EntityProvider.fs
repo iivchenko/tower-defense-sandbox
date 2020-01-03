@@ -1,15 +1,16 @@
 ﻿namespace TowerDefenseSandbox.Game.Engine
 
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+
 open System.Collections.Generic
-open Microsoft.Xna.Framework
 
 open TowerDefenseSandbox.Engine
 
 type IEntity =
     abstract member Radius: float32 with get
     abstract member Position: Vector with get, set
-    abstract member Update: GameTime -> unit
-    abstract member Draw: GameTime -> unit
+    abstract member Update: float32<second> -> unit
+    abstract member Draw: float32<second> -> unit
 
 type IEntityProvider =
     abstract member GetEntities: unit -> IEntity seq

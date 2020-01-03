@@ -1,8 +1,6 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
-open Microsoft.Xna.Framework
-
-open System
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
@@ -22,7 +20,7 @@ type SlowBullet (draw: Shape -> unit, center: Vector, entityProvider: IEntityPro
             with get () = center
             and set (value) = center <- value
 
-        member this.Update (gameTime: GameTime) =
+        member this.Update (time: float32<second>) =
             let entity = target :> IEntity
             let (Vector(x1, y1)) = center
             let (Vector(x2, y2)) = entity.Position
@@ -36,11 +34,11 @@ type SlowBullet (draw: Shape -> unit, center: Vector, entityProvider: IEntityPro
 
             if (Vector.distance center entity.Position) < radius
                 then
-                    SlowDownEffect (TimeSpan (0, 0, 5), 0.5f) |> target.ApplyEffect
+                    SlowDownEffect (5.0f<second>, 0.5f) |> target.ApplyEffect
                     entityProvider.RemoveEntity this
                 else 
                     ()
 
-        member _.Draw (gameTime: GameTime) =
+        member _.Draw (time: float32<second>) =
              let (Vector(x, y)) = center
              Rectangle(x - radius, y - radius, radius, radius, true, Color.blue) |> draw

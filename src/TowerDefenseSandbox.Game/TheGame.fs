@@ -6,6 +6,7 @@ open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Engine.MonoGame
 open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Screens
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 type TheGame () as this =
     inherit Microsoft.Xna.Framework.Game()
@@ -44,7 +45,7 @@ type TheGame () as this =
 
     override _.Update (gameTime: GameTime) =
 
-        screenManager.Screen.Update gameTime
+        screenManager.Screen.Update (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
 
         base.Update(gameTime)
 
@@ -53,8 +54,8 @@ type TheGame () as this =
         graphics.GraphicsDevice.Clear(Color.CornflowerBlue)
 
         spriteBatch.Begin()
-
-        screenManager.Screen.Draw gameTime
+        
+        screenManager.Screen.Draw (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
 
         spriteBatch.End()
 

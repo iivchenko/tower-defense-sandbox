@@ -1,8 +1,6 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
-open Microsoft.Xna.Framework
-
-open System
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
@@ -13,7 +11,7 @@ type SplashBullet (draw: Shape -> unit, center: Vector, entityProvider: IEntityP
     let radius = 5.0f
     let boomRadius = 15.0f * radius
     let mutable isBoom = false
-    let mutable ttl = TimeSpan (0, 0, 0, 0, 300)
+    let mutable ttl = 0.3f<second>
     let mutable center = center
 
     interface IEntity with
@@ -24,7 +22,7 @@ type SplashBullet (draw: Shape -> unit, center: Vector, entityProvider: IEntityP
             with get () = center
             and set (value) = center <- value
 
-        member this.Update (gameTime: GameTime) =
+        member this.Update (time: float32<second>) =
             let (Vector (x1, y1)) = center
             let (Vector (x2, y2)) = target
             let tx = x2 - x1
@@ -36,9 +34,9 @@ type SplashBullet (draw: Shape -> unit, center: Vector, entityProvider: IEntityP
             center <- Vector.init (x1 + velX) (y1 + velY)
 
             if isBoom then
-                ttl <- ttl.Subtract(gameTime.ElapsedGameTime)
+                ttl <- ttl - time
 
-                if (ttl.TotalMilliseconds <= 0.0) then entityProvider.RemoveEntity this else ()
+                if (ttl <= 0.0f<second>) then entityProvider.RemoveEntity this else ()
             else 
                 if (Vector.distance center target) < radius
                     then
@@ -54,7 +52,7 @@ type SplashBullet (draw: Shape -> unit, center: Vector, entityProvider: IEntityP
                     else 
                         ()
 
-        member _.Draw (gameTime: GameTime) =
+        member _.Draw (time: float32<second>) =
             let (Vector(x, y)) = center
 
             match isBoom with 

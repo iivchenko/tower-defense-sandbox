@@ -1,11 +1,12 @@
 ﻿namespace TowerDefenseSandbox.Game.Screens
 
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+
 open Myra.Graphics2D.UI
-open Microsoft.Xna.Framework
+open Microsoft.Xna.Framework.Input
 
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
-open Microsoft.Xna.Framework.Input
 
 type MainMenuScreen (manager: ScreenManager, exit: unit -> unit, draw: Shape -> unit, screenWith: int, screenHeight: int) =
 
@@ -34,11 +35,12 @@ type MainMenuScreen (manager: ScreenManager, exit: unit -> unit, draw: Shape -> 
 
         Desktop.Widgets.Add(panel)
 
-    interface IScreen with 
-        member _.Update (_: GameTime) =
+    interface IScreen with
+
+       member _.Update (_: float32<second>) =
             if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then exit() else ()
 
             isEscUpPrev <- Keyboard.GetState().IsKeyUp(Keys.Escape)
 
-        member _.Draw (_: GameTime) =
+        member _.Draw (time: float32<second>) =
             Desktop.Render ()

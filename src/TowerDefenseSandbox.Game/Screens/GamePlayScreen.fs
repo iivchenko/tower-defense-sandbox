@@ -1,6 +1,7 @@
 ﻿namespace TowerDefenseSandbox.Game.Screens
 
-open Microsoft.Xna.Framework
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+
 open Microsoft.Xna.Framework.Input
 open MonoGame.Extended
 
@@ -69,13 +70,13 @@ type GamePlayScreen (manager: ScreenManager, draw: Shape -> unit, screenWith: in
             |> factory.UpdatePath
        
     interface IScreen with 
-        member _.Update (gameTime: GameTime) =
+        member _.Update (time: float32<second>) =
 
             if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then manager.Back() else ()
 
             isEscUpPrev <- Keyboard.GetState().IsKeyUp(Keys.Escape)
 
-            grid.Update(gameTime)
+            grid.Update(time)
 
             let state = Mouse.GetState ()
 
@@ -94,11 +95,11 @@ type GamePlayScreen (manager: ScreenManager, draw: Shape -> unit, screenWith: in
 
             previousButtonState <- state.LeftButton
 
-            entityProvider.GetEntities() |> Seq.iter (fun x -> x.Update(gameTime))
+            entityProvider.GetEntities() |> Seq.iter (fun x -> x.Update(time))
 
             entityProvider.Flush ()
 
-        member _.Draw (gameTime: GameTime) =
+        member _.Draw (time: float32<second>) =
 
-            grid.Draw(gameTime)
-            entityProvider.GetEntities() |> Seq.iter (fun x -> x.Draw(gameTime))
+            grid.Draw(time)
+            entityProvider.GetEntities() |> Seq.iter (fun x -> x.Draw(time))

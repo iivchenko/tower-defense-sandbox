@@ -1,6 +1,7 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
-open Microsoft.Xna.Framework
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+
 open MonoGame.Extended
 
 open TowerDefenseSandbox.Engine
@@ -13,13 +14,12 @@ type RegularTurret (zindex: int, draw: Shape -> unit, entityProvider: IEntityPro
     let mutable reload = 0
 
     let center (position: RectangleF) = Vector.init (position.X + position.Width / 2.0f) (position.Y + position.Height / 2.0f)
-    let toVector2 (Vector(x, y)) = Vector2 (x, y)
 
     interface ICell with
 
         member _.ZIndex = zindex
 
-        member this.Update (gameTime: GameTime) (position: RectangleF) =
+        member this.Update (time: float32<second>) (position: RectangleF) =
     
             let c = center position
             let target =
@@ -37,7 +37,7 @@ type RegularTurret (zindex: int, draw: Shape -> unit, entityProvider: IEntityPro
 
             reload <- reload + 1
 
-        member this.Draw (gameTime: GameTime) (position: RectangleF) =
+        member this.Draw (time: float32<second>) (position: RectangleF) =
             let (Vector(x, y)) = center position
             Circle(x, y, radius, true, Color.black) |> draw
             #if DEBUG

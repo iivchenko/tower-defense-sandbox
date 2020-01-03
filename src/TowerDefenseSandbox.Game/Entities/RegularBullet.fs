@@ -1,6 +1,6 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
-open Microsoft.Xna.Framework
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
@@ -20,7 +20,7 @@ type RegularBullet (draw: Shape -> unit, center: Vector, entityProvider: IEntity
             with get () = center
             and set (value) = center <- value
 
-        member this.Update (gameTime: GameTime) =
+        member this.Update (time: float32<second>) =
             let entity = target :> IEntity
             let (Vector(x1, y1)) = center
             let (Vector(x2, y2)) = entity.Position
@@ -39,6 +39,6 @@ type RegularBullet (draw: Shape -> unit, center: Vector, entityProvider: IEntity
                 else 
                     ()
 
-        member _.Draw (gameTime: GameTime) =
+        member _.Draw (time: float32<second>) =
             let (Vector(x, y)) = center
             Circle(x, y, radius, true, Color.black) |> draw

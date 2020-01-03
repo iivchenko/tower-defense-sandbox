@@ -1,6 +1,7 @@
 ﻿namespace TowerDefenseSandbox.Game.Entities
 
-open Microsoft.Xna.Framework
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+
 open MonoGame.Extended
 
 open TowerDefenseSandbox.Engine
@@ -21,10 +22,10 @@ type TurretPicker (zindex: int, draw: Shape -> unit, parent: Grid, entityProvide
 
         member _.ZIndex = zindex 
 
-        member _.Update(gameTime: GameTime) (position: RectangleF) = 
+        member _.Update(time: float32<second>) (position: RectangleF) = 
             ()
         
-        member _.Draw(gameTime: GameTime) (position: RectangleF) =
+        member _.Draw(time: float32<second>) (position: RectangleF) =
             
             let x = position.X
             let y = position.Y
