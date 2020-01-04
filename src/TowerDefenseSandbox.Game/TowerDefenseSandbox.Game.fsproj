@@ -12,12 +12,7 @@
     <Compile Include="Entities\Enemy.fs" />
     <Compile Include="Entities\Receiver.fs" />
     <Compile Include="Entities\Spawner.fs" />
-    <Compile Include="Entities\RegularBullet.fs" />
-    <Compile Include="Entities\SlowBullet.fs" />
-    <Compile Include="Entities\SplashBullet.fs" />
-    <Compile Include="Entities\RegularTurret.fs" />
-    <Compile Include="Entities\SlowTurret.fs" />
-    <Compile Include="Entities\SplashTurret.fs" />
+    <Compile Include="Entities\Turret.fs" />
     <Compile Include="Entities\TurretPicker.fs" />
     <Compile Include="Screens\GameEditorScreen.fs" />
     <Compile Include="Screens\GamePlayScreen.fs" />

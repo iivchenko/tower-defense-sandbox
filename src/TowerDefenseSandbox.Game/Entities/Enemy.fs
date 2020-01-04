@@ -58,6 +58,8 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
             let (Vector(x, y)) = center
             Circle (x, y, radius, true, Color.red) |> draw
 
+    member _.Effects with get () = effects
+
     member this.ApplyEffect (effect: TowerDefenseSandbox.Game.Entities.Effect) =
 
         effects <- effect::effects

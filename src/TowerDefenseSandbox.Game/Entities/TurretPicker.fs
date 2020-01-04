@@ -14,9 +14,12 @@ type TurretPicker (zindex: int, draw: Shape -> unit, parent: Grid, entityProvide
         let d = clickY - cellPosition.Position.Y
 
         match y with 
-        | _ when d > 0.0f && d <= cellPosition.Size.Height / 3.0f -> parent.[x, y] <- RegularTurret (1, draw, entityProvider) :> ICell |> Some
-        | _ when d > cellPosition.Size.Height / 3.0f && d <= cellPosition.Size.Height / 3.0f * 2.0f -> parent.[x, y] <- SlowTurret (1, draw, entityProvider) :> ICell |> Some
-        | _ -> parent.[x, y] <- SplashTurret (1, draw, entityProvider) :> ICell |> Some
+        | _ when d > 0.0f && d <= cellPosition.Size.Height / 3.0f -> 
+            parent.[x, y] <- Turret.CreateRegular(draw, entityProvider) :> ICell |> Some
+        | _ when d > cellPosition.Size.Height / 3.0f && d <= cellPosition.Size.Height / 3.0f * 2.0f -> 
+            parent.[x, y] <- Turret.CreateSlow(draw, entityProvider) :> ICell |> Some
+        | _ ->
+             parent.[x, y] <- Turret.CreateSplash(draw, entityProvider) :> ICell |> Some 
 
     interface ICell with
 
