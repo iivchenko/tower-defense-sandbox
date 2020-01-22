@@ -3,6 +3,7 @@ source https://api.nuget.org/v3/index.json
 nuget FSharp.Core
 nuget Monogame.Extended
 nuget MonoGame.Framework.DesktopGL.Core
+nuget MonoGame.Content.Builder
 nuget Myra
 nuget nunit
 nuget FsUnit

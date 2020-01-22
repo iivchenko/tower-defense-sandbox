@@ -1,8 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Winexe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <MonoGameContentReference Include="**\*.mgcb" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine\Screen.fs" />
     <Compile Include="Engine\EntityProvider.fs" />
@@ -20,7 +24,7 @@
     <Compile Include="TheGame.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Content\" />
+    <None Include="Content\*" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TowerDefenseSandbox.Engine.MonoGame\TowerDefenseSandbox.Engine.MonoGame.fsproj" />
