@@ -26,7 +26,9 @@
     <Compile Include="TheGame.fs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Content\*" />
+    <None Include="Content\**" />
+    <None Remove="Content\bin\**" />
+    <None Remove="Content\obj\**" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TowerDefenseSandbox.Engine.MonoGame\TowerDefenseSandbox.Engine.MonoGame.fsproj" />
