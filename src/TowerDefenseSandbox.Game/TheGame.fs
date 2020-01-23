@@ -21,6 +21,7 @@ type TheGame () as this =
     let screenManager = ScreenManager ()
 
     override _.LoadContent() =
+        this.Content.RootDirectory <- "Content"
         spriteBatch <- new SpriteBatch(this.GraphicsDevice)
         draw <- Graphic.draw (MonoGameGraphic(spriteBatch))
 
@@ -41,7 +42,7 @@ type TheGame () as this =
 
         MyraEnvironment.Game <- this
 
-        let createMainScreen () = MainMenuScreen(screenManager, this.Exit) :> IScreen
+        let createMainScreen () = MainMenuScreen(screenManager, this.Content, this.Exit) :> IScreen
         let createGamePlayScreen () = GamePlayScreen(screenManager, draw, screenWith, screenWith) :> IScreen
         let createGameEditScreen () = GameEditorScreen(screenManager, draw, screenWith, screenHeight) :> IScreen
         let createGameSettingsScreen () = EmptyScreen() :> IScreen

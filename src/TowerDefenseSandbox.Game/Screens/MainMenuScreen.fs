@@ -3,35 +3,72 @@
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open Myra.Graphics2D.UI
+open Microsoft.Xna.Framework.Content
+open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Input
 
-open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-type MainMenuScreen (manager: IScreenManager, exit: unit -> unit) =
+type MainMenuScreen (manager: IScreenManager, content: ContentManager, exit: unit -> unit) =
 
     let mutable isEscUpPrev = true
 
     let startGame _ = manager.ToGamePlay()
     let editGame _ = manager.ToGameEdit()
+    let editSettings _ = manager.ToGameSettings()
+    let exitGame _ = exit ()
+
+    let h1 = content.Load<SpriteFont>("Fonts\H1")
+    let h3 = content.Load<SpriteFont>("Fonts\H3")
 
     do
+        Desktop.Widgets.Clear()
+
         let panel = new VerticalStackPanel()
         panel.HorizontalAlignment <- HorizontalAlignment.Center
         panel.VerticalAlignment <- VerticalAlignment.Center
+
+        let label = new Label()
+        label.Text <- "The Tower Defence"
+        label.Font <- h1
+        label.HorizontalAlignment <- HorizontalAlignment.Center
+        label.VerticalAlignment <- VerticalAlignment.Top
+        label.PaddingBottom <- 100
+
+        let menu = new VerticalMenu()
+        menu.HorizontalAlignment <- HorizontalAlignment.Center
+        menu.VerticalAlignment <- VerticalAlignment.Center    
+        menu.LabelHorizontalAlignment <- HorizontalAlignment.Center
+        menu.LabelFont <- h3
+        menu.Background <- Myra.Graphics2D.Brushes.SolidBrush(new Microsoft.Xna.Framework.Color(0, 0, 0, 0)) 
         
-        let newGameButton = new TextButton()
-        newGameButton.Text <- "New Game"
-        newGameButton.Id <- ""
-        newGameButton.Click.Add(startGame)
+        let newGameMenuItem = new MenuItem()
+        newGameMenuItem.Text <- "New Game"
+        newGameMenuItem.Id <- ""
+        newGameMenuItem.Selected.Add(startGame)
 
-        let createLevelButton = new TextButton()
-        createLevelButton.Text <- "Create Level"
-        createLevelButton.Id <- ""
-        createLevelButton.Click.Add(editGame)
+        let createLevelMenuItem = new MenuItem()
+        createLevelMenuItem.Text <- "Create Level"
+        createLevelMenuItem.Id <- ""
+        createLevelMenuItem.Selected.Add(editGame)
 
-        panel.Widgets.Add(newGameButton)
-        panel.Widgets.Add(createLevelButton)
+        let settingsMenuItem = new MenuItem()
+        settingsMenuItem.Text <- "Settings"
+        settingsMenuItem.Id <- ""
+        settingsMenuItem.Selected.Add(editSettings)
+
+        let exitMenuItem = new MenuItem()
+        exitMenuItem.Text <- "Exit"
+        exitMenuItem.Id <- ""
+        exitMenuItem.Selected.Add(exitGame)
+
+        menu.Items.Add(newGameMenuItem)
+        menu.Items.Add(createLevelMenuItem)
+        menu.Items.Add(settingsMenuItem)
+        menu.Items.Add(exitMenuItem)
+
+        panel.Widgets.Add(label)
+        panel.Widgets.Add(menu)
 
         Desktop.Widgets.Add(panel)
 
