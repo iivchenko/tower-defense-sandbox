@@ -18,9 +18,11 @@
     <Compile Include="Entities\Spawner.fs" />
     <Compile Include="Entities\Turret.fs" />
     <Compile Include="Entities\TurretPicker.fs" />
+    <Compile Include="Screens\IScreenManager.fs" />
     <Compile Include="Screens\GameEditorScreen.fs" />
     <Compile Include="Screens\GamePlayScreen.fs" />
     <Compile Include="Screens\MainMenuScreen.fs" />
+    <Compile Include="Screens\ScreenManager.fs" />
     <Compile Include="TheGame.fs" />
   </ItemGroup>
   <ItemGroup>

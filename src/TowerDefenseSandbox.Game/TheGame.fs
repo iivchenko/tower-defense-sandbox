@@ -41,7 +41,19 @@ type TheGame () as this =
 
         MyraEnvironment.Game <- this
 
-        screenManager.Next(MainMenuScreen(screenManager, this.Exit, draw, screenWith, screenHeight))
+        let createMainScreen () = MainMenuScreen(screenManager, this.Exit) :> IScreen
+        let createGamePlayScreen () = GamePlayScreen(screenManager, draw, screenWith, screenWith) :> IScreen
+        let createGameEditScreen () = GameEditorScreen(screenManager, draw, screenWith, screenHeight) :> IScreen
+        let createGameSettingsScreen () = EmptyScreen() :> IScreen
+        let createGameOverScreen () = EmptyScreen() :> IScreen
+
+        screenManager.SetMainMenu createMainScreen
+        screenManager.SetGamePlay createGamePlayScreen
+        screenManager.SetGameEdit createGameEditScreen
+        screenManager.SetGameSettings createGameSettingsScreen
+        screenManager.SetGameOver createGameOverScreen
+
+        (screenManager :> IScreenManager).ToMainMenu ()
 
     override _.Update (gameTime: GameTime) =
 

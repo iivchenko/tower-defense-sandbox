@@ -8,12 +8,12 @@ open Microsoft.Xna.Framework.Input
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-type MainMenuScreen (manager: ScreenManager, exit: unit -> unit, draw: Shape -> unit, screenWith: int, screenHeight: int) =
+type MainMenuScreen (manager: IScreenManager, exit: unit -> unit) =
 
     let mutable isEscUpPrev = true
 
-    let startGame _ = manager.Next(GamePlayScreen(manager, draw, screenWith, screenHeight))
-    let editGame _ = manager.Next(GameEditorScreen(manager, draw, screenWith, screenHeight))
+    let startGame _ = manager.ToGamePlay()
+    let editGame _ = manager.ToGameEdit()
 
     do
         let panel = new VerticalStackPanel()

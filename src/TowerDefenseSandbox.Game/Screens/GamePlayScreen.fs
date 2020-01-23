@@ -12,7 +12,7 @@ open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Entities
 
-type GamePlayScreen (manager: ScreenManager, draw: Shape -> unit, screenWith: int, screenHeight: int) =
+type GamePlayScreen (manager: IScreenManager, draw: Shape -> unit, screenWith: int, screenHeight: int) =
 
     let entityProvider = EntityProvider() :> IEntityProvider
     let cellWidth = 48.0f
@@ -72,7 +72,7 @@ type GamePlayScreen (manager: ScreenManager, draw: Shape -> unit, screenWith: in
     interface IScreen with 
         member _.Update (time: float32<second>) =
 
-            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then manager.Back() else ()
+            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then manager.ToMainMenu() else ()
 
             isEscUpPrev <- Keyboard.GetState().IsKeyUp(Keys.Escape)
 
