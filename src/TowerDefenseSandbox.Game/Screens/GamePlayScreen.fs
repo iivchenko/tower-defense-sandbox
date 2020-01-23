@@ -99,6 +99,15 @@ type GamePlayScreen (manager: IScreenManager, draw: Shape -> unit, screenWith: i
 
             entityProvider.Flush ()
 
+            for x in [0..(columns) - 1] do 
+                for y in [0..(raws) - 1] do 
+                    match grid.[x, y] with
+                    | None -> ()
+                    | Some cell ->
+                        match cell with 
+                        | :? Receiver as receiver when receiver.Life <= 0.0f -> manager.ToGameOver()
+                        | _ -> ()
+
         member _.Draw (time: float32<second>) =
 
             grid.Draw(time)
