@@ -61,4 +61,3 @@ module VectorTests =
 
         // Assert
         actualVector |> should equal expectedVector
-

@@ -40,7 +40,7 @@ type Boom (draw: Shape -> unit, center: Vector, radius: float32, entityProvider:
             radius <- radius + (delta / 0.1f<second>) * time
 
         member _.Draw (time: float32<second>) =
-            let (Vector(x, y)) = center            
+            let (Vector(x, y)) = center
             Circle(x, y, radius, true, Color(byte 255, byte 0, byte 0, byte 50)) |> draw
 
 type Bullet(draw: Vector -> unit, entityProvider: IEntityProvider, center: Vector, speed: float32<pixel/second>, getTargetPosition: unit -> Vector, apply: Bullet -> unit) =
