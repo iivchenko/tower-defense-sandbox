@@ -2,8 +2,12 @@
 
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
+open Microsoft.Xna.Framework.Content
+open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Input
 open MonoGame.Extended
+
+open Myra.Graphics2D.UI
 
 open System.IO
 open Newtonsoft.Json
@@ -12,13 +16,16 @@ open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Entities
 
-type GamePlayScreen (manager: IScreenManager, draw: Shape -> unit, screenWith: int, screenHeight: int) =
+type GamePlayScreen (manager: IScreenManager, draw: Shape -> unit, content: ContentManager, screenWith: int, screenHeight: int) =
 
+    let h3 = content.Load<SpriteFont>("Fonts\H3")
     let entityProvider = EntityProvider() :> IEntityProvider
     let cellWidth = 48.0f
     let cellHeight = 45.0f
     let columns = screenWith / int cellWidth
     let raws = screenHeight / int cellHeight
+
+    let lifes = new Label()
 
     let mutable isEscUpPrev = true
     let mutable grid = Unchecked.defaultof<Grid> 
@@ -68,6 +75,23 @@ type GamePlayScreen (manager: IScreenManager, draw: Shape -> unit, screenWith: i
             |> List.rev 
             |> List.map (fun (x, y) -> Vector.init (float32 x * cellWidth + cellWidth / 2.0f) (float32 y * cellHeight + cellHeight / 2.0f)) 
             |> factory.UpdatePath
+    
+        Desktop.Widgets.Clear()
+
+        let panel = new HorizontalStackPanel()
+        panel.HorizontalAlignment <- HorizontalAlignment.Right
+        panel.VerticalAlignment <- VerticalAlignment.Top
+        
+        lifes.Text <- "Life: 0"
+        lifes.Font <- h3
+        lifes.HorizontalAlignment <- HorizontalAlignment.Right
+        lifes.VerticalAlignment <- VerticalAlignment.Center 
+        lifes.PaddingRight <- 20
+        lifes.PaddingTop <- 20
+
+        panel.Widgets.Add(lifes)
+
+        Desktop.Widgets.Add(panel)
        
     interface IScreen with 
         member _.Update (time: float32<second>) =
@@ -105,10 +129,11 @@ type GamePlayScreen (manager: IScreenManager, draw: Shape -> unit, screenWith: i
                     | None -> ()
                     | Some cell ->
                         match cell with 
-                        | :? Receiver as receiver when receiver.Life <= 0.0f -> manager.ToGameOver()
+                        | :? Receiver as receiver when receiver.Life > 0 -> lifes.Text <- sprintf "Life: %i" receiver.Life
+                        | :? Receiver as receiver when receiver.Life <= 0 -> manager.ToGameOver()
                         | _ -> ()
 
-        member _.Draw (time: float32<second>) =
+        member _.Draw (time: float32<second>) = 
 
             grid.Draw(time)
             entityProvider.GetEntities() |> Seq.iter (fun x -> x.Draw(time))

@@ -8,9 +8,9 @@ open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
 type Receiver (draw: Shape -> unit, entityProvider: IEntityProvider, zindex: int) = 
-    
-    let mutable life = 1.0f
 
+    let mutable life = 10
+    let factor = life
     let center (position: RectangleF) = Vector.init (position.X + position.Width / 2.0f) (position.Y + position.Height / 2.0f)
 
     member _.Life with get () = life
@@ -20,8 +20,9 @@ type Receiver (draw: Shape -> unit, entityProvider: IEntityProvider, zindex: int
         member _.ZIndex = zindex
             
         member _.Update (_: float32<second>) (position: RectangleF) =
+
             let c = center position
-            let radius = position.Width / 2.0f * life
+            let radius = position.Width / 2.0f * ((float32 life)/(float32 factor))
             let enemy =
                 entityProvider.GetEntities()
                 |> Seq.filter (fun x -> x.GetType() = typeof<Enemy>)
@@ -31,11 +32,11 @@ type Receiver (draw: Shape -> unit, entityProvider: IEntityProvider, zindex: int
             match enemy with 
             | None -> ()
             | Some e ->
-                life <- life - 0.1f
+                life <- life - 1
                 entityProvider.RemoveEntity e
             
         member _.Draw (_: float32<second>) (position: RectangleF) =
-            let radius = position.Width / 2.0f * life
+            let radius = position.Width / 2.0f * ((float32 life)/(float32 factor))
             let (Vector(x, y)) = center position
 
             Circle(x, y, radius, false, Color.coral) |> draw

@@ -7,6 +7,7 @@ open TowerDefenseSandbox.Engine.MonoGame
 open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Screens
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+open Myra.Graphics2D.UI
 
 type TheGame () as this =
     inherit Microsoft.Xna.Framework.Game()
@@ -43,7 +44,7 @@ type TheGame () as this =
         MyraEnvironment.Game <- this
 
         let createMainScreen () = MainMenuScreen(screenManager, this.Content, this.Exit) :> IScreen
-        let createGamePlayScreen () = GamePlayScreen(screenManager, draw, screenWith, screenWith) :> IScreen
+        let createGamePlayScreen () = GamePlayScreen(screenManager, draw, this.Content, screenWith, screenWith) :> IScreen
         let createGameEditScreen () = GameEditorScreen(screenManager, draw, screenWith, screenHeight) :> IScreen
         let createGameSettingsScreen () = EmptyScreen() :> IScreen
         let createGameOverScreen () = GameOverScreen(screenManager, this.Content) :> IScreen
@@ -71,6 +72,8 @@ type TheGame () as this =
         screenManager.Screen.Draw (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
 
         spriteBatch.End()
+
+        Desktop.Render ()
 
 [<EntryPoint>]
 let main _ =

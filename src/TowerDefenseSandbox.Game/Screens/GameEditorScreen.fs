@@ -4,6 +4,8 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open Microsoft.Xna.Framework.Input
 
+open Myra.Graphics2D.UI
+
 open System.IO
 open Newtonsoft.Json
 
@@ -31,6 +33,9 @@ type GameEditorScreen(manager: IScreenManager, draw: Shape -> unit, screenWith: 
         | :? Spawner -> 0
         | :? Road -> 1
         | :? Receiver -> 2
+
+    do
+        Desktop.Widgets.Clear()
 
     interface IScreen with 
         member _.Update(time: float32<second>) =
