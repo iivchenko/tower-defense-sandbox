@@ -55,11 +55,17 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
             | _ -> ()
 
         member _.Draw (time: float32<second>) =
+            
             let (Vector(x, y)) = center
-            Circle (x, y, radius, true, Color.red) |> draw
+
+            let a1 = Vector.init 00.0f 10.0f
+            let a2 = Vector.init -10.0f -10.0f
+            let a3 = Vector.init 10.0f -10.0f
+
+            Triangle (x, y, a1, a2, a3, Color.red) |> draw
 
     member _.Effects with get () = effects
 
     member this.ApplyEffect (effect: TowerDefenseSandbox.Game.Entities.Effect) =
 
-        effects <- effect::effects
+        effects <- effect::effects 
