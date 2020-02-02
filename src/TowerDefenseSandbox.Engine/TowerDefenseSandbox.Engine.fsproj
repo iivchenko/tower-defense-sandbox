@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Vector.fs" />
+    <Compile Include="Matrix.fs" />
     <Compile Include="Graphic.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

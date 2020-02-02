@@ -11,12 +11,18 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
     let mutable center = center
     let mutable path = path
     let mutable effects: Effect list = []
+    let mutable orientation = 0.0f
 
     let radius = 10.0f
     let speed = 1.0f
 
     let limit = max 0
     let direction v1 v2 = v2 - v1 |> Vector.normalize
+    let coordinates = [|
+                        Vector.init  00.0f   radius;
+                        Vector.init -radius -radius;
+                        Vector.init  radius -radius;
+                      |]
 
     interface IEntity with
 
@@ -29,6 +35,7 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
         member this.Update (time: float32<second>) =
 
             let mutable currentSpeed = speed
+
             effects 
             |> List.iter (fun effect -> 
                 match effect with
@@ -51,6 +58,8 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
             match path with 
             | h::tail when Vector.distance center h < radius -> path <- tail
             | h::_ ->
+                let (x, y) = direction h center |> Vector.unwrap
+                orientation <- System.Math.Atan2(float -x, float y) |> float32
                 center <- center + currentSpeed * (direction h center)
             | _ -> ()
 
@@ -58,9 +67,11 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
             
             let (Vector(x, y)) = center
 
-            let a1 = Vector.init 00.0f 10.0f
-            let a2 = Vector.init -10.0f -10.0f
-            let a3 = Vector.init 10.0f -10.0f
+            let transform = Matrix.rotation orientation
+
+            let a1 = coordinates.[0] * transform
+            let a2 = coordinates.[1] * transform
+            let a3 = coordinates.[2] * transform
 
             Triangle (x, y, a1, a2, a3, Color.red) |> draw
 
@@ -68,4 +79,4 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
 
     member this.ApplyEffect (effect: TowerDefenseSandbox.Game.Entities.Effect) =
 
-        effects <- effect::effects 
+        effects <- effect::effects
