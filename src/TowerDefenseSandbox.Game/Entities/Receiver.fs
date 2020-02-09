@@ -15,12 +15,6 @@ type Receiver (position: Vector, draw: Shape -> unit, entityProvider: IEntityPro
     member _.Life with get () = life
 
     interface IEntity with
-
-        member _.Radius = radius
-
-        member _.Position 
-            with get () = position
-            and set(value: Vector) = ()
             
         member _.Update (_: float32<second>) =
 
@@ -28,6 +22,7 @@ type Receiver (position: Vector, draw: Shape -> unit, entityProvider: IEntityPro
             let enemy =
                 entityProvider.GetEntities()
                 |> Seq.filter (fun x -> x.GetType() = typeof<Enemy>)
+                |> Seq.cast<Enemy>
                 |> Seq.filter (fun x -> (Vector.distance position x.Position) - x.Radius < radius)
                 |> Seq.tryHead
 

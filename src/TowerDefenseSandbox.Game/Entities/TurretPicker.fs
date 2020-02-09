@@ -32,13 +32,7 @@ type TurretPicker (position: Vector, width: float32, height: float32, draw: Shap
             entityProvider.RegisterEntity turret
             entityProvider.RemoveEntity this
 
-    interface IEntity with 
-
-        member _.Radius = 0.0f
-
-        member _.Position
-            with get () = position
-            and set (value) = ()
+    interface IEntity with
 
         member _.Update(time: float32<second>) = 
             ()

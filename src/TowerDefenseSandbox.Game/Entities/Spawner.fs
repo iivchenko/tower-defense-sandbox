@@ -29,12 +29,6 @@ type Spawner (position: Vector, draw: Shape -> unit, factory: EnemyFactory) =
 
     interface IEntity with
 
-        member _.Position
-            with get () = position
-            and set(value: Vector) = ()
-
-        member _.Radius = radius
-            
         member _.Update (time: float32<second>) =
             if nextSpawn < 0.0f<second>
                 then 

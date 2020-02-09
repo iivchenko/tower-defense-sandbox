@@ -24,13 +24,12 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
                         Vector.init  radius -radius;
                       |]
 
+    member _.Radius = radius
+
+    member _.Position
+        with get () = center
+
     interface IEntity with
-
-        member _.Position
-            with get () = center
-            and set (value) = center <- value
-
-        member _.Radius = radius
 
         member this.Update (time: float32<second>) =
 

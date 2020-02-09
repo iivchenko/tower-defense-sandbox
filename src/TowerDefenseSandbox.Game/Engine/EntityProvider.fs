@@ -4,11 +4,7 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open System.Collections.Generic
 
-open TowerDefenseSandbox.Engine
-
 type IEntity =
-    abstract member Radius: float32 with get
-    abstract member Position: Vector with get, set
     abstract member Update: float32<second> -> unit
     abstract member Draw: float32<second> -> unit
 

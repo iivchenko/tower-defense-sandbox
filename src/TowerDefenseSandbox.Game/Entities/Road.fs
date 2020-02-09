@@ -7,13 +7,7 @@ open TowerDefenseSandbox.Game.Engine
 
 type Road (position: Vector, width: float32, height: float32, draw: Shape -> unit) = 
 
-    interface IEntity with 
-
-        member _.Radius = width / 2.0f
-
-        member _.Position 
-            with get () = position
-            and set(value: Vector) = ()
+    interface IEntity with
 
         member _.Update (time: float32<second>) =
             ()
