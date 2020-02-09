@@ -2,31 +2,33 @@
 
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
-open MonoGame.Extended
-
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-type Receiver (draw: Shape -> unit, entityProvider: IEntityProvider, zindex: int) = 
+type Receiver (position: Vector, draw: Shape -> unit, entityProvider: IEntityProvider) = 
 
     let mutable life = 10
     let factor = life
-    let center (position: RectangleF) = Vector.init (position.X + position.Width / 2.0f) (position.Y + position.Height / 2.0f)
+
+    let radius = 25.0f
 
     member _.Life with get () = life
 
-    interface ICell with 
+    interface IEntity with
 
-        member _.ZIndex = zindex
+        member _.Radius = radius
+
+        member _.Position 
+            with get () = position
+            and set(value: Vector) = ()
             
-        member _.Update (_: float32<second>) (position: RectangleF) =
+        member _.Update (_: float32<second>) =
 
-            let c = center position
-            let radius = position.Width / 2.0f * ((float32 life)/(float32 factor))
+            let radius = radius / 2.0f * ((float32 life)/(float32 factor))
             let enemy =
                 entityProvider.GetEntities()
                 |> Seq.filter (fun x -> x.GetType() = typeof<Enemy>)
-                |> Seq.filter (fun x -> (Vector.distance c x.Position) - x.Radius < radius)
+                |> Seq.filter (fun x -> (Vector.distance position x.Position) - x.Radius < radius)
                 |> Seq.tryHead
 
             match enemy with 
@@ -35,8 +37,9 @@ type Receiver (draw: Shape -> unit, entityProvider: IEntityProvider, zindex: int
                 life <- life - 1
                 entityProvider.RemoveEntity e
             
-        member _.Draw (_: float32<second>) (position: RectangleF) =
-            let radius = position.Width / 2.0f * ((float32 life)/(float32 factor))
-            let (Vector(x, y)) = center position
+        member _.Draw (_: float32<second>) =
+
+            let (Vector(x, y)) = position
+            let radius = radius * ((float32 life)/(float32 factor))
 
             Circle(x, y, radius, false, Color.coral) |> draw

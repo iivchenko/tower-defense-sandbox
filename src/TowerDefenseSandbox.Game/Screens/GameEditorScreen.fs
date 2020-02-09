@@ -19,7 +19,7 @@ type GameEditorScreen(manager: IScreenManager, draw: Shape -> unit, screenWith: 
     let cellHeight = 45.0f
     let columns = screenWith / int cellWidth
     let raws = screenHeight / int cellHeight
-    let grid = Grid (draw, columns, raws, cellWidth, cellHeight)
+    let grid = Array2D.create columns raws None
 
     let mutable isEscUpPrev = true
     let mutable leftButtonPreviousState = ButtonState.Released
@@ -28,11 +28,13 @@ type GameEditorScreen(manager: IScreenManager, draw: Shape -> unit, screenWith: 
 
     let mutable currentEdit = 0
 
-    let mapTo (e: ICell) = 
+    let mapTo (e: IEntity) = 
         match e with 
         | :? Spawner -> 0
         | :? Road -> 1
         | :? Receiver -> 2
+
+    let center (column: int) (raw: int) = Vector.init ((float32 column) * cellWidth + cellWidth / 2.0f) ((float32 raw) * cellHeight + cellHeight / 2.0f)
 
     do
         Desktop.Widgets.Clear()
@@ -57,9 +59,9 @@ type GameEditorScreen(manager: IScreenManager, draw: Shape -> unit, screenWith: 
                 let y = state.Y / int cellHeight
 
                 grid.[x, y] <- match currentEdit with
-                | 0 -> Spawner (0, draw, new EnemyFactory((fun _ -> ()), new EntityProvider())) :> ICell |> Some
-                | 1 -> Road (draw, 0) :> ICell |> Some
-                | 2 -> Receiver (draw, new EntityProvider(), 0) :> ICell |> Some
+                | 0 -> Spawner (center x y, draw, new EnemyFactory((fun _ -> ()), new EntityProvider())) :> IEntity |> Some
+                | 1 -> Road (Vector.init (float32 x * cellWidth) (float32 y * cellHeight), cellWidth, cellHeight, draw) :> IEntity |> Some
+                | 2 -> Receiver (center x y, draw, new EntityProvider()) :> IEntity |> Some
                 
             else 
                 ()
@@ -92,4 +94,12 @@ type GameEditorScreen(manager: IScreenManager, draw: Shape -> unit, screenWith: 
                 ()
 
         member _.Draw(time: float32<second>) = 
-            grid.Draw time
+            for x in [0..columns - 1] do 
+                for y in [0..raws - 1] do 
+                    match grid.[x, y] with 
+                    | Some entity -> entity.Draw time
+                    | _ -> ()
+
+            for x in [0 .. columns - 1] do
+                for y in [0 .. raws - 1] do
+                    Rectangle(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight, false, Color.black ) |> draw

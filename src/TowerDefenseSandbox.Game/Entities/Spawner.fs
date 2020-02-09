@@ -17,7 +17,7 @@ type EnemyFactory (draw: Shape -> unit, entityProvider: IEntityProvider) =
     member _.UpdatePath (newPath: Vector list) =
         path <- newPath
 
-type Spawner (zindex: int, draw: Shape -> unit, factory: EnemyFactory) =
+type Spawner (position: Vector, draw: Shape -> unit, factory: EnemyFactory) =
 
     [<Literal>] 
     let spawnTime = 1.0f<second>
@@ -27,18 +27,22 @@ type Spawner (zindex: int, draw: Shape -> unit, factory: EnemyFactory) =
 
     let center (position: RectangleF) = Vector.init (position.X + position.Width / 2.0f) (position.Y + position.Height / 2.0f)
 
-    interface ICell with 
+    interface IEntity with
 
-        member _.ZIndex = zindex
+        member _.Position
+            with get () = position
+            and set(value: Vector) = ()
+
+        member _.Radius = radius
             
-        member _.Update (time: float32<second>) (position: RectangleF) =
+        member _.Update (time: float32<second>) =
             if nextSpawn < 0.0f<second>
                 then 
-                    factory.Create (center position)
+                    factory.Create position
                     nextSpawn <- spawnTime
                 else
                     nextSpawn <- nextSpawn - time
             
-        member _.Draw (time: float32<second>) (position: RectangleF) =
-            let (Vector(x, y)) = center position
+        member _.Draw (time: float32<second>) =
+            let (Vector(x, y)) = position
             Circle(x, y, radius, false, Color.aquamarine) |> draw

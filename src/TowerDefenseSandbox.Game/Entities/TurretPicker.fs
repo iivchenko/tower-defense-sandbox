@@ -7,7 +7,9 @@ open MonoGame.Extended
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-type TurretPicker (zindex: int, draw: Shape -> unit, parent: Grid, entityProvider: IEntityProvider, x: int, y: int) =
+type TurretPicker (position: Vector, width: float32, height: float32, draw: Shape -> unit, parent: IEntity option [,], entityProvider: IEntityProvider, x: int, y: int) =
+
+    let center (column: int) (raw: int) = Vector.init ((float32 column) * width + width / 2.0f) ((float32 raw) * height + height / 2.0f)
 
     member this.Click (cellPosition: RectangleF, clickPosition: Vector) = 
         let (Vector(_, clickY)) = clickPosition
@@ -15,25 +17,36 @@ type TurretPicker (zindex: int, draw: Shape -> unit, parent: Grid, entityProvide
 
         match y with 
         | _ when d > 0.0f && d <= cellPosition.Size.Height / 3.0f -> 
-            parent.[x, y] <- Turret.CreateRegular(draw, entityProvider) :> ICell |> Some
+            let turret = Turret.CreateRegular(center x y, draw, entityProvider) :> IEntity
+            parent.[x, y] <- Some turret
+            entityProvider.RegisterEntity turret
+            entityProvider.RemoveEntity this
         | _ when d > cellPosition.Size.Height / 3.0f && d <= cellPosition.Size.Height / 3.0f * 2.0f -> 
-            parent.[x, y] <- Turret.CreateSlow(draw, entityProvider) :> ICell |> Some
+            let turret = Turret.CreateSlow(center x y, draw, entityProvider) :> IEntity
+            parent.[x, y] <- Some turret
+            entityProvider.RegisterEntity turret
+            entityProvider.RemoveEntity this
         | _ ->
-             parent.[x, y] <- Turret.CreateSplash(draw, entityProvider) :> ICell |> Some 
+            let turret = Turret.CreateSplash(center x y, draw, entityProvider) :> IEntity
+            parent.[x, y] <- Some turret
+            entityProvider.RegisterEntity turret
+            entityProvider.RemoveEntity this
 
-    interface ICell with
+    interface IEntity with 
 
-        member _.ZIndex = zindex 
+        member _.Radius = 0.0f
 
-        member _.Update(time: float32<second>) (position: RectangleF) = 
+        member _.Position
+            with get () = position
+            and set (value) = ()
+
+        member _.Update(time: float32<second>) = 
             ()
-        
-        member _.Draw(time: float32<second>) (position: RectangleF) =
-            
-            let x = position.X
-            let y = position.Y
-            let width = position.Size.Width
-            let height = position.Size.Height / 3.0f
+           
+        member this.Draw(time: float32<second>) =
+               
+            let (Vector(x, y)) = position
+            let height = height / 3.0f
 
             Rectangle(x, y + 0.0f * height, width, height, true, Color.black) |> draw
             Rectangle(x, y + 1.0f * height, width, height, true, Color.blue) |> draw
