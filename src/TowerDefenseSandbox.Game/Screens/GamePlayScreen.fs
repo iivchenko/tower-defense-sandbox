@@ -95,7 +95,7 @@ type GamePlayScreen (manager: IScreenManager, draw: Shape -> unit, content: Cont
         Desktop.Widgets.Add(panel)
        
     interface IScreen with 
-        member _.Update (time: float32<second>) =
+        member _.Update (delta: float32<second>) =
 
             if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then manager.ToMainMenu() else ()
 
@@ -121,7 +121,7 @@ type GamePlayScreen (manager: IScreenManager, draw: Shape -> unit, content: Cont
 
             previousButtonState <- state.LeftButton
 
-            entityProvider.GetEntities() |> Seq.iter (fun x -> x.Update(time))
+            entityProvider.Update delta
 
             entityProvider.Flush ()
 
@@ -135,9 +135,9 @@ type GamePlayScreen (manager: IScreenManager, draw: Shape -> unit, content: Cont
                         | :? Receiver as receiver when receiver.Life <= 0 -> manager.ToGameOver()
                         | _ -> ()
 
-        member _.Draw (time: float32<second>) = 
+        member _.Draw (delta: float32<second>) = 
 
-            entityProvider.GetEntities() |> Seq.iter (fun x -> x.Draw(time))
+            entityProvider.Draw delta
 
             for x in [0 .. columns - 1] do
                 for y in [0 .. raws - 1] do

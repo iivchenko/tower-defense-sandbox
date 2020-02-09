@@ -9,6 +9,8 @@ type IEntity =
     abstract member Draw: float32<second> -> unit
 
 type IEntityProvider =
+    abstract member Update: float32<second> -> unit
+    abstract member Draw: float32<second> -> unit
     abstract member GetEntities: unit -> IEntity seq
     abstract member RegisterEntity: IEntity -> unit
     abstract member RemoveEntity: IEntity -> unit
@@ -20,6 +22,12 @@ type EntityProvider() =
     let entities = List<IEntity>()
     
     interface IEntityProvider with
+
+        member _.Update(delta: float32<second>) = 
+            entities |> Seq.iter (fun x -> x.Update delta) 
+
+        member _.Draw(delta: float32<second>) = 
+            entities |> Seq.iter (fun x -> x.Draw delta) 
         
         member _.GetEntities () =
             entities :> IEnumerable<IEntity>
