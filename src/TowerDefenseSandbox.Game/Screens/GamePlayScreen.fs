@@ -15,7 +15,14 @@ open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Entities
 
-type GamePlayScreen (manager: IScreenManager, draw: Shape -> unit, content: ContentManager, screenWith: int, screenHeight: int) =
+type EnemyKilledMessageHandler (entityProvier: IEntityProvider) =
+    
+    interface IMessageHandler<EnemyKilledMessage> with
+
+        member _.Handle (message: EnemyKilledMessage) =
+            entityProvier.RemoveEntity message.Enemy
+
+type GamePlayScreen (manager: IScreenManager, register: IMessageHandlerRegister, queue: IMessageQueue, draw: Shape -> unit, content: ContentManager, screenWith: int, screenHeight: int) =
 
     let h3 = content.Load<SpriteFont>("Fonts\H3")
     let entityProvider = EntityProvider() :> IEntityProvider
@@ -62,7 +69,9 @@ type GamePlayScreen (manager: IScreenManager, draw: Shape -> unit, content: Cont
         | 2 -> Receiver (center column raw, draw, entityProvider) :> IEntity
 
     do
-        let factory = EnemyFactory (draw, entityProvider)
+        register.Register (EnemyKilledMessageHandler(entityProvider) :> IMessageHandler<EnemyKilledMessage>)
+
+        let factory = EnemyFactory (draw, entityProvider, queue)
         let data = JsonConvert.DeserializeObject<(int*int*int) list>(File.ReadAllText("level.json"));
 
         data 

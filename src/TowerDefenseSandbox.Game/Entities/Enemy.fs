@@ -5,7 +5,12 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEntityProvider, path: Vector list) =
+type EnemyKilledMessage (pixels: int, enemy: Enemy) =
+    
+    member _.Pixels = pixels
+    member _.Enemy = enemy
+
+and Enemy (life: int, draw: Shape -> unit, center: Vector, path: Vector list, events: IMessageQueue) =
 
     let mutable life = life
     let mutable center = center
@@ -15,6 +20,8 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
 
     let radius = 10.0f
     let speed = 1.0f
+
+    let pixels = 10
 
     let limit = max 0
     let coordinates = [|
@@ -39,7 +46,7 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
                 match effect with
                 | DamageEffect amount -> 
                     life <- life - amount |> limit
-                    if life = 0 then entityProvider.RemoveEntity this else ()
+                    if life = 0 then (events.Push (EnemyKilledMessage (pixels, this))) else ()
                 | SlowDownEffect (_, koefficient) -> currentSpeed <- currentSpeed * (1.0f - koefficient))
                 
             effects <- 

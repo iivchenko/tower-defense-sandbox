@@ -57,9 +57,8 @@ type GameEditorScreen(manager: IScreenManager, draw: Shape -> unit, screenWith: 
             if leftButtonPreviousState = ButtonState.Pressed && state.LeftButton = ButtonState.Released then
                 let x = state.X / int cellWidth
                 let y = state.Y / int cellHeight
-
                 grid.[x, y] <- match currentEdit with
-                | 0 -> Spawner (center x y, draw, new EnemyFactory((fun _ -> ()), new EntityProvider())) :> IEntity |> Some
+                | 0 -> Spawner (center x y, draw, new EnemyFactory((fun _ -> ()), new EntityProvider(), new MessageBus())) :> IEntity |> Some
                 | 1 -> Road (Vector.init (float32 x * cellWidth) (float32 y * cellHeight), cellWidth, cellHeight, draw) :> IEntity |> Some
                 | 2 -> Receiver (center x y, draw, new EntityProvider()) :> IEntity |> Some
                 

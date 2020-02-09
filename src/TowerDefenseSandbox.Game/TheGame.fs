@@ -44,7 +44,8 @@ type TheGame () as this =
         MyraEnvironment.Game <- this
 
         let createMainScreen () = MainMenuScreen(screenManager, this.Content, this.Exit) :> IScreen
-        let createGamePlayScreen () = GamePlayScreen(screenManager, draw, this.Content, screenWith, screenWith) :> IScreen
+        let bus = MessageBus()
+        let createGamePlayScreen () = GamePlayScreen(screenManager, bus, bus, draw, this.Content, screenWith, screenWith) :> IScreen
         let createGameEditScreen () = GameEditorScreen(screenManager, draw, screenWith, screenHeight) :> IScreen
         let createGameSettingsScreen () = EmptyScreen() :> IScreen
         let createGameOverScreen () = GameOverScreen(screenManager, this.Content) :> IScreen
