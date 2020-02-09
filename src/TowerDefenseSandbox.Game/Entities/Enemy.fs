@@ -5,23 +5,43 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-type EnemyKilledMessage (pixels: int, enemy: Enemy) =
+type EnemyInfo =
+    {Life: int
+     Center: Vector
+     Path: Vector list
+     Pixels: int}
+
+type IEnemyMessage = interface end
+
+type EnemyCreatedMessage (enemy: Enemy) =
+    
+    member _.Enemy = enemy
+
+    interface IEnemyMessage
+
+and EnemyKilledMessage (pixels: int, enemy: Enemy) =
     
     member _.Pixels = pixels
     member _.Enemy = enemy
 
-and Enemy (life: int, draw: Shape -> unit, center: Vector, path: Vector list, events: IMessageQueue) =
+    interface IEnemyMessage
 
-    let mutable life = life
-    let mutable center = center
-    let mutable path = path
+and EnemyMessage = 
+    | EnemyCreatedMessage of EnemyCreatedMessage
+    | EnemyKilledMessage of EnemyKilledMessage
+
+and Enemy (info: EnemyInfo, draw: Shape -> unit, pushMessage: EnemyMessage -> unit) as this =
+
+    let mutable life = info.Life
+    let mutable center = info.Center
+    let mutable path = info.Path
     let mutable effects: Effect list = []
     let mutable orientation = 0.0f
 
     let radius = 10.0f
     let speed = 1.0f
 
-    let pixels = 10
+    let pixels = info.Pixels
 
     let limit = max 0
     let coordinates = [|
@@ -29,6 +49,9 @@ and Enemy (life: int, draw: Shape -> unit, center: Vector, path: Vector list, ev
                         Vector.init -radius -radius;
                         Vector.init  radius -radius;
                       |]
+
+    do
+        pushMessage (EnemyCreatedMessage(new EnemyCreatedMessage(this)))
 
     member _.Radius = radius
 
@@ -46,7 +69,7 @@ and Enemy (life: int, draw: Shape -> unit, center: Vector, path: Vector list, ev
                 match effect with
                 | DamageEffect amount -> 
                     life <- life - amount |> limit
-                    if life = 0 then (events.Push (EnemyKilledMessage (pixels, this))) else ()
+                    if life = 0 then (pushMessage (EnemyKilledMessage(new EnemyKilledMessage (pixels, this)))) else ()
                 | SlowDownEffect (_, koefficient) -> currentSpeed <- currentSpeed * (1.0f - koefficient))
                 
             effects <- 
@@ -85,6 +108,6 @@ and Enemy (life: int, draw: Shape -> unit, center: Vector, path: Vector list, ev
 
     member _.Effects with get () = effects
 
-    member this.ApplyEffect (effect: Effect) =
+    member _.ApplyEffect (effect: Effect) =
 
         effects <- effect::effects

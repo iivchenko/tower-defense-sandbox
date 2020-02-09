@@ -15,6 +15,13 @@ open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Entities
 
+type EnemyCreatedMessageHandler (entityProvier: IEntityProvider) =
+    
+    interface IMessageHandler<EnemyCreatedMessage> with
+
+        member _.Handle (message: EnemyCreatedMessage) =
+            entityProvier.RegisterEntity message.Enemy
+
 type EnemyKilledMessageHandler (entityProvier: IEntityProvider) =
     
     interface IMessageHandler<EnemyKilledMessage> with
@@ -22,10 +29,17 @@ type EnemyKilledMessageHandler (entityProvier: IEntityProvider) =
         member _.Handle (message: EnemyKilledMessage) =
             entityProvier.RemoveEntity message.Enemy
 
-type GamePlayScreen (manager: IScreenManager, register: IMessageHandlerRegister, queue: IMessageQueue, draw: Shape -> unit, content: ContentManager, screenWith: int, screenHeight: int) =
+type GamePlayScreen (
+                    manager: IScreenManager, 
+                    entityProvider: IEntityProvider,
+                    register: IMessageHandlerRegister, 
+                    queue: IMessageQueue, 
+                    draw: Shape -> unit, 
+                    content: ContentManager, 
+                    screenWith: int, 
+                    screenHeight: int) =
 
     let h3 = content.Load<SpriteFont>("Fonts\H3")
-    let entityProvider = EntityProvider() :> IEntityProvider
     let cellWidth = 48.0f
     let cellHeight = 45.0f
     let columns = screenWith / int cellWidth
@@ -69,9 +83,13 @@ type GamePlayScreen (manager: IScreenManager, register: IMessageHandlerRegister,
         | 2 -> Receiver (center column raw, draw, entityProvider) :> IEntity
 
     do
-        register.Register (EnemyKilledMessageHandler(entityProvider) :> IMessageHandler<EnemyKilledMessage>)
+        register.Register (EnemyCreatedMessageHandler(entityProvider) :> IMessageHandler<EnemyCreatedMessage>)
+        register.Register (EnemyKilledMessageHandler(entityProvider) :> IMessageHandler<EnemyKilledMessage>)        
 
-        let factory = EnemyFactory (draw, entityProvider, queue)
+        let factory = EnemyFactory (draw, fun message -> 
+                                                    match message with 
+                                                    | EnemyCreatedMessage m -> queue.Push m
+                                                    | EnemyKilledMessage m -> queue.Push m)
         let data = JsonConvert.DeserializeObject<(int*int*int) list>(File.ReadAllText("level.json"));
 
         data 

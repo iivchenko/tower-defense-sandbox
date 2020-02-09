@@ -5,12 +5,14 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-type EnemyFactory (draw: Shape -> unit, entityProvider: IEntityProvider, queue: IMessageQueue) = 
+type EnemyFactory (draw: Shape -> unit, pushMessage: EnemyMessage -> unit) = 
     
     let mutable path = []
 
     member _.Create (center: Vector) =
-        Enemy(100, draw, center, path, queue) |> entityProvider.RegisterEntity
+        let info = { Life = 100; Center = center; Path = path; Pixels = 75 }
+
+        Enemy(info, draw, pushMessage) |> ignore
 
     member _.UpdatePath (newPath: Vector list) =
         path <- newPath
