@@ -10,7 +10,7 @@ type Receiver (position: Vector, draw: Shape -> unit, entityProvider: IEntityPro
     let (Vector(x, y)) = position
 
     let mutable life = 10
-    let factor = life
+    let maxLife = life
 
     let maxRadius = 25.0f
     let mutable radius = maxRadius
@@ -34,7 +34,7 @@ type Receiver (position: Vector, draw: Shape -> unit, entityProvider: IEntityPro
             | Some e ->
                 life <- life - 1
                 entityProvider.RemoveEntity e
-                radius <- maxRadius / 2.0f * ((float32 life)/(float32 factor))
+                radius <- maxRadius * ((float32 life)/(float32 maxLife))
                 body <- Circle(x, y, radius, false, Color.coral) 
             
         member _.Draw (_: float32<second>) =

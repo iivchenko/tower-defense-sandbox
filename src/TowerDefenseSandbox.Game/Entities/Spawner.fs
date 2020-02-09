@@ -25,6 +25,12 @@ type Spawner (position: Vector, draw: Shape -> unit, factory: EnemyFactory) =
     let (Vector(x, y)) = position
     let body = Circle(x, y, radius, false, Color.aquamarine)
 
+    // Blinker
+    let maxK = 1.0f
+    let factor = 0.1f
+    let frequency = 25.0f<1/second>
+    let mutable k = 0.0f
+
     interface IEntity with
 
         member _.Update (delta: float32<second>) =
@@ -34,6 +40,9 @@ type Spawner (position: Vector, draw: Shape -> unit, factory: EnemyFactory) =
                     nextSpawn <- spawnTime
                 else
                     nextSpawn <- nextSpawn - delta
+
+            if k <= maxK then k <- k + factor * frequency * delta else k <- 0.0f
             
         member _.Draw (_: float32<second>) =
+            Circle(x, y, radius * k, false, Color.red) |> draw
             draw body
