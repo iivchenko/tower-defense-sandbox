@@ -22,12 +22,14 @@ type EnemyCreatedMessageHandler (entityProvier: IEntityProvider) =
         member _.Handle (message: EnemyCreatedMessage) =
             entityProvier.RegisterEntity message.Enemy
 
-type EnemyKilledMessageHandler (entityProvier: IEntityProvider) =
+type EnemyKilledMessageHandler (entityProvier: IEntityProvider, updatePixels: int -> unit) =
     
     interface IMessageHandler<EnemyKilledMessage> with
 
         member _.Handle (message: EnemyKilledMessage) =
             entityProvier.RemoveEntity message.Enemy
+
+            updatePixels message.Pixels
 
 type GamePlayScreen (
                     manager: IScreenManager, 
@@ -46,6 +48,8 @@ type GamePlayScreen (
     let raws = screenHeight / int cellHeight
 
     let lifes = new Label()
+    let pixelsLabel = new Label()
+    let mutable pixels = 0
 
     let mutable isEscUpPrev = true
     let grid: IEntity option [,] = Array2D.init columns raws (fun _ _ -> None)
@@ -83,8 +87,11 @@ type GamePlayScreen (
         | 2 -> Receiver (center column raw, draw, entityProvider) :> IEntity
 
     do
+        let updatePixels p = 
+            pixels <- pixels + p
+            pixelsLabel.Text <- sprintf "Pixels: %i" pixels
         register.Register (EnemyCreatedMessageHandler(entityProvider) :> IMessageHandler<EnemyCreatedMessage>)
-        register.Register (EnemyKilledMessageHandler(entityProvider) :> IMessageHandler<EnemyKilledMessage>)        
+        register.Register (EnemyKilledMessageHandler(entityProvider, updatePixels) :> IMessageHandler<EnemyKilledMessage>)        
 
         let factory = EnemyFactory (draw, fun message -> 
                                                     match message with 
@@ -117,7 +124,15 @@ type GamePlayScreen (
         lifes.PaddingRight <- 20
         lifes.PaddingTop <- 20
 
+        pixelsLabel.Text <- "Pixels: 0"
+        pixelsLabel.Font <- h3
+        pixelsLabel.HorizontalAlignment <- HorizontalAlignment.Right
+        pixelsLabel.VerticalAlignment <- VerticalAlignment.Center 
+        pixelsLabel.PaddingRight <- 20
+        pixelsLabel.PaddingTop <- 20
+
         panel.Widgets.Add(lifes)
+        panel.Widgets.Add(pixelsLabel)
 
         Desktop.Widgets.Add(panel)
        
