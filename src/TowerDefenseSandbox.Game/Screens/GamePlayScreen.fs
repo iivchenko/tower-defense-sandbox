@@ -5,7 +5,6 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Input
-open MonoGame.Extended
 
 open Myra.Graphics2D.UI
 
@@ -115,7 +114,7 @@ type GamePlayScreen (manager: IScreenManager, draw: Shape -> unit, content: Cont
                     entityProvider.RegisterEntity picker
                 | Some cell ->
                     match cell with 
-                    | :? TurretPicker as picker -> picker.Click(RectangleF(float32 column * cellWidth, float32 raw * cellHeight, cellWidth, cellHeight), Vector(float32 state.X, float32 state.Y))
+                    | :? TurretPicker as picker -> picker.Click(Vector(float32 state.X, float32 state.Y))
                     | _ -> ()
             else 
                 ()

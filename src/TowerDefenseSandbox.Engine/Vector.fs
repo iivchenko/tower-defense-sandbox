@@ -15,3 +15,4 @@ module Vector =
     let distance (Vector (x1, y1): Vector) (Vector(x2, y2): Vector) = pown (x2 - x1) 2 + pown (y2 - y1) 2 |> sqrt
     let length (Vector(x, y)) = pown x 2 + pown y 2 |> sqrt
     let normalize (v: Vector) = v / length v
+    let direction v1 v2 = v1 - v2 |> normalize

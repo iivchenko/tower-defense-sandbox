@@ -2,8 +2,6 @@
 
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
-open MonoGame.Extended
-
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
@@ -11,15 +9,15 @@ open TowerDefenseSandbox.Game.Engine
 
 type Boom (draw: Shape -> unit, center: Vector, radius: float32, entityProvider: IEntityProvider) =
     
-    let delta = radius / 3.0f
+    let k = radius / 3.0f
+    let (Vector(x, y)) = center
 
-    let mutable center = center
     let mutable ttl = 0.3f<second>
     let mutable radius = 0.0f
 
     interface IEntity with
 
-        member this.Update (time: float32<second>) =
+        member this.Update (delta: float32<second>) =
 
             if (ttl <= 0.0f<second>) 
                 then entityProvider.RemoveEntity this
@@ -30,11 +28,11 @@ type Boom (draw: Shape -> unit, center: Vector, radius: float32, entityProvider:
                         |> Seq.filter (fun entity -> Vector.distance center entity.Position < radius)
                         |> Seq.iter (fun enemy -> DamageEffect 3 |> enemy.ApplyEffect)
 
-            ttl <- ttl - time
-            radius <- radius + (delta / 0.1f<second>) * time
+            ttl <- ttl - delta
+            radius <- radius + (k / 0.1f<second>) * delta
 
         member _.Draw (time: float32<second>) =
-            let (Vector(x, y)) = center
+
             Circle(x, y, radius, true, Color(byte 255, byte 0, byte 0, byte 50)) |> draw
 
 type Bullet(draw: Vector -> unit, entityProvider: IEntityProvider, center: Vector, speed: float32<pixel/second>, getTargetPosition: unit -> Vector, apply: Bullet -> unit) =
@@ -44,13 +42,12 @@ type Bullet(draw: Vector -> unit, entityProvider: IEntityProvider, center: Vecto
 
     member _.Position
         with get () = center
-        and set (value) = center <- value
 
     interface IEntity with
     
-        member this.Update (time: float32<second>) =
+        member this.Update (delta: float32<second>) =
             let v = getTargetPosition()
-            let velocity = (center - v |> Vector.normalize) * float32 (speed * time)
+            let velocity = (Vector.direction center v) * float32 (speed * delta)
             
             center <- center + velocity
 
@@ -61,7 +58,7 @@ type Bullet(draw: Vector -> unit, entityProvider: IEntityProvider, center: Vecto
                 else 
                     ()
 
-        member _.Draw (time: float32<second>) =
+        member _.Draw (_: float32<second>) =
             draw center
 
 type Turret (
@@ -75,11 +72,17 @@ type Turret (
             entityProvider: IEntityProvider) =
 
     let radius = 25.0f
+    let (Vector(x, y)) = center
+    let body = Circle(x, y, radius, true, color)
+
+    #if DEBUG
+    let view = Circle(x, y, viewRadius, false, Color.aquamarine)
+    #endif
 
     let mutable nextReload = reload
 
     interface IEntity with
-`
+
         member _.Update(time: float32<second>) = 
 
             let enemies = 
@@ -97,13 +100,12 @@ type Turret (
 
             nextReload <- nextReload - time
 
-        member _.Draw(time: float32<second>) =
+        member _.Draw(_: float32<second>) =
 
-            let (Vector(x, y)) = center
-            Circle(x, y, radius, true, color) |> draw
+            draw body
 
             #if DEBUG
-            Circle(x, y, viewRadius, false, Color.aquamarine) |> draw
+            draw view
             #endif
 
     static member private Create(center: Vector, color: Color, viewRadius: float32, reload: float32<second>, select: Enemy seq -> Enemy option, fire: Vector -> Enemy -> unit, draw: Shape -> unit, entityProvider: IEntityProvider) =  

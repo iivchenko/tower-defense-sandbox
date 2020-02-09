@@ -2,8 +2,6 @@
 
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
-open MonoGame.Extended
-
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
@@ -24,19 +22,18 @@ type Spawner (position: Vector, draw: Shape -> unit, factory: EnemyFactory) =
 
     let radius = 15.0f
     let mutable nextSpawn = spawnTime
-
-    let center (position: RectangleF) = Vector.init (position.X + position.Width / 2.0f) (position.Y + position.Height / 2.0f)
+    let (Vector(x, y)) = position
+    let body = Circle(x, y, radius, false, Color.aquamarine)
 
     interface IEntity with
 
-        member _.Update (time: float32<second>) =
+        member _.Update (delta: float32<second>) =
             if nextSpawn < 0.0f<second>
                 then 
                     factory.Create position
                     nextSpawn <- spawnTime
                 else
-                    nextSpawn <- nextSpawn - time
+                    nextSpawn <- nextSpawn - delta
             
-        member _.Draw (time: float32<second>) =
-            let (Vector(x, y)) = position
-            Circle(x, y, radius, false, Color.aquamarine) |> draw
+        member _.Draw (_: float32<second>) =
+            draw body

@@ -7,18 +7,21 @@ open TowerDefenseSandbox.Game.Engine
 
 type Receiver (position: Vector, draw: Shape -> unit, entityProvider: IEntityProvider) = 
 
+    let (Vector(x, y)) = position
+
     let mutable life = 10
     let factor = life
 
-    let radius = 25.0f
+    let maxRadius = 25.0f
+    let mutable radius = maxRadius
+    let mutable body = Circle(x, y, radius, false, Color.coral) 
 
     member _.Life with get () = life
 
     interface IEntity with
             
         member _.Update (_: float32<second>) =
-
-            let radius = radius / 2.0f * ((float32 life)/(float32 factor))
+        
             let enemy =
                 entityProvider.GetEntities()
                 |> Seq.filter (fun x -> x.GetType() = typeof<Enemy>)
@@ -31,10 +34,9 @@ type Receiver (position: Vector, draw: Shape -> unit, entityProvider: IEntityPro
             | Some e ->
                 life <- life - 1
                 entityProvider.RemoveEntity e
+                radius <- maxRadius / 2.0f * ((float32 life)/(float32 factor))
+                body <- Circle(x, y, radius, false, Color.coral) 
             
         member _.Draw (_: float32<second>) =
 
-            let (Vector(x, y)) = position
-            let radius = radius * ((float32 life)/(float32 factor))
-
-            Circle(x, y, radius, false, Color.coral) |> draw
+            draw body

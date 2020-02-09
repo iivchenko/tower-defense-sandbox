@@ -7,12 +7,15 @@ open TowerDefenseSandbox.Game.Engine
 
 type Road (position: Vector, width: float32, height: float32, draw: Shape -> unit) = 
 
+    let (Vector(x, y)) = position
+    let body = Rectangle(x, y, width, height, true, Color.grey)
+
     interface IEntity with
 
-        member _.Update (time: float32<second>) =
+        member _.Update (_: float32<second>) =
             ()
             
-        member _.Draw (time: float32<second>) =
-            let (Vector(x, y)) = position
-            Rectangle(x, y, width, height, true, Color.grey) |> draw
+        member _.Draw (_: float32<second>) =
+            
+            draw body
 

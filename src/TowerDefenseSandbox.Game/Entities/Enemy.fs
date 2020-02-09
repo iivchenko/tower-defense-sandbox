@@ -17,7 +17,6 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
     let speed = 1.0f
 
     let limit = max 0
-    let direction v1 v2 = v2 - v1 |> Vector.normalize
     let coordinates = [|
                         Vector.init  00.0f   radius;
                         Vector.init -radius -radius;
@@ -31,7 +30,7 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
 
     interface IEntity with
 
-        member this.Update (time: float32<second>) =
+        member this.Update (delta: float32<second>) =
 
             let mutable currentSpeed = speed
 
@@ -51,18 +50,21 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
                            | SlowDownEffect (period, _) -> period > 0.0f<second>)
                 |> List.map (fun effect -> 
                     match effect with
-                    | SlowDownEffect (period, koefficient) -> SlowDownEffect(period - time, koefficient)
+                    | SlowDownEffect (period, koefficient) -> SlowDownEffect(period - delta, koefficient)
                     | e -> e)
 
             match path with 
-            | h::tail when Vector.distance center h < radius -> path <- tail
+            | target::tail when Vector.distance center target < radius -> 
+                path <- tail
             | h::_ ->
-                let (x, y) = direction h center |> Vector.unwrap
-                orientation <- System.Math.Atan2(float -x, float y) |> float32
-                center <- center + currentSpeed * (direction h center)
+                let direction = Vector.direction center h
+                let (x, y) = Vector.unwrap direction
+
+                orientation <- atan2 -x y
+                center <- center + currentSpeed * direction
             | _ -> ()
 
-        member _.Draw (time: float32<second>) =
+        member _.Draw (_: float32<second>) =
             
             let (Vector(x, y)) = center
 
@@ -76,6 +78,6 @@ type Enemy (life: int, draw: Shape -> unit, center: Vector, entityProvider: IEnt
 
     member _.Effects with get () = effects
 
-    member this.ApplyEffect (effect: TowerDefenseSandbox.Game.Entities.Effect) =
+    member this.ApplyEffect (effect: Effect) =
 
         effects <- effect::effects
