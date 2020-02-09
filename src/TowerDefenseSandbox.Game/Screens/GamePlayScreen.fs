@@ -39,7 +39,7 @@ type GamePlayScreen (
                     draw: Shape -> unit, 
                     content: ContentManager, 
                     screenWith: int, 
-                    screenHeight: int) =
+                    screenHeight: int) as this=
 
     let h3 = content.Load<SpriteFont>("Fonts\H3")
     let cellWidth = 48.0f
@@ -49,11 +49,13 @@ type GamePlayScreen (
 
     let lifes = new Label()
     let pixelsLabel = new Label()
-    let mutable pixels = 0
+    let mutable pixels = 75
 
     let mutable isEscUpPrev = true
     let grid: IEntity option [,] = Array2D.init columns raws (fun _ _ -> None)
     let mutable previousButtonState = ButtonState.Released
+
+    let pushTurretMessage (message: TurretCreatedMessage) = queue.Push message
 
     let createPath (grid: IEntity option [,]) =
         let rec findSpawner (grid: IEntity option [,]) x y raws columns =
@@ -90,6 +92,8 @@ type GamePlayScreen (
         let updatePixels p = 
             pixels <- pixels + p
             pixelsLabel.Text <- sprintf "Pixels: %i" pixels
+
+        register.Register (this :> IMessageHandler<TurretCreatedMessage>)
         register.Register (EnemyCreatedMessageHandler(entityProvider) :> IMessageHandler<EnemyCreatedMessage>)
         register.Register (EnemyKilledMessageHandler(entityProvider, updatePixels) :> IMessageHandler<EnemyKilledMessage>)        
 
@@ -124,7 +128,7 @@ type GamePlayScreen (
         lifes.PaddingRight <- 20
         lifes.PaddingTop <- 20
 
-        pixelsLabel.Text <- "Pixels: 0"
+        pixelsLabel.Text <- sprintf "Pixels: %i" pixels
         pixelsLabel.Font <- h3
         pixelsLabel.HorizontalAlignment <- HorizontalAlignment.Right
         pixelsLabel.VerticalAlignment <- VerticalAlignment.Center 
@@ -136,6 +140,12 @@ type GamePlayScreen (
 
         Desktop.Widgets.Add(panel)
        
+    interface IMessageHandler<TurretCreatedMessage> with
+       
+            member _.Handle (message: TurretCreatedMessage) =
+                pixels <- pixels - message.Pixels
+                pixelsLabel.Text <- sprintf "Pixels: %i" pixels
+
     interface IScreen with 
         member _.Update (delta: float32<second>) =
 
@@ -151,12 +161,12 @@ type GamePlayScreen (
 
                 match grid.[column, raw] with
                 | None -> 
-                    let picker = TurretPicker(Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight, draw, grid, entityProvider, column, raw) :> IEntity
+                    let picker = TurretPicker(Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight, draw, grid, pushTurretMessage, entityProvider, column, raw) :> IEntity
                     grid.[column, raw] <- Some picker
                     entityProvider.RegisterEntity picker
                 | Some cell ->
                     match cell with 
-                    | :? TurretPicker as picker -> picker.Click(Vector(float32 state.X, float32 state.Y))
+                    | :? TurretPicker as picker -> picker.Click(Vector(float32 state.X, float32 state.Y), pixels)
                     | _ -> ()
             else 
                 ()
