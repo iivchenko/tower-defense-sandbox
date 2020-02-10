@@ -14,6 +14,7 @@ type Shape =
 | Circle of x: float32 * y: float32 * radius: float32 * fill: bool * color: Color
 | Rectangle of x: float32 * y: float32 * width: float32 * height: float32 * fill: bool * color: Color
 | Triangle of x: float32 * y: float32 * a1: Vector * a2: Vector * a3: Vector * color: Color
+| Polygon of x: float32 * y: float32 * points: Vector list * color: Color
 | Shape of Shape list
 
 type IDrawSystem =

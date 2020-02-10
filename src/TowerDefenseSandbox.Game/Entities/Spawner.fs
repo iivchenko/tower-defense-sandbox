@@ -10,9 +10,7 @@ type EnemyFactory (draw: Shape -> unit, pushMessage: EnemyMessage -> unit) =
     let mutable path = []
 
     member _.Create (center: Vector) =
-        let info = { Life = 100; Center = center; Path = path; Pixels = 75 }
-
-        Enemy(info, draw, pushMessage) |> ignore
+        Enemy.CreateHard (center, path, draw, pushMessage)
 
     member _.UpdatePath (newPath: Vector list) =
         path <- newPath
