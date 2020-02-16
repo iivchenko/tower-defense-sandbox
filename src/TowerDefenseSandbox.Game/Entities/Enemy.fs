@@ -111,7 +111,7 @@ and Enemy (info: EnemyInfo, createBody: Vector -> float32 -> float32 -> Shape, d
 
             Triangle (x, y, a1, a2, a3, Color.red)
 
-        let info = { Life = 100; Speed = 1.0f; Center = position; Path = path; Pixels = 50 }
+        let info = { Life = 200; Speed = 1.0f; Center = position; Path = path; Pixels = 10 }
 
         Enemy(info, createBody, draw, pushMessage)
 
@@ -121,7 +121,7 @@ and Enemy (info: EnemyInfo, createBody: Vector -> float32 -> float32 -> Shape, d
 
             Circle (x, y, radius, false, Color.red)
 
-        let info = { Life = 50; Speed = 3.0f; Center = position; Path = path; Pixels = 30 }
+        let info = { Life = 100; Speed = 2.0f; Center = position; Path = path; Pixels = 5 }
 
         Enemy(info, createBody, draw, pushMessage)
 
@@ -137,6 +137,6 @@ and Enemy (info: EnemyInfo, createBody: Vector -> float32 -> float32 -> Shape, d
 
             Polygon (x, y, a1::a2::a3::a4::[], Color.red)
 
-        let info = { Life = 500; Speed = 0.5f; Center = position; Path = path; Pixels = 100 }
+        let info = { Life = 1000; Speed = 0.5f; Center = position; Path = path; Pixels = 15 }
 
         Enemy(info,createBody,  draw, pushMessage)

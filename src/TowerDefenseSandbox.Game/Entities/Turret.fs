@@ -26,7 +26,7 @@ type Boom (draw: Shape -> unit, center: Vector, radius: float32, entityProvider:
                         |> Seq.filter (fun x -> x.GetType() = typeof<Enemy>)
                         |> Seq.cast<Enemy>
                         |> Seq.filter (fun entity -> Vector.distance center entity.Position < radius)
-                        |> Seq.iter (fun enemy -> DamageEffect 3 |> enemy.ApplyEffect)
+                        |> Seq.iter (fun enemy -> DamageEffect 5 |> enemy.ApplyEffect)
 
             ttl <- ttl - delta
             radius <- radius + (k / 0.1f<second>) * delta
@@ -145,7 +145,7 @@ type Turret (
 
         let fire position (enemy: Enemy)= 
             let draw (Vector(x, y)) = Rectangle(x - 7.0f, y - 7.0f, 7.0f, 7.0f, true, Color.blue) |> draw
-            Bullet(draw, entityProvider, position, 100.0f<pixel/second>, (fun _ -> enemy.Position), (fun _ -> SlowDownEffect (5.0f<second>, 0.5f) |> enemy.ApplyEffect)) |> entityProvider.RegisterEntity
+            Bullet(draw, entityProvider, position, 150.0f<pixel/second>, (fun _ -> enemy.Position), (fun _ -> SlowDownEffect (5.0f<second>, 0.5f) |> enemy.ApplyEffect)) |> entityProvider.RegisterEntity
 
         let info = {Position = position; Color = Color.blue; ViewRadius = 100.0f; Reload = 0.7f<second>; Pixels = 100}
         Turret.Create (info, select, fire, draw, pushMessage, entityProvider)
@@ -158,5 +158,5 @@ type Turret (
             let drawBullet (Vector(x, y)) = Circle(x, y, 2.5f, false, Color.red) |> draw
             Bullet(drawBullet, entityProvider, position, 250.0f<pixel/second>, (fun _ -> target), (fun bullet -> Boom(draw, bullet.Position, 100.0f, entityProvider) |> entityProvider.RegisterEntity)) |> entityProvider.RegisterEntity
 
-        let info = {Position = position; Color = Color.red; ViewRadius = 100.0f; Reload = 1.0f<second>; Pixels = 150}
+        let info = {Position = position; Color = Color.red; ViewRadius = 100.0f; Reload = 1.0f<second>; Pixels = 120}
         Turret.Create (info, select, fire, draw, pushMessage, entityProvider)

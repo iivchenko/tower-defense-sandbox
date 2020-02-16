@@ -34,7 +34,7 @@ type TurretPicker (
             parent.[column, raw] <- Some turret
             entityProvider.RegisterEntity turret
             entityProvider.RemoveEntity this
-        | _ when pixels >= 150->
+        | _ when pixels >= 120->
             let turret = Turret.CreateSplash(center column raw, draw, pushMessage, entityProvider) :> IEntity
             parent.[column, raw] <- Some turret
             entityProvider.RegisterEntity turret
