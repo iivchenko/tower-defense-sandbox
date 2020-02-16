@@ -1,5 +1,5 @@
 # Tower Defense Sandbox
-Yet another project to learn game development and functional paradigm. The game reprosends prototype to the classical tower deffence.
+Yet another project to learn game development and functional paradigm. The game represents prototype to the classical tower defense.
 
 [Roadmap](https://github.com/iivchenko/tower-defense-sandbox/wiki/Roadmap)
 
