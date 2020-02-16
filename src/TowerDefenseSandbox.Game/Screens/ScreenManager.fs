@@ -10,6 +10,7 @@ type ScreenManager() =
     let mutable createGamePlayScreen = (fun () -> EmptyScreen() :> IScreen)
     let mutable createGameEditScreen = (fun () -> EmptyScreen() :> IScreen)
     let mutable createGameSettingsScreen = (fun () -> EmptyScreen() :> IScreen)
+    let mutable createGameVictoryScreen = (fun () -> EmptyScreen() :> IScreen)
     let mutable createGameOverScreen = (fun () -> EmptyScreen() :> IScreen)
 
     member _.Screen with get() = screen and set value = screen <-value
@@ -18,6 +19,7 @@ type ScreenManager() =
     member _.SetGamePlay factory = createGamePlayScreen <- factory
     member _.SetGameEdit factory = createGameEditScreen <- factory
     member _.SetGameSettings factory = createGameSettingsScreen <- factory
+    member _.SetGameVictory factory = createGameVictoryScreen <- factory
     member _.SetGameOver factory = createGameOverScreen <- factory
 
     interface IScreenManager with
@@ -26,5 +28,6 @@ type ScreenManager() =
         member _.ToGamePlay () = screen <- createGamePlayScreen()
         member _.ToGameEdit () = screen <- createGameEditScreen()
         member _.ToGameSettings () = screen <- createGameSettingsScreen()
+        member _.ToGameVictory () = screen <- createGameVictoryScreen()
         member _.ToGameOver () = screen <- createGameOverScreen()
 

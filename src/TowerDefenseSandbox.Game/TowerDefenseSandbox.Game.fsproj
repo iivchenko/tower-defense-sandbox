@@ -21,6 +21,7 @@
     <Compile Include="Screens\IScreenManager.fs" />
     <Compile Include="Screens\GameEditorScreen.fs" />
     <Compile Include="Screens\GamePlayScreen.fs" />
+    <Compile Include="Screens\GameVictoryScreen.fs" />
     <Compile Include="Screens\GameOverScreen.fs" />
     <Compile Include="Screens\MainMenuScreen.fs" />
     <Compile Include="Screens\ScreenManager.fs" />

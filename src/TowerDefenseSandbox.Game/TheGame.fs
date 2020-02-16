@@ -52,12 +52,14 @@ type TheGame () as this =
 
         let createGameEditScreen () = GameEditorScreen(screenManager, draw, screenWith, screenHeight) :> IScreen
         let createGameSettingsScreen () = EmptyScreen() :> IScreen
+        let createGameVictoryScreen () = GameVictoryScreen(screenManager, this.Content) :> IScreen
         let createGameOverScreen () = GameOverScreen(screenManager, this.Content) :> IScreen
 
         screenManager.SetMainMenu createMainScreen
         screenManager.SetGamePlay createGamePlayScreen
         screenManager.SetGameEdit createGameEditScreen
         screenManager.SetGameSettings createGameSettingsScreen
+        screenManager.SetGameVictory createGameVictoryScreen
         screenManager.SetGameOver createGameOverScreen
 
         (screenManager :> IScreenManager).ToMainMenu ()

@@ -31,6 +31,13 @@ type EnemyKilledMessageHandler (entityProvier: IEntityProvider, updatePixels: in
 
             updatePixels message.Pixels
 
+type GameVictoryMessageHandler (manager: IScreenManager) =
+    
+    interface IMessageHandler<WavesOverMessage> with
+    
+        member _.Handle (_: WavesOverMessage) =
+            manager.ToGameVictory()
+
 type GamePlayScreen (
                     manager: IScreenManager, 
                     entityProvider: IEntityProvider,
@@ -49,7 +56,7 @@ type GamePlayScreen (
 
     let lifes = new Label()
     let pixelsLabel = new Label()
-    let mutable pixels = 75
+    let mutable pixels = 100
 
     let mutable isEscUpPrev = true
     let grid: IEntity option [,] = Array2D.init columns raws (fun _ _ -> None)
@@ -84,7 +91,7 @@ type GamePlayScreen (
     let center (column: int) (raw: int) = Vector.init ((float32 column) * cellWidth + cellWidth / 2.0f) ((float32 raw) * cellHeight + cellHeight / 2.0f)
     let createEntity (t: int) (draw: Shape -> unit) column raw (entityProvider: IEntityProvider) (factory: EnemyFactory) =
         match t with 
-        | 0 -> Spawner (center column raw, draw, factory) :> IEntity
+        | 0 -> Spawner (center column raw, draw, factory, (fun m -> queue.Push m), entityProvider) :> IEntity
         | 1 -> Road (Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight, draw) :> IEntity
         | 2 -> Receiver (center column raw, draw, entityProvider) :> IEntity
 
@@ -94,6 +101,7 @@ type GamePlayScreen (
             pixelsLabel.Text <- sprintf "Pixels: %i" pixels
 
         register.Register (this :> IMessageHandler<TurretCreatedMessage>)
+        register.Register (GameVictoryMessageHandler(manager) :> IMessageHandler<WavesOverMessage>)
         register.Register (EnemyCreatedMessageHandler(entityProvider) :> IMessageHandler<EnemyCreatedMessage>)
         register.Register (EnemyKilledMessageHandler(entityProvider, updatePixels) :> IMessageHandler<EnemyKilledMessage>)        
 
@@ -142,10 +150,10 @@ type GamePlayScreen (
        
     interface IMessageHandler<TurretCreatedMessage> with
        
-            member _.Handle (message: TurretCreatedMessage) =
-                pixels <- pixels - message.Pixels
-                pixelsLabel.Text <- sprintf "Pixels: %i" pixels
-
+        member _.Handle (message: TurretCreatedMessage) =
+            pixels <- pixels - message.Pixels
+            pixelsLabel.Text <- sprintf "Pixels: %i" pixels
+        
     interface IScreen with 
         member _.Update (delta: float32<second>) =
 
