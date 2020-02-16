@@ -11,6 +11,7 @@ open TowerDefenseSandbox.Game.Engine
 
 type MainMenuScreen (manager: IScreenManager, content: ContentManager, exit: unit -> unit) =
 
+    let version = "version: 0.1.0"
     let mutable isEscUpPrev = true
 
     let startGame _ = manager.ToGamePlay()
@@ -67,10 +68,18 @@ type MainMenuScreen (manager: IScreenManager, content: ContentManager, exit: uni
         menu.Items.Add(settingsMenuItem)
         menu.Items.Add(exitMenuItem)
 
+        let versionLabel = new Label()
+        versionLabel.Text <- version
+        versionLabel.HorizontalAlignment <- HorizontalAlignment.Right
+        versionLabel.VerticalAlignment <- VerticalAlignment.Bottom
+        versionLabel.PaddingRight <- 25
+        versionLabel.PaddingBottom <- 25
+
         panel.Widgets.Add(label)
         panel.Widgets.Add(menu)
 
         Desktop.Widgets.Add(panel)
+        Desktop.Widgets.Add(versionLabel)
 
     interface IScreen with
 
