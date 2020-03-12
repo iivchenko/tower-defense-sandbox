@@ -65,8 +65,8 @@ type TheGame () as this =
 
         MyraEnvironment.Game <- this
 
-        let createMainScreen () = MainMenuScreen(screenManager, this.Content, this.Exit) :> IScreen
-       
+        let createMainScreen () = MainMenuScreen(screenManager, this.Content, this.Exit) :> IScene
+
         let createGamePlayScreen () = 
             let entityProvider = new EntityProvider()
             let bus = MessageBus()
@@ -75,12 +75,12 @@ type TheGame () as this =
             register.Register (GameOverMessageHandler(screenManager) :> IMessageHandler<GameOverMessage>)
             register.Register (GameExitMessageHandler(screenManager) :> IMessageHandler<GameExitMessage>)
 
-            GamePlayScreen(entityProvider, bus, bus, draw, this.Content, screenWith, screenWith) :> IScreen
+            GamePlayScreen(entityProvider, bus, bus, draw, this.Content, screenWith, screenWith) :> IScene
 
-        let createGameEditScreen () = GameEditorScreen(screenManager, draw, screenWith, screenHeight) :> IScreen
-        let createGameSettingsScreen () = EmptyScreen() :> IScreen
-        let createGameVictoryScreen () = GameVictoryScreen(screenManager, this.Content) :> IScreen
-        let createGameOverScreen () = GameOverScreen(screenManager, this.Content) :> IScreen
+        let createGameEditScreen () = GameEditorScreen(screenManager, draw, screenWith, screenHeight) :> IScene
+        let createGameSettingsScreen () = EmptyScene() :> IScene
+        let createGameVictoryScreen () = GameVictoryScreen(screenManager, this.Content) :> IScene
+        let createGameOverScreen () = GameOverScreen(screenManager, this.Content) :> IScene
 
         screenManager.SetMainMenu createMainScreen
         screenManager.SetGamePlay createGamePlayScreen
@@ -93,7 +93,7 @@ type TheGame () as this =
 
     override _.Update (gameTime: GameTime) =
 
-        screenManager.Screen.Update (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
+        screenManager.Scene.Update (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
 
         base.Update(gameTime)
 
@@ -103,7 +103,7 @@ type TheGame () as this =
 
         spriteBatch.Begin()
         
-        screenManager.Screen.Draw (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
+        screenManager.Scene.Draw (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
 
         spriteBatch.End()
 

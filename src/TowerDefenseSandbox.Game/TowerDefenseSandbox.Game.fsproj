@@ -10,7 +10,6 @@
   <ItemGroup>
     <Compile Include="Engine\Messaging.fs" />
     <Compile Include="Engine\Scene.fs" />
-    <Compile Include="Engine\Screen.fs" />
     <Compile Include="Engine\EntityProvider.fs" />
     <Compile Include="Entities\Road.fs" />
     <Compile Include="Entities\Effects.fs" />

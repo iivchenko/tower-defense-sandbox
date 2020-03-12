@@ -39,7 +39,7 @@ type GameEditorScreen(manager: IScreenManager, draw: Shape -> unit, screenWith: 
     do
         Desktop.Widgets.Clear()
 
-    interface IScreen with 
+    interface IScene with 
         member _.Update(time: float32<second>) =
             if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then manager.ToMainMenu() else ()
         

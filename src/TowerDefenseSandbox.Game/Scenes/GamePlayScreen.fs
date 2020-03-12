@@ -154,7 +154,7 @@ type GamePlayScreen (
 
         Desktop.Widgets.Add(panel)
         
-    interface IScreen with 
+    interface IScene with 
         member _.Update (delta: float32<second>) =
 
             if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then queue.Push(GameExitMessage()) else ()

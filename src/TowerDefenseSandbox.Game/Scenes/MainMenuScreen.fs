@@ -81,16 +81,6 @@ type MainMenuScreen (manager: IScreenManager, content: ContentManager, exit: uni
         Desktop.Widgets.Add(panel)
         Desktop.Widgets.Add(versionLabel)
 
-    interface IScreen with
-
-       member _.Update (_: float32<second>) =
-            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then exit() else ()
-
-            isEscUpPrev <- Keyboard.GetState().IsKeyUp(Keys.Escape)
-
-        member _.Draw (_: float32<second>) =
-            Desktop.Render ()
-
     interface IScene with
     
         member _.Update (_: float32<second>) =

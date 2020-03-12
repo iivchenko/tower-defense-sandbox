@@ -4,16 +4,12 @@ open TowerDefenseSandbox.Game.Engine
 
 type SceneManager() =
 
-    let mutable screen = EmptyScreen() :> IScreen
-
-    let mutable createMainScreen = (fun () -> EmptyScreen() :> IScreen)
-    let mutable createGamePlayScreen = (fun () -> EmptyScreen() :> IScreen)
-    let mutable createGameEditScreen = (fun () -> EmptyScreen() :> IScreen)
-    let mutable createGameSettingsScreen = (fun () -> EmptyScreen() :> IScreen)
-    let mutable createGameVictoryScreen = (fun () -> EmptyScreen() :> IScreen)
-    let mutable createGameOverScreen = (fun () -> EmptyScreen() :> IScreen)
-
-    member _.Screen with get() = screen and set value = screen <-value
+    let mutable createMainScreen = (fun () -> EmptyScene() :> IScene)
+    let mutable createGamePlayScreen = (fun () -> EmptyScene() :> IScene)
+    let mutable createGameEditScreen = (fun () -> EmptyScene() :> IScene)
+    let mutable createGameSettingsScreen =(fun () -> EmptyScene() :> IScene)
+    let mutable createGameVictoryScreen = (fun () -> EmptyScene() :> IScene)
+    let mutable createGameOverScreen = (fun () -> EmptyScene() :> IScene)
 
     member val Scene : IScene = EmptyScene() :> IScene with get, set
 
@@ -26,10 +22,10 @@ type SceneManager() =
 
     interface IScreenManager with
     
-        member _.ToMainMenu () = screen <- createMainScreen()
-        member _.ToGamePlay () = screen <- createGamePlayScreen()
-        member _.ToGameEdit () = screen <- createGameEditScreen()
-        member _.ToGameSettings () = screen <- createGameSettingsScreen()
-        member _.ToGameVictory () = screen <- createGameVictoryScreen()
-        member _.ToGameOver () = screen <- createGameOverScreen()
+        member this.ToMainMenu () = this.Scene <- createMainScreen()
+        member this.ToGamePlay () = this.Scene <- createGamePlayScreen()
+        member this.ToGameEdit () = this.Scene <- createGameEditScreen()
+        member this.ToGameSettings () = this.Scene <- createGameSettingsScreen()
+        member this.ToGameVictory () = this.Scene <- createGameVictoryScreen()
+        member this.ToGameOver () = this.Scene <- createGameOverScreen()
 

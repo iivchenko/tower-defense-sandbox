@@ -58,7 +58,7 @@ type GameVictoryScreen (manager: IScreenManager, content: ContentManager) =
 
         Desktop.Widgets.Add(panel)
 
-    interface IScreen with
+    interface IScene with
 
        member _.Update (_: float32<second>) =
           ()
