@@ -8,15 +8,29 @@ open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Scenes
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open Myra.Graphics2D.UI
-open Microsoft.Xna.Framework.Content
 open TowerDefenseSandbox.Game.Entities
 
-//type MainMenuTransitionMessageHandler(sceneManager: SceneManager, content: ContentManager, exit: unit -> unit) =
-//    interface IMessageHandler<MainMenuTransitionMessage> with
+type GameVictoryMessageHandler (manager: IScreenManager) =
+    
+    interface IMessageHandler<WavesOverMessage> with
+    
+        member _.Handle (_: WavesOverMessage) =
+            manager.ToGameVictory()
 
-//        member _.Handle(_: MainMenuTransitionMessage) =
-//            sceneManager.Scene <- MainMenuScreen(sceneManager, content, exit) :> IScene
+type GameOverMessageHandler (manager: IScreenManager) =
+    
+    interface IMessageHandler<GameOverMessage> with
+    
+        member _.Handle (_: GameOverMessage) =
+            manager.ToGameOver()
 
+type GameExitMessageHandler (manager: IScreenManager) =
+    
+    interface IMessageHandler<GameExitMessage> with
+    
+        member _.Handle (_: GameExitMessage) =
+            manager.ToMainMenu()
+            
 type TheGame () as this =
     inherit Microsoft.Xna.Framework.Game()
 
@@ -57,13 +71,11 @@ type TheGame () as this =
             let entityProvider = new EntityProvider()
             let bus = MessageBus()
             let register = bus :> IMessageHandlerRegister
+            register.Register (GameVictoryMessageHandler(screenManager) :> IMessageHandler<WavesOverMessage>)
+            register.Register (GameOverMessageHandler(screenManager) :> IMessageHandler<GameOverMessage>)
+            register.Register (GameExitMessageHandler(screenManager) :> IMessageHandler<GameExitMessage>)
 
-            //register.Register (this :> IMessageHandler<TurretCreatedMessage>)
-            //register.Register (GameVictoryMessageHandler(screenManager) :> IMessageHandler<WavesOverMessage>)
-            //register.Register (EnemyCreatedMessageHandler(entityProvider) :> IMessageHandler<EnemyCreatedMessage>)
-            //register.Register (EnemyKilledMessageHandler(entityProvider, updatePixels) :> IMessageHandler<EnemyKilledMessage>)
-
-            GamePlayScreen(screenManager, entityProvider, bus, bus, draw, this.Content, screenWith, screenWith) :> IScreen
+            GamePlayScreen(entityProvider, bus, bus, draw, this.Content, screenWith, screenWith) :> IScreen
 
         let createGameEditScreen () = GameEditorScreen(screenManager, draw, screenWith, screenHeight) :> IScreen
         let createGameSettingsScreen () = EmptyScreen() :> IScreen

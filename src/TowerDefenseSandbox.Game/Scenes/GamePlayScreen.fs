@@ -31,22 +31,24 @@ type EnemyKilledMessageHandler (entityProvier: IEntityProvider, updatePixels: in
 
             updatePixels message.Pixels
 
-type GameVictoryMessageHandler (manager: IScreenManager) =
-    
-    interface IMessageHandler<WavesOverMessage> with
-    
-        member _.Handle (_: WavesOverMessage) =
-            manager.ToGameVictory()
+type TurretCreatedMessageHandler(updatePixels: int -> unit) =
+    interface IMessageHandler<TurretCreatedMessage> with
+
+       member _.Handle (message: TurretCreatedMessage) =
+           updatePixels message.Pixels
+
+type GameExitMessage() = class end
+
+type GameOverMessage() = class end
 
 type GamePlayScreen (
-                    manager: IScreenManager, 
                     entityProvider: IEntityProvider,
                     register: IMessageHandlerRegister, 
                     queue: IMessageQueue, 
                     draw: Shape -> unit, 
                     content: ContentManager, 
                     screenWith: int, 
-                    screenHeight: int) as this=
+                    screenHeight: int) =
 
     let h3 = content.Load<SpriteFont>("Fonts\H3")
     let cellWidth = 48.0f
@@ -96,14 +98,18 @@ type GamePlayScreen (
         | 2 -> Receiver (center column raw, draw, entityProvider) :> IEntity
 
     do
-        let updatePixels p = 
+
+        let addPixels p =
             pixels <- pixels + p
             pixelsLabel.Text <- sprintf "Pixels: %i" pixels
 
-        register.Register (this :> IMessageHandler<TurretCreatedMessage>)
-        register.Register (GameVictoryMessageHandler(manager) :> IMessageHandler<WavesOverMessage>)
+        let subPixels p =
+            pixels <- pixels - p
+            pixelsLabel.Text <- sprintf "Pixels: %i" pixels
+
+        register.Register (TurretCreatedMessageHandler(subPixels))
         register.Register (EnemyCreatedMessageHandler(entityProvider) :> IMessageHandler<EnemyCreatedMessage>)
-        register.Register (EnemyKilledMessageHandler(entityProvider, updatePixels) :> IMessageHandler<EnemyKilledMessage>)
+        register.Register (EnemyKilledMessageHandler(entityProvider, addPixels) :> IMessageHandler<EnemyKilledMessage>)
 
         let factory = EnemyFactory (draw, fun message -> 
                                                     match message with 
@@ -147,17 +153,11 @@ type GamePlayScreen (
         panel.Widgets.Add(pixelsLabel)
 
         Desktop.Widgets.Add(panel)
-       
-    interface IMessageHandler<TurretCreatedMessage> with
-       
-        member _.Handle (message: TurretCreatedMessage) =
-            pixels <- pixels - message.Pixels
-            pixelsLabel.Text <- sprintf "Pixels: %i" pixels
         
     interface IScreen with 
         member _.Update (delta: float32<second>) =
 
-            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then manager.ToMainMenu() else ()
+            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then queue.Push(GameExitMessage()) else ()
 
             isEscUpPrev <- Keyboard.GetState().IsKeyUp(Keys.Escape)
 
@@ -192,7 +192,7 @@ type GamePlayScreen (
                     | Some cell ->
                         match cell with 
                         | :? Receiver as receiver when receiver.Life > 0 -> lifes.Text <- sprintf "Life: %i" receiver.Life
-                        | :? Receiver as receiver when receiver.Life <= 0 -> manager.ToGameOver()
+                        | :? Receiver as receiver when receiver.Life <= 0 -> queue.Push(GameOverMessage())
                         | _ -> ()
 
         member _.Draw (delta: float32<second>) = 
