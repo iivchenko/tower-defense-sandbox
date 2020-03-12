@@ -9,6 +9,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine\Messaging.fs" />
+    <Compile Include="Engine\Scene.fs" />
     <Compile Include="Engine\Screen.fs" />
     <Compile Include="Engine\EntityProvider.fs" />
     <Compile Include="Entities\Road.fs" />
@@ -18,13 +19,14 @@
     <Compile Include="Entities\Spawner.fs" />
     <Compile Include="Entities\Turret.fs" />
     <Compile Include="Entities\TurretPicker.fs" />
-    <Compile Include="Screens\IScreenManager.fs" />
-    <Compile Include="Screens\GameEditorScreen.fs" />
-    <Compile Include="Screens\GamePlayScreen.fs" />
-    <Compile Include="Screens\GameVictoryScreen.fs" />
-    <Compile Include="Screens\GameOverScreen.fs" />
-    <Compile Include="Screens\MainMenuScreen.fs" />
-    <Compile Include="Screens\ScreenManager.fs" />
+    <Compile Include="Scenes\SceneTranitionMessages.fs" />
+    <Compile Include="Scenes\IScreenManager.fs" />
+    <Compile Include="Scenes\GameEditorScreen.fs" />
+    <Compile Include="Scenes\GamePlayScreen.fs" />
+    <Compile Include="Scenes\GameVictoryScreen.fs" />
+    <Compile Include="Scenes\GameOverScreen.fs" />
+    <Compile Include="Scenes\MainMenuScreen.fs" />
+    <Compile Include="Scenes\SceneManager.fs" />
     <Compile Include="TheGame.fs" />
   </ItemGroup>
   <ItemGroup>
