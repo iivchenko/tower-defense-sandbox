@@ -9,7 +9,7 @@ open Microsoft.Xna.Framework.Input
 
 open TowerDefenseSandbox.Game.Engine
 
-type MainMenuScreen (manager: IScreenManager, content: ContentManager, exit: unit -> unit) =
+type MainMenuScene (manager: IScreenManager, content: ContentManager, exit: unit -> unit) =
 
     let version = "version: 0.1.0"
     let mutable isEscUpPrev = true

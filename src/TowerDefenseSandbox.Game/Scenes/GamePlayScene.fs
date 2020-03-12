@@ -41,7 +41,7 @@ type GameExitMessage() = class end
 
 type GameOverMessage() = class end
 
-type GamePlayScreen (
+type GamePlayScene (
                     entityProvider: IEntityProvider,
                     register: IMessageHandlerRegister, 
                     queue: IMessageQueue, 

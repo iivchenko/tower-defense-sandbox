@@ -13,7 +13,7 @@ open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Entities
 
-type GameEditorScreen(manager: IScreenManager, draw: Shape -> unit, screenWith: int, screenHeight: int) =
+type GameEditorScene(manager: IScreenManager, draw: Shape -> unit, screenWith: int, screenHeight: int) =
 
     let cellWidth = 48.0f
     let cellHeight = 45.0f

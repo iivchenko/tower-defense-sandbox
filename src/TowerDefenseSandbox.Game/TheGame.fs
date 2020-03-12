@@ -65,7 +65,7 @@ type TheGame () as this =
 
         MyraEnvironment.Game <- this
 
-        let createMainScreen () = MainMenuScreen(screenManager, this.Content, this.Exit) :> IScene
+        let createMainScreen () = MainMenuScene(screenManager, this.Content, this.Exit) :> IScene
 
         let createGamePlayScreen () = 
             let entityProvider = new EntityProvider()
@@ -75,12 +75,12 @@ type TheGame () as this =
             register.Register (GameOverMessageHandler(screenManager) :> IMessageHandler<GameOverMessage>)
             register.Register (GameExitMessageHandler(screenManager) :> IMessageHandler<GameExitMessage>)
 
-            GamePlayScreen(entityProvider, bus, bus, draw, this.Content, screenWith, screenWith) :> IScene
+            GamePlayScene(entityProvider, bus, bus, draw, this.Content, screenWith, screenWith) :> IScene
 
-        let createGameEditScreen () = GameEditorScreen(screenManager, draw, screenWith, screenHeight) :> IScene
+        let createGameEditScreen () = GameEditorScene(screenManager, draw, screenWith, screenHeight) :> IScene
         let createGameSettingsScreen () = EmptyScene() :> IScene
-        let createGameVictoryScreen () = GameVictoryScreen(screenManager, this.Content) :> IScene
-        let createGameOverScreen () = GameOverScreen(screenManager, this.Content) :> IScene
+        let createGameVictoryScreen () = GameVictoryScene(screenManager, this.Content) :> IScene
+        let createGameOverScreen () = GameOverScene(screenManager, this.Content) :> IScene
 
         screenManager.SetMainMenu createMainScreen
         screenManager.SetGamePlay createGamePlayScreen

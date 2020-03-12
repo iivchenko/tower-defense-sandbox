@@ -9,7 +9,7 @@ open Myra.Graphics2D.UI
 
 open TowerDefenseSandbox.Game.Engine
 
-type GameVictoryScreen (manager: IScreenManager, content: ContentManager) =
+type GameOverScene (manager: IScreenManager, content: ContentManager) =
 
     let mutable isEscUpPrev = true
 
@@ -26,12 +26,12 @@ type GameVictoryScreen (manager: IScreenManager, content: ContentManager) =
         panel.HorizontalAlignment <- HorizontalAlignment.Center
         panel.VerticalAlignment <- VerticalAlignment.Center
 
-        let victoryLabel = new Label()
-        victoryLabel.Text <- "Victory"
-        victoryLabel.Font <- h1
-        victoryLabel.HorizontalAlignment <- HorizontalAlignment.Center
-        victoryLabel.VerticalAlignment <- VerticalAlignment.Top
-        victoryLabel.PaddingBottom <- 100
+        let gameOver = new Label()
+        gameOver.Text <- "Game Over"
+        gameOver.Font <- h1
+        gameOver.HorizontalAlignment <- HorizontalAlignment.Center
+        gameOver.VerticalAlignment <- VerticalAlignment.Top
+        gameOver.PaddingBottom <- 100
 
         let menu = new VerticalMenu()
         menu.HorizontalAlignment <- HorizontalAlignment.Center
@@ -53,7 +53,7 @@ type GameVictoryScreen (manager: IScreenManager, content: ContentManager) =
         menu.Items.Add(restartGameMenuItem)
         menu.Items.Add(exitGameMenuItem)
 
-        panel.Widgets.Add(victoryLabel)
+        panel.Widgets.Add(gameOver)
         panel.Widgets.Add(menu)
 
         Desktop.Widgets.Add(panel)
