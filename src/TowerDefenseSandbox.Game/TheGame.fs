@@ -13,7 +13,7 @@ open Microsoft.Xna.Framework.Content
 
 // Main Menu
 type StartGameMessageHandler (
-                                manager: SceneManager,
+                                manager: ISceneManager,
                                 draw: Shape -> unit, 
                                 content: ContentManager, 
                                 screenWidth: int, 
@@ -33,7 +33,7 @@ type StartGameMessageHandler (
             manager.Scene <- GamePlayScene(entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
 
 and EditGameMessageHandler (
-                           manager: SceneManager,
+                           manager: ISceneManager,
                            draw: Shape -> unit, 
                            content: ContentManager, 
                            screenWidth: int, 
@@ -49,7 +49,7 @@ and EditGameMessageHandler (
 
             manager.Scene <- GameEditorScene(bus, draw, screenWidth, screenHeight)
 
-and SettingsGameMessageHandler (manager: SceneManager) =
+and SettingsGameMessageHandler (manager: ISceneManager) =
     
     interface IMessageHandler<SettingsGameMessage> with
     
@@ -65,7 +65,7 @@ and ExitApplicationMessageHandler (exit: unit -> unit) =
 
 // Game Play
 and GameVictoryMessageHandler (
-                                manager: SceneManager,
+                                manager: ISceneManager,
                                 draw: Shape -> unit, 
                                 content: ContentManager, 
                                 screenWidth: int, 
@@ -83,7 +83,7 @@ and GameVictoryMessageHandler (
             manager.Scene <- GameVictoryScene(bus, content)
 
 and GameOverMessageHandler (
-                            manager: SceneManager,
+                            manager: ISceneManager,
                             draw: Shape -> unit, 
                             content: ContentManager, 
                             screenWidth: int, 
@@ -101,7 +101,7 @@ and GameOverMessageHandler (
             manager.Scene <- GameOverScene(bus, content)
 
 and GameExitMessageHandler (   
-                            manager: SceneManager,
+                            manager: ISceneManager,
                             draw: Shape -> unit, 
                             content: ContentManager, 
                             screenWidth: int, 
@@ -123,7 +123,7 @@ and GameExitMessageHandler (
 
 // Game Edit
 and ExitGameEditorMessageHandler(
-                                   manager: SceneManager,
+                                   manager: ISceneManager,
                                    draw: Shape -> unit, 
                                    content: ContentManager, 
                                    screenWidth: int, 
@@ -143,7 +143,7 @@ and ExitGameEditorMessageHandler(
 
 // Game Victory
 and GameVictoryRestartMessageHandler (
-                                        manager: SceneManager,
+                                        manager: ISceneManager,
                                         draw: Shape -> unit, 
                                         content: ContentManager, 
                                         screenWidth: int, 
@@ -163,7 +163,7 @@ and GameVictoryRestartMessageHandler (
             manager.Scene <- GamePlayScene(entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
 
 and GameVictoryExitMessageHandler (
-                                    manager: SceneManager,
+                                    manager: ISceneManager,
                                     draw: Shape -> unit, 
                                     content: ContentManager, 
                                     screenWidth: int, 
@@ -184,7 +184,7 @@ and GameVictoryExitMessageHandler (
 
 // Game Over
 and RestartGameOverMessageHandler (
-                                    manager: SceneManager,
+                                    manager: ISceneManager,
                                     draw: Shape -> unit, 
                                     content: ContentManager, 
                                     screenWidth: int, 
@@ -204,7 +204,7 @@ and RestartGameOverMessageHandler (
             manager.Scene <- GamePlayScene(entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
 
 and ExitGameOverMessageHandler(
-                                manager: SceneManager,
+                                manager: ISceneManager,
                                 draw: Shape -> unit, 
                                 content: ContentManager, 
                                 screenWidth: int, 
@@ -233,7 +233,13 @@ type TheGame () as this =
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch>
     let mutable draw: Shape -> unit = (fun _ -> ())
 
-    let screenManager = SceneManager ()
+    let mutable scene: IScene = EmptyScene() :> IScene
+
+    interface ISceneManager with 
+        
+        member _.Scene
+            with get() = scene
+            and set(value) = scene <- value
 
     override _.LoadContent() =
         this.Content.RootDirectory <- "Content"
@@ -259,16 +265,16 @@ type TheGame () as this =
        
         let bus = MessageBus()
         let register = bus :> IMessageHandlerRegister
-        register.Register (StartGameMessageHandler(screenManager, draw, this.Content, screenWidth, screenHeight, this.Exit))
-        register.Register (EditGameMessageHandler(screenManager, draw, this.Content, screenWidth, screenHeight, this.Exit))
-        register.Register (SettingsGameMessageHandler(screenManager))
+        register.Register (StartGameMessageHandler(this, draw, this.Content, screenWidth, screenHeight, this.Exit))
+        register.Register (EditGameMessageHandler(this, draw, this.Content, screenWidth, screenHeight, this.Exit))
+        register.Register (SettingsGameMessageHandler(this))
         register.Register (ExitApplicationMessageHandler(this.Exit))
 
-        screenManager.Scene <- MainMenuScene(bus, this.Content)
+        scene <- MainMenuScene(bus, this.Content)
 
     override _.Update (gameTime: GameTime) =
 
-        screenManager.Scene.Update (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
+        scene.Update (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
 
         base.Update(gameTime)
 
@@ -278,7 +284,7 @@ type TheGame () as this =
 
         spriteBatch.Begin()
         
-        screenManager.Scene.Draw (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
+        scene.Draw (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
 
         spriteBatch.End()
 

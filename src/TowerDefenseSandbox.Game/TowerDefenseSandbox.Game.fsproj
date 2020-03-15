@@ -23,7 +23,6 @@
     <Compile Include="Scenes\GameVictoryScene.fs" />
     <Compile Include="Scenes\GameOverScene.fs" />
     <Compile Include="Scenes\MainMenuScene.fs" />
-    <Compile Include="Scenes\SceneManager.fs" />
     <Compile Include="TheGame.fs" />
   </ItemGroup>
   <ItemGroup>

@@ -10,3 +10,6 @@ type EmptyScene () =
     interface IScene with
         member _.Update (_) = ()
         member _.Draw (_) = ()
+
+type ISceneManager =
+    abstract member Scene: IScene with get, set

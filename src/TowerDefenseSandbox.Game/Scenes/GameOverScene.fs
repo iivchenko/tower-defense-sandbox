@@ -14,8 +14,6 @@ type ExitGameOverMessage() = class end
 
 type GameOverScene (queue: IMessageQueue, content: ContentManager) =
 
-    let mutable isEscUpPrev = true
-
     let h1 = content.Load<SpriteFont>("Fonts\H1")
     let h3 = content.Load<SpriteFont>("Fonts\H3")
 
@@ -66,5 +64,5 @@ type GameOverScene (queue: IMessageQueue, content: ContentManager) =
        member _.Update (_: float32<second>) =
           ()
 
-        member _.Draw (time: float32<second>) =
+        member _.Draw (_: float32<second>) =
             Desktop.Render ()
