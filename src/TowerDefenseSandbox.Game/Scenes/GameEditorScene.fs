@@ -13,7 +13,9 @@ open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Entities
 
-type GameEditorScene(manager: IScreenManager, draw: Shape -> unit, screenWith: int, screenHeight: int) =
+type ExitGameEditorMessage() = class end
+
+type GameEditorScene(queue: IMessageQueue, draw: Shape -> unit, screenWith: int, screenHeight: int) =
 
     let cellWidth = 48.0f
     let cellHeight = 45.0f
@@ -40,8 +42,8 @@ type GameEditorScene(manager: IScreenManager, draw: Shape -> unit, screenWith: i
         Desktop.Widgets.Clear()
 
     interface IScene with 
-        member _.Update(time: float32<second>) =
-            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then manager.ToMainMenu() else ()
+        member _.Update(_: float32<second>) =
+            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then queue.Push(ExitGameEditorMessage()) else ()
         
             isEscUpPrev <- Keyboard.GetState().IsKeyUp(Keys.Escape)
 

@@ -9,33 +9,225 @@ open TowerDefenseSandbox.Game.Scenes
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open Myra.Graphics2D.UI
 open TowerDefenseSandbox.Game.Entities
+open Microsoft.Xna.Framework.Content
 
-type GameVictoryMessageHandler (manager: IScreenManager) =
+// Main Menu
+type StartGameMessageHandler (
+                                manager: SceneManager,
+                                draw: Shape -> unit, 
+                                content: ContentManager, 
+                                screenWidth: int, 
+                                screenHeight: int,
+                                exit: unit -> unit) =
+    
+    interface IMessageHandler<StartGameMessage> with
+    
+        member _.Handle (_: StartGameMessage) =
+            let entityProvider = new EntityProvider()
+            let bus = MessageBus()
+            let register = bus :> IMessageHandlerRegister
+            register.Register (GameVictoryMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (GameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+
+            manager.Scene <- GamePlayScene(entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
+
+and EditGameMessageHandler (
+                           manager: SceneManager,
+                           draw: Shape -> unit, 
+                           content: ContentManager, 
+                           screenWidth: int, 
+                           screenHeight: int,
+                           exit: unit -> unit) =
+    
+    interface IMessageHandler<EditGameMessage> with
+    
+        member _.Handle (_: EditGameMessage) =
+            let bus = MessageBus()
+            let register = bus :> IMessageHandlerRegister
+            register.Register (ExitGameEditorMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+
+            manager.Scene <- GameEditorScene(bus, draw, screenWidth, screenHeight)
+
+and SettingsGameMessageHandler (manager: SceneManager) =
+    
+    interface IMessageHandler<SettingsGameMessage> with
+    
+        member _.Handle (_: SettingsGameMessage) =          
+
+            manager.Scene <- EmptyScene()
+
+and ExitApplicationMessageHandler (exit: unit -> unit) =
+    
+    interface IMessageHandler<ExitApplicationMessage> with
+    
+        member _.Handle (_: ExitApplicationMessage) = exit()
+
+// Game Play
+and GameVictoryMessageHandler (
+                                manager: SceneManager,
+                                draw: Shape -> unit, 
+                                content: ContentManager, 
+                                screenWidth: int, 
+                                screenHeight: int,
+                                exit: unit -> unit) =
     
     interface IMessageHandler<WavesOverMessage> with
     
         member _.Handle (_: WavesOverMessage) =
-            manager.ToGameVictory()
+            let bus = MessageBus()
+            let register = bus :> IMessageHandlerRegister
+            register.Register (GameVictoryRestartMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (GameVictoryExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
 
-type GameOverMessageHandler (manager: IScreenManager) =
+            manager.Scene <- GameVictoryScene(bus, content)
+
+and GameOverMessageHandler (
+                            manager: SceneManager,
+                            draw: Shape -> unit, 
+                            content: ContentManager, 
+                            screenWidth: int, 
+                            screenHeight: int,
+                            exit: unit -> unit) =
     
     interface IMessageHandler<GameOverMessage> with
     
         member _.Handle (_: GameOverMessage) =
-            manager.ToGameOver()
+            let bus = MessageBus()
+            let register = bus :> IMessageHandlerRegister
+            register.Register (RestartGameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (ExitGameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
 
-type GameExitMessageHandler (manager: IScreenManager) =
+            manager.Scene <- GameOverScene(bus, content)
+
+and GameExitMessageHandler (   
+                            manager: SceneManager,
+                            draw: Shape -> unit, 
+                            content: ContentManager, 
+                            screenWidth: int, 
+                            screenHeight: int,
+                            exit: unit -> unit) =
     
     interface IMessageHandler<GameExitMessage> with
     
         member _.Handle (_: GameExitMessage) =
-            manager.ToMainMenu()
-            
+
+            let bus = MessageBus()
+            let register = bus :> IMessageHandlerRegister
+            register.Register (StartGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (EditGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (SettingsGameMessageHandler(manager))
+            register.Register (ExitApplicationMessageHandler(exit))
+
+            manager.Scene <- MainMenuScene(bus, content)
+
+// Game Edit
+and ExitGameEditorMessageHandler(
+                                   manager: SceneManager,
+                                   draw: Shape -> unit, 
+                                   content: ContentManager, 
+                                   screenWidth: int, 
+                                   screenHeight: int,
+                                   exit: unit -> unit) =
+
+    interface IMessageHandler<ExitGameEditorMessage> with 
+        member _.Handle(_: ExitGameEditorMessage) =
+            let bus = MessageBus()
+            let register = bus :> IMessageHandlerRegister
+            register.Register (StartGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (EditGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (SettingsGameMessageHandler(manager))
+            register.Register (ExitApplicationMessageHandler(exit))
+
+            manager.Scene <- MainMenuScene(bus, content)
+
+// Game Victory
+and GameVictoryRestartMessageHandler (
+                                        manager: SceneManager,
+                                        draw: Shape -> unit, 
+                                        content: ContentManager, 
+                                        screenWidth: int, 
+                                        screenHeight: int,
+                                        exit: unit -> unit) =
+    
+    interface IMessageHandler<GameVictoryRestartMessage> with
+        
+        member _.Handle(_: GameVictoryRestartMessage) =
+            let entityProvider = new EntityProvider()
+            let bus = MessageBus()
+            let register = bus :> IMessageHandlerRegister
+            register.Register (GameVictoryMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (GameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+
+            manager.Scene <- GamePlayScene(entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
+
+and GameVictoryExitMessageHandler (
+                                    manager: SceneManager,
+                                    draw: Shape -> unit, 
+                                    content: ContentManager, 
+                                    screenWidth: int, 
+                                    screenHeight: int,
+                                    exit: unit -> unit) =
+    
+    interface IMessageHandler<GameVictoryExitMessage> with
+        
+        member _.Handle(_: GameVictoryExitMessage) =
+            let bus = MessageBus()
+            let register = bus :> IMessageHandlerRegister
+            register.Register (StartGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (EditGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (SettingsGameMessageHandler(manager))
+            register.Register (ExitApplicationMessageHandler(exit))
+
+            manager.Scene <- MainMenuScene(bus, content)
+
+// Game Over
+and RestartGameOverMessageHandler (
+                                    manager: SceneManager,
+                                    draw: Shape -> unit, 
+                                    content: ContentManager, 
+                                    screenWidth: int, 
+                                    screenHeight: int,
+                                    exit: unit -> unit) =
+    
+    interface IMessageHandler<RestartGameOverMessage> with
+    
+        member _.Handle (_: RestartGameOverMessage) =
+            let entityProvider = new EntityProvider()
+            let bus = MessageBus()
+            let register = bus :> IMessageHandlerRegister
+            register.Register (GameVictoryMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (GameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+
+            manager.Scene <- GamePlayScene(entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
+
+and ExitGameOverMessageHandler(
+                                manager: SceneManager,
+                                draw: Shape -> unit, 
+                                content: ContentManager, 
+                                screenWidth: int, 
+                                screenHeight: int,
+                                exit: unit -> unit) =
+    
+    interface IMessageHandler<ExitGameOverMessage> with
+    
+        member _.Handle (_: ExitGameOverMessage) =
+            let bus = MessageBus()
+            let register = bus :> IMessageHandlerRegister
+            register.Register (StartGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (EditGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (SettingsGameMessageHandler(manager))
+            register.Register (ExitApplicationMessageHandler(exit))
+
+            manager.Scene <- MainMenuScene(bus, content)
+
 type TheGame () as this =
     inherit Microsoft.Xna.Framework.Game()
 
     let graphics = new GraphicsDeviceManager(this)
-    let screenWith = 1920 
+    let screenWidth = 1920 
     let screenHeight = 1080
 
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch>
@@ -52,7 +244,7 @@ type TheGame () as this =
 
         base.Initialize()
 
-        graphics.PreferredBackBufferWidth <- screenWith
+        graphics.PreferredBackBufferWidth <- screenWidth
         graphics.PreferredBackBufferHeight <- screenHeight
         
         #if RELEASE 
@@ -64,32 +256,15 @@ type TheGame () as this =
         base.IsMouseVisible <- true
 
         MyraEnvironment.Game <- this
+       
+        let bus = MessageBus()
+        let register = bus :> IMessageHandlerRegister
+        register.Register (StartGameMessageHandler(screenManager, draw, this.Content, screenWidth, screenHeight, this.Exit))
+        register.Register (EditGameMessageHandler(screenManager, draw, this.Content, screenWidth, screenHeight, this.Exit))
+        register.Register (SettingsGameMessageHandler(screenManager))
+        register.Register (ExitApplicationMessageHandler(this.Exit))
 
-        let createMainScreen () = MainMenuScene(screenManager, this.Content, this.Exit) :> IScene
-
-        let createGamePlayScreen () = 
-            let entityProvider = new EntityProvider()
-            let bus = MessageBus()
-            let register = bus :> IMessageHandlerRegister
-            register.Register (GameVictoryMessageHandler(screenManager) :> IMessageHandler<WavesOverMessage>)
-            register.Register (GameOverMessageHandler(screenManager) :> IMessageHandler<GameOverMessage>)
-            register.Register (GameExitMessageHandler(screenManager) :> IMessageHandler<GameExitMessage>)
-
-            GamePlayScene(entityProvider, bus, bus, draw, this.Content, screenWith, screenWith) :> IScene
-
-        let createGameEditScreen () = GameEditorScene(screenManager, draw, screenWith, screenHeight) :> IScene
-        let createGameSettingsScreen () = EmptyScene() :> IScene
-        let createGameVictoryScreen () = GameVictoryScene(screenManager, this.Content) :> IScene
-        let createGameOverScreen () = GameOverScene(screenManager, this.Content) :> IScene
-
-        screenManager.SetMainMenu createMainScreen
-        screenManager.SetGamePlay createGamePlayScreen
-        screenManager.SetGameEdit createGameEditScreen
-        screenManager.SetGameSettings createGameSettingsScreen
-        screenManager.SetGameVictory createGameVictoryScreen
-        screenManager.SetGameOver createGameOverScreen
-
-        (screenManager :> IScreenManager).ToMainMenu ()
+        screenManager.Scene <- MainMenuScene(bus, this.Content)
 
     override _.Update (gameTime: GameTime) =
 

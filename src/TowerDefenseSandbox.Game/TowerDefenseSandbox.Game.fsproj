@@ -18,8 +18,6 @@
     <Compile Include="Entities\Spawner.fs" />
     <Compile Include="Entities\Turret.fs" />
     <Compile Include="Entities\TurretPicker.fs" />
-    <Compile Include="Scenes\SceneTranitionMessages.fs" />
-    <Compile Include="Scenes\IScreenManager.fs" />
     <Compile Include="Scenes\GameEditorScene.fs" />
     <Compile Include="Scenes\GamePlayScene.fs" />
     <Compile Include="Scenes\GameVictoryScene.fs" />

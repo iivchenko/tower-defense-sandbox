@@ -9,15 +9,18 @@ open Myra.Graphics2D.UI
 
 open TowerDefenseSandbox.Game.Engine
 
-type GameVictoryScene (manager: IScreenManager, content: ContentManager) =
+type GameVictoryRestartMessage() = class end
+type GameVictoryExitMessage() = class end
+
+type GameVictoryScene (queue: IMessageQueue, content: ContentManager) =
 
     let mutable isEscUpPrev = true
 
     let h1 = content.Load<SpriteFont>("Fonts\H1")
     let h3 = content.Load<SpriteFont>("Fonts\H3")
 
-    let restartGame _ = manager.ToGamePlay()
-    let exitGame _ = manager.ToMainMenu()
+    let restartGame _ = queue.Push(GameVictoryRestartMessage())
+    let exitGame _ = queue.Push(GameVictoryExitMessage())
 
     do
         Desktop.Widgets.Clear()

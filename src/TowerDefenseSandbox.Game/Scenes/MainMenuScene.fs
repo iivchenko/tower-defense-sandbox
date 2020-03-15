@@ -9,15 +9,20 @@ open Microsoft.Xna.Framework.Input
 
 open TowerDefenseSandbox.Game.Engine
 
-type MainMenuScene (manager: IScreenManager, content: ContentManager, exit: unit -> unit) =
+type StartGameMessage() = class end
+type EditGameMessage() = class end
+type SettingsGameMessage() = class end
+type ExitApplicationMessage() = class end
+
+type MainMenuScene (queue: IMessageQueue, content: ContentManager) =
 
     let version = "version: 0.1.0"
     let mutable isEscUpPrev = true
 
-    let startGame _ = manager.ToGamePlay()
-    let editGame _ = manager.ToGameEdit()
-    let editSettings _ = manager.ToGameSettings()
-    let exitGame _ = exit ()
+    let startGame _ = queue.Push(StartGameMessage())
+    let editGame _ = queue.Push(EditGameMessage())
+    let editSettings _ = queue.Push(SettingsGameMessage())
+    let exitGame _ = queue.Push(ExitApplicationMessage())
 
     let h1 = content.Load<SpriteFont>("Fonts\H1")
     let h3 = content.Load<SpriteFont>("Fonts\H3")
@@ -84,7 +89,7 @@ type MainMenuScene (manager: IScreenManager, content: ContentManager, exit: unit
     interface IScene with
     
         member _.Update (_: float32<second>) =
-            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then exit() else ()
+            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then queue.Push(ExitApplicationMessage()) else ()
     
             isEscUpPrev <- Keyboard.GetState().IsKeyUp(Keys.Escape)
     
