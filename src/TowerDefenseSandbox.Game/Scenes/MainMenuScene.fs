@@ -5,9 +5,9 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open Myra.Graphics2D.UI
 open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Graphics
-open Microsoft.Xna.Framework.Input
 
 open TowerDefenseSandbox.Game.Engine
+open TowerDefenseSandbox.Engine.Messaging
 
 type StartGameMessage() = class end
 type EditGameMessage() = class end
@@ -17,7 +17,6 @@ type ExitApplicationMessage() = class end
 type MainMenuScene (queue: IMessageQueue, content: ContentManager) =
 
     let version = "version: 0.1.0"
-    let mutable isEscUpPrev = true
 
     let startGame _ = queue.Push(StartGameMessage())
     let editGame _ = queue.Push(EditGameMessage())
@@ -88,10 +87,6 @@ type MainMenuScene (queue: IMessageQueue, content: ContentManager) =
 
     interface IScene with
     
-        member _.Update (_: float32<second>) =
-            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then queue.Push(ExitApplicationMessage()) else ()
+        member _.Update (_: float32<second>) = ()
     
-            isEscUpPrev <- Keyboard.GetState().IsKeyUp(Keys.Escape)
-    
-        member _.Draw (_: float32<second>) =
-            Desktop.Render ()
+        member _.Draw (_: float32<second>) = Desktop.Render ()

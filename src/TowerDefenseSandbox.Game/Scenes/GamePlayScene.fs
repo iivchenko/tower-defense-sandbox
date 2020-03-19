@@ -4,7 +4,6 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Graphics
-open Microsoft.Xna.Framework.Input
 
 open Myra.Graphics2D.UI
 
@@ -14,6 +13,17 @@ open Newtonsoft.Json
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Entities
+open TowerDefenseSandbox.Engine.Input
+open TowerDefenseSandbox.Engine.Messaging
+
+type GamePlayInteractionMessage (x: int, y: int) =
+    member _.X = x
+    member _.Y = y
+
+type GamePlayInteractionMessageHandler(interact: int -> int -> unit) =
+    interface IMessageHandler<GamePlayInteractionMessage> with
+        member _.Handle(message: GamePlayInteractionMessage) =
+            interact message.X message.Y
 
 type EnemyCreatedMessageHandler (entityProvier: IEntityProvider) =
     
@@ -42,6 +52,7 @@ type GameExitMessage() = class end
 type GameOverMessage() = class end
 
 type GamePlayScene (
+                    input: IInputController,
                     entityProvider: IEntityProvider,
                     register: IMessageHandlerRegister, 
                     queue: IMessageQueue, 
@@ -60,9 +71,7 @@ type GamePlayScene (
     let pixelsLabel = new Label()
     let mutable pixels = 100
 
-    let mutable isEscUpPrev = true
     let grid: IEntity option [,] = Array2D.init columns raws (fun _ _ -> None)
-    let mutable previousButtonState = ButtonState.Released
 
     let pushTurretMessage (message: TurretCreatedMessage) = queue.Push message
 
@@ -107,9 +116,24 @@ type GamePlayScene (
             pixels <- pixels - p
             pixelsLabel.Text <- sprintf "Pixels: %i" pixels
 
+        let gameInteract x y =
+            let column = x / int cellWidth
+            let raw = y / int cellHeight
+
+            match grid.[column, raw] with
+            | None -> 
+                let picker = TurretPicker(Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight, draw, grid, pushTurretMessage, entityProvider, column, raw) :> IEntity
+                grid.[column, raw] <- Some picker
+                entityProvider.RegisterEntity picker
+            | Some cell ->
+                match cell with 
+                | :? TurretPicker as picker -> picker.Click(Vector(float32 x, float32 y), pixels)
+                | _ -> ()
+
         register.Register (TurretCreatedMessageHandler(subPixels))
-        register.Register (EnemyCreatedMessageHandler(entityProvider) :> IMessageHandler<EnemyCreatedMessage>)
-        register.Register (EnemyKilledMessageHandler(entityProvider, addPixels) :> IMessageHandler<EnemyKilledMessage>)
+        register.Register (EnemyCreatedMessageHandler(entityProvider))
+        register.Register (EnemyKilledMessageHandler(entityProvider, addPixels))
+        register.Register (GamePlayInteractionMessageHandler(gameInteract))
 
         let factory = EnemyFactory (draw, fun message -> 
                                                     match message with 
@@ -157,29 +181,7 @@ type GamePlayScene (
     interface IScene with 
         member _.Update (delta: float32<second>) =
 
-            if not isEscUpPrev && Keyboard.GetState().IsKeyUp(Keys.Escape) then queue.Push(GameExitMessage()) else ()
-
-            isEscUpPrev <- Keyboard.GetState().IsKeyUp(Keys.Escape)
-
-            let state = Mouse.GetState ()
-
-            if previousButtonState = ButtonState.Pressed && state.LeftButton = ButtonState.Released then
-                let column = state.X / int cellWidth
-                let raw = state.Y / int cellHeight
-
-                match grid.[column, raw] with
-                | None -> 
-                    let picker = TurretPicker(Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight, draw, grid, pushTurretMessage, entityProvider, column, raw) :> IEntity
-                    grid.[column, raw] <- Some picker
-                    entityProvider.RegisterEntity picker
-                | Some cell ->
-                    match cell with 
-                    | :? TurretPicker as picker -> picker.Click(Vector(float32 state.X, float32 state.Y), pixels)
-                    | _ -> ()
-            else 
-                ()
-
-            previousButtonState <- state.LeftButton
+            input.Update delta
 
             entityProvider.Update delta
 

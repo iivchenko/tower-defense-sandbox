@@ -1,4 +1,4 @@
-﻿namespace TowerDefenseSandbox.Engine.MonoGame
+﻿namespace TowerDefenseSandbox.Engine.MonoGame.Graphic
 
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics

@@ -8,6 +8,7 @@ open Microsoft.Xna.Framework.Graphics
 open Myra.Graphics2D.UI
 
 open TowerDefenseSandbox.Game.Engine
+open TowerDefenseSandbox.Engine.Messaging
 
 type RestartGameOverMessage() = class end
 type ExitGameOverMessage() = class end

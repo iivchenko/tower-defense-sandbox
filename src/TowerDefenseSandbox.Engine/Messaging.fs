@@ -1,4 +1,4 @@
-﻿namespace TowerDefenseSandbox.Game.Engine
+﻿namespace TowerDefenseSandbox.Engine.Messaging
 
 open System
 open System.Collections.Generic

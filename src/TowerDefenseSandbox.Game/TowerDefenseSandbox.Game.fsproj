@@ -8,7 +8,6 @@
     <MonoGameContentReference Include="**\*.mgcb" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Engine\Messaging.fs" />
     <Compile Include="Engine\Scene.fs" />
     <Compile Include="Engine\EntityProvider.fs" />
     <Compile Include="Entities\Road.fs" />
