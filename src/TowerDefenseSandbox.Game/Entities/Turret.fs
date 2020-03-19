@@ -5,8 +5,6 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-[<Measure>] type pixel
-
 type Boom (draw: Shape -> unit, center: Vector, radius: float32, entityProvider: IEntityProvider) =
     
     let k = radius / 3.0f
@@ -46,12 +44,12 @@ type Bullet(draw: Vector -> unit, entityProvider: IEntityProvider, center: Vecto
     interface IEntity with
     
         member this.Update (delta: float32<second>) =
-            let v = getTargetPosition()
-            let velocity = (Vector.direction center v) * float32 (speed * delta)
+            let target = getTargetPosition()
+            let velocity = (Behavior.seek center target speed) * (float32 delta)
             
             center <- center + velocity
 
-            if (Vector.distance center v) < radius
+            if (Vector.distance center target) < radius
                 then
                     apply(this)
                     entityProvider.RemoveEntity this

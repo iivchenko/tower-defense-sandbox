@@ -8,7 +8,7 @@ open TowerDefenseSandbox.Game.Engine
 type EnemyInfo =
     {Life: int
      Center: Vector
-     Speed: float32
+     Speed: float32<pixel/second>
      Path: Vector list
      Pixels: int}
 
@@ -83,11 +83,11 @@ and Enemy (info: EnemyInfo, createBody: Vector -> float32 -> float32 -> Shape, d
             | target::tail when Vector.distance center target < radius -> 
                 path <- tail
             | h::_ ->
-                let direction = Vector.direction center h
-                let (x, y) = Vector.unwrap direction
 
-                orientation <- atan2 -x y
-                center <- center + currentSpeed * direction
+                let velocity = (Behavior.seek center h currentSpeed) * (float32 delta)
+                center <- center + velocity
+
+                orientation <-  Behavior.face center h
             | _ -> ()
 
         member _.Draw (_: float32<second>) =
@@ -111,7 +111,7 @@ and Enemy (info: EnemyInfo, createBody: Vector -> float32 -> float32 -> Shape, d
 
             Triangle (x, y, a1, a2, a3, Color.red)
 
-        let info = { Life = 200; Speed = 1.0f; Center = position; Path = path; Pixels = 10 }
+        let info = { Life = 200; Speed = 50.0f<pixel/second>; Center = position; Path = path; Pixels = 10 }
 
         Enemy(info, createBody, draw, pushMessage)
 
@@ -121,7 +121,7 @@ and Enemy (info: EnemyInfo, createBody: Vector -> float32 -> float32 -> Shape, d
 
             Circle (x, y, radius, false, Color.red)
 
-        let info = { Life = 100; Speed = 2.0f; Center = position; Path = path; Pixels = 5 }
+        let info = { Life = 100; Speed = 150.0f<pixel/second>; Center = position; Path = path; Pixels = 5 }
 
         Enemy(info, createBody, draw, pushMessage)
 
@@ -137,6 +137,6 @@ and Enemy (info: EnemyInfo, createBody: Vector -> float32 -> float32 -> Shape, d
 
             Polygon (x, y, a1::a2::a3::a4::[], Color.red)
 
-        let info = { Life = 1000; Speed = 0.5f; Center = position; Path = path; Pixels = 15 }
+        let info = { Life = 1000; Speed = 25.0f<pixel/second>; Center = position; Path = path; Pixels = 15 }
 
         Enemy(info,createBody,  draw, pushMessage)

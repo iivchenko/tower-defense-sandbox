@@ -4,11 +4,13 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Units.fs" />
     <Compile Include="Scene.fs" />
     <Compile Include="Messaging.fs" />
     <Compile Include="Input.fs" />
     <Compile Include="Vector.fs" />
     <Compile Include="Matrix.fs" />
+    <Compile Include="Behavior.fs" />
     <Compile Include="Graphic.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

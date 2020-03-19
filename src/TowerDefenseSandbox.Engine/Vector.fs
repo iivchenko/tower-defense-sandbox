@@ -2,8 +2,8 @@
 
 type Vector = 
     | Vector of x: float32 * y: float32
-    static member (+) (Vector (x1, y1), Vector (x2, y2)) = Vector (x2 + x1, y2 + y1)
-    static member (-) (Vector (x1, y1), Vector (x2, y2)) = Vector (x2 - x1, y2 - y1)
+    static member (+) (Vector (x1, y1), Vector (x2, y2)) = Vector (x1 + x2, y1 + y2)
+    static member (-) (Vector (x1, y1), Vector (x2, y2)) = Vector (x1 - x2, y1 - y2)
     static member (*) (Vector (x, y), scalar) = Vector (x * scalar, y * scalar)
     static member (*) (scalar, Vector (x, y)) = Vector (x * scalar, y * scalar)
     static member (/) (Vector (x, y), scalar) = Vector (x / scalar, y / scalar)
@@ -15,4 +15,4 @@ module Vector =
     let distance (Vector (x1, y1): Vector) (Vector(x2, y2): Vector) = pown (x2 - x1) 2 + pown (y2 - y1) 2 |> sqrt
     let length (Vector(x, y)) = pown x 2 + pown y 2 |> sqrt
     let normalize (v: Vector) = v / length v
-    let direction v1 v2 = v1 - v2 |> normalize
+    let direction v1 v2 = v2 - v1 |> normalize
