@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Scene.fs" />
     <Compile Include="Messaging.fs" />
     <Compile Include="Input.fs" />
     <Compile Include="Vector.fs" />

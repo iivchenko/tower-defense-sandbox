@@ -1,20 +1,18 @@
 ﻿namespace TowerDefenseSandbox.Game.Scenes
 
-open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
-
-open Microsoft.Xna.Framework.Content
-open Microsoft.Xna.Framework.Graphics
-
-open Myra.Graphics2D.UI
-
 open System.IO
 open Newtonsoft.Json
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+open Microsoft.Xna.Framework.Content
+open Microsoft.Xna.Framework.Graphics
+open Myra.Graphics2D.UI
 
 open TowerDefenseSandbox.Engine
-open TowerDefenseSandbox.Game.Engine
-open TowerDefenseSandbox.Game.Entities
 open TowerDefenseSandbox.Engine.Input
 open TowerDefenseSandbox.Engine.Messaging
+open TowerDefenseSandbox.Engine.Scene
+open TowerDefenseSandbox.Game.Engine
+open TowerDefenseSandbox.Game.Entities
 
 type GamePlayInteractionMessage (x: int, y: int) =
     member _.X = x

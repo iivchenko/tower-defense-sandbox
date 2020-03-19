@@ -1,19 +1,20 @@
-﻿open Microsoft.Xna.Framework
+﻿open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
+open Microsoft.Xna.Framework.Content
 open Myra
+open Myra.Graphics2D.UI
 
 open TowerDefenseSandbox.Engine
-open TowerDefenseSandbox.Engine.MonoGame
-open TowerDefenseSandbox.Game.Engine
-open TowerDefenseSandbox.Game.Scenes
-open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
-open Myra.Graphics2D.UI
-open TowerDefenseSandbox.Game.Entities
-open Microsoft.Xna.Framework.Content
 open TowerDefenseSandbox.Engine.Input
 open TowerDefenseSandbox.Engine.Messaging
+open TowerDefenseSandbox.Engine.Scene
+open TowerDefenseSandbox.Engine.MonoGame
 open TowerDefenseSandbox.Engine.MonoGame.Input
 open TowerDefenseSandbox.Engine.MonoGame.Graphic
+open TowerDefenseSandbox.Game.Engine
+open TowerDefenseSandbox.Game.Scenes
+open TowerDefenseSandbox.Game.Entities
 
 // Main Menu
 type StartGameMessageHandler (

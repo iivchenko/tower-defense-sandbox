@@ -1,14 +1,12 @@
 ﻿namespace TowerDefenseSandbox.Game.Scenes
 
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
-
 open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Graphics
-
 open Myra.Graphics2D.UI
 
-open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Engine.Messaging
+open TowerDefenseSandbox.Engine.Scene
 
 type GameVictoryRestartMessage() = class end
 type GameVictoryExitMessage() = class end

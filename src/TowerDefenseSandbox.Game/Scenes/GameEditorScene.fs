@@ -1,17 +1,16 @@
 ﻿namespace TowerDefenseSandbox.Game.Scenes
 
-open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
-
-open Myra.Graphics2D.UI
-
 open System.IO
 open Newtonsoft.Json
+open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
+open Myra.Graphics2D.UI
 
 open TowerDefenseSandbox.Engine
-open TowerDefenseSandbox.Game.Engine
-open TowerDefenseSandbox.Game.Entities
 open TowerDefenseSandbox.Engine.Messaging
 open TowerDefenseSandbox.Engine.Input
+open TowerDefenseSandbox.Engine.Scene
+open TowerDefenseSandbox.Game.Engine
+open TowerDefenseSandbox.Game.Entities
 
 type ExitGameEditorMessage() = class end
 
