@@ -200,6 +200,6 @@ type Spawner (position: Vector<pixel>, draw: Shape -> unit, factory: EnemyFactor
 
             if k <= maxK then k <- k + factor * frequency * delta else k <- 0.0f
             
-        member _.Draw (_: float32<second>) =
+        member _.DrawOld (_: float32<second>) =
             Circle(x, y, radius * k, false, Color.red) |> draw
             draw body

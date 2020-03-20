@@ -90,7 +90,7 @@ and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixe
                 orientation <-  Behavior.face center h
             | _ -> ()
 
-        member _.Draw (_: float32<second>) =
+        member _.DrawOld (_: float32<second>) =
 
             createBody center orientation radius |> draw
 

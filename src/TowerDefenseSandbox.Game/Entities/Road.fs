@@ -15,7 +15,7 @@ type Road (position: Vector<pixel>, width: float32<pixel>, height: float32<pixel
         member _.Update (_: float32<second>) =
             ()
             
-        member _.Draw (_: float32<second>) =
+        member _.DrawOld (_: float32<second>) =
             
             draw body
 

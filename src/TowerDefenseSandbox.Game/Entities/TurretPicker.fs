@@ -46,7 +46,7 @@ type TurretPicker (
         member _.Update(_: float32<second>) = 
             ()
            
-        member this.Draw(_: float32<second>) =
+        member this.DrawOld(_: float32<second>) =
                
             let (Vector(x, y)) = position
             let height = height / 3.0f

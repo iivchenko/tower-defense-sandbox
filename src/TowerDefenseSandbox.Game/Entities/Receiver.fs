@@ -37,6 +37,6 @@ type Receiver (position: Vector<pixel>, draw: Shape -> unit, entityProvider: IEn
                 radius <- maxRadius * ((float32 life)/(float32 maxLife))
                 body <- Circle(x, y, radius, false, Color.coral) 
             
-        member _.Draw (_: float32<second>) =
+        member _.DrawOld (_: float32<second>) =
 
             draw body

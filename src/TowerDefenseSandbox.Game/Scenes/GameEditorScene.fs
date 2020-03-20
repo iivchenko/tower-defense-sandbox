@@ -113,7 +113,7 @@ type GameEditorScene(input: IInputController, register: IMessageHandlerRegister,
             for x in [0..columns - 1] do 
                 for y in [0..raws - 1] do 
                     match grid.[x, y] with 
-                    | Some entity -> entity.Draw time
+                    | Some entity -> entity.DrawOld time
                     | _ -> ()
 
             for x in [0 .. columns - 1] do

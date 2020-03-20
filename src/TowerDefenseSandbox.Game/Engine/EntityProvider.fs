@@ -6,7 +6,7 @@ open System.Collections.Generic
 
 type IEntity =
     abstract member Update: float32<second> -> unit
-    abstract member Draw: float32<second> -> unit
+    abstract member DrawOld: float32<second> -> unit
 
 type IEntityProvider =
     abstract member Update: float32<second> -> unit
@@ -27,7 +27,7 @@ type EntityProvider() =
             entities |> Seq.iter (fun x -> x.Update delta) 
 
         member _.Draw(delta: float32<second>) = 
-            entities |> Seq.iter (fun x -> x.Draw delta) 
+            entities |> Seq.iter (fun x -> x.DrawOld delta) 
         
         member _.GetEntities () =
             entities :> IEnumerable<IEntity>

@@ -29,7 +29,7 @@ type Boom (draw: Shape -> unit, center: Vector<pixel>, radius: float32<pixel>, e
             ttl <- ttl - delta
             radius <- radius + (k / 0.1f<second>) * delta
 
-        member _.Draw (time: float32<second>) =
+        member _.DrawOld (time: float32<second>) =
 
             Circle(x, y, radius, true, Color(byte 255, byte 0, byte 0, byte 50)) |> draw
 
@@ -56,7 +56,7 @@ type Bullet(draw: Vector<pixel> -> unit, entityProvider: IEntityProvider, center
                 else 
                     ()
 
-        member _.Draw (_: float32<second>) =
+        member _.DrawOld (_: float32<second>) =
             draw center
 
 type TurretCreatedMessage(pixels: int) =
@@ -114,7 +114,7 @@ type Turret (
 
             nextReload <- nextReload - time
 
-        member _.Draw(_: float32<second>) =
+        member _.DrawOld(_: float32<second>) =
 
             draw body
 
