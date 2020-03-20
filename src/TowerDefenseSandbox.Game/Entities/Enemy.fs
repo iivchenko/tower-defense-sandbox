@@ -84,8 +84,8 @@ and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixe
                 path <- tail
             | h::_ ->
 
-                let velocity = (Behavior.seek center h currentSpeed) * delta
-                center <- center + velocity
+                let velocity = Behavior.seek center h currentSpeed 
+                center <- center + velocity * delta
 
                 orientation <-  Behavior.face center h
             | _ -> ()

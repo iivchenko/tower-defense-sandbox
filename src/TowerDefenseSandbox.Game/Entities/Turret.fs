@@ -45,9 +45,9 @@ type Bullet(draw: Vector<pixel> -> unit, entityProvider: IEntityProvider, center
     
         member this.Update (delta: float32<second>) =
             let target = getTargetPosition()
-            let velocity = (Behavior.seek center target speed) * delta
+            let velocity = Behavior.seek center target speed
             
-            center <- center + velocity
+            center <- center + velocity * delta
 
             if (Vector.distance center target) < radius
                 then
