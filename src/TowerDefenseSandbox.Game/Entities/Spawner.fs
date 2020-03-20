@@ -51,7 +51,7 @@ module Wave =
 
 type WavesOverMessage () = class end
 
-type Spawner (position: Vector<pixel>, draw: Shape -> unit, factory: EnemyFactory, pushMessage: WavesOverMessage -> unit, entityProvider: IEntityProvider) =
+type Spawner (position: Vector<pixel>, factory: EnemyFactory, pushMessage: WavesOverMessage -> unit, entityProvider: IEntityProvider) =
 
     [<Literal>] 
     let spawnTime = 1.0f<second>
@@ -200,6 +200,4 @@ type Spawner (position: Vector<pixel>, draw: Shape -> unit, factory: EnemyFactor
 
             if k <= maxK then k <- k + factor * frequency * delta else k <- 0.0f
             
-        member _.DrawOld (_: float32<second>) =
-            Circle(x, y, radius * k, false, Color.red) |> draw
-            draw body
+        member _.Draw() = Shape(Circle(x, y, radius * k, false, Color.red)::body::[])

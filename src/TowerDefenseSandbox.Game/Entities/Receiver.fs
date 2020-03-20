@@ -5,7 +5,7 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-type Receiver (position: Vector<pixel>, draw: Shape -> unit, entityProvider: IEntityProvider) = 
+type Receiver (position: Vector<pixel>, entityProvider: IEntityProvider) = 
 
     let (Vector(x, y)) = position
 
@@ -36,7 +36,5 @@ type Receiver (position: Vector<pixel>, draw: Shape -> unit, entityProvider: IEn
                 entityProvider.RemoveEntity e
                 radius <- maxRadius * ((float32 life)/(float32 maxLife))
                 body <- Circle(x, y, radius, false, Color.coral) 
-            
-        member _.DrawOld (_: float32<second>) =
 
-            draw body
+        member _.Draw() = body

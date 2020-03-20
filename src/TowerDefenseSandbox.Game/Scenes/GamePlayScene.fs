@@ -100,9 +100,9 @@ type GamePlayScene (
     let center (column: int) (raw: int) = Vector.init ((float32 column) * cellWidth + cellWidth / 2.0f) ((float32 raw) * cellHeight + cellHeight / 2.0f)
     let createEntity (t: int) (draw: Shape -> unit) column raw (entityProvider: IEntityProvider) (factory: EnemyFactory) =
         match t with 
-        | 0 -> Spawner (center column raw, draw, factory, (fun m -> queue.Push m), entityProvider) :> IEntity
-        | 1 -> Road (Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight, draw) :> IEntity
-        | 2 -> Receiver (center column raw, draw, entityProvider) :> IEntity
+        | 0 -> Spawner (center column raw, factory, (fun m -> queue.Push m), entityProvider) :> IEntity
+        | 1 -> Road (Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight) :> IEntity
+        | 2 -> Receiver (center column raw, entityProvider) :> IEntity
 
     do
 
@@ -120,7 +120,7 @@ type GamePlayScene (
 
             match grid.[column, raw] with
             | None -> 
-                let picker = TurretPicker(Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight, draw, grid, pushTurretMessage, entityProvider, column, raw) :> IEntity
+                let picker = TurretPicker(Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight, grid, pushTurretMessage, entityProvider, column, raw) :> IEntity
                 grid.[column, raw] <- Some picker
                 entityProvider.RegisterEntity picker
             | Some cell ->
@@ -195,9 +195,14 @@ type GamePlayScene (
                         | :? Receiver as receiver when receiver.Life <= 0 -> queue.Push(GameOverMessage())
                         | _ -> ()
 
-        member _.Draw (delta: float32<second>) = 
+        member _.Draw (_: float32<second>) = 
 
-            entityProvider.Draw delta
+            entityProvider.GetEntities() 
+            |> Seq.map (fun x -> x.Draw())
+            |> Seq.rev
+            |> Seq.fold (fun acc x -> x::acc) []
+            |> (fun list -> Shape(list)) 
+            |> draw
 
             for x in [0 .. columns - 1] do
                 for y in [0 .. raws - 1] do

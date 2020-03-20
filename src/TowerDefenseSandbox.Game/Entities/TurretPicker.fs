@@ -9,7 +9,6 @@ type TurretPicker (
                     position: Vector<pixel>, 
                     width: float32<pixel>, 
                     height: float32<pixel>, 
-                    draw: Shape -> unit, 
                     parent: IEntity option [,], 
                     pushMessage: TurretCreatedMessage -> unit,
                     entityProvider: IEntityProvider, 
@@ -25,17 +24,17 @@ type TurretPicker (
 
         match raw with 
         | _ when d > 0.0f<pixel> && d <= height / 3.0f && pixels >= 75 -> 
-            let turret = Turret.CreateRegular(center column raw, draw, pushMessage, entityProvider) :> IEntity
+            let turret = Turret.CreateRegular(center column raw, pushMessage, entityProvider) :> IEntity
             parent.[column, raw] <- Some turret
             entityProvider.RegisterEntity turret
             entityProvider.RemoveEntity this
         | _ when d > height / 3.0f && d <= height / 3.0f * 2.0f && pixels >= 100 -> 
-            let turret = Turret.CreateSlow(center column raw, draw, pushMessage, entityProvider) :> IEntity
+            let turret = Turret.CreateSlow(center column raw, pushMessage, entityProvider) :> IEntity
             parent.[column, raw] <- Some turret
             entityProvider.RegisterEntity turret
             entityProvider.RemoveEntity this
         | _ when pixels >= 120->
-            let turret = Turret.CreateSplash(center column raw, draw, pushMessage, entityProvider) :> IEntity
+            let turret = Turret.CreateSplash(center column raw, pushMessage, entityProvider) :> IEntity
             parent.[column, raw] <- Some turret
             entityProvider.RegisterEntity turret
             entityProvider.RemoveEntity this
@@ -46,11 +45,11 @@ type TurretPicker (
         member _.Update(_: float32<second>) = 
             ()
            
-        member this.DrawOld(_: float32<second>) =
-               
+        member _.Draw() = 
             let (Vector(x, y)) = position
             let height = height / 3.0f
-
-            Rectangle(x, y + 0.0f * height, width, height, true, Color.black) |> draw
-            Rectangle(x, y + 1.0f * height, width, height, true, Color.blue) |> draw
-            Rectangle(x, y + 2.0f * height, width, height, true, Color.red) |> draw
+            [
+                Rectangle(x, y + 0.0f * height, width, height, true, Color.black); 
+                Rectangle(x, y + 1.0f * height, width, height, true, Color.blue);
+                Rectangle(x, y + 2.0f * height, width, height, true, Color.red)
+            ] |> Shape

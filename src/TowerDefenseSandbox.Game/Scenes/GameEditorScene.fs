@@ -84,9 +84,9 @@ type GameEditorScene(input: IInputController, register: IMessageHandlerRegister,
         let column = x / int cellWidth
         let raw = y / int cellHeight
         grid.[column, raw] <- match currentEdit with
-        | 0 -> Spawner (center column raw, draw, new EnemyFactory((fun _ -> ()), (fun _ -> ())), (fun _ -> ()), new EntityProvider()) :> IEntity |> Some
-        | 1 -> Road (Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight, draw) :> IEntity |> Some
-        | 2 -> Receiver (center column raw, draw, new EntityProvider()) :> IEntity |> Some
+        | 0 -> Spawner (center column raw, new EnemyFactory((fun _ -> ()), (fun _ -> ())), (fun _ -> ()), new EntityProvider()) :> IEntity |> Some
+        | 1 -> Road (Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight) :> IEntity |> Some
+        | 2 -> Receiver (center column raw, new EntityProvider()) :> IEntity |> Some
 
     let updateEdit() = currentEdit <- (currentEdit + 1) % 3
 
@@ -109,12 +109,15 @@ type GameEditorScene(input: IInputController, register: IMessageHandlerRegister,
             
             input.Update(time)
 
-        member _.Draw(time: float32<second>) = 
-            for x in [0..columns - 1] do 
-                for y in [0..raws - 1] do 
-                    match grid.[x, y] with 
-                    | Some entity -> entity.DrawOld time
-                    | _ -> ()
+        member _.Draw(_: float32<second>) = 
+
+            seq {
+                for x in [0..columns - 1] do 
+                    for y in [0..raws - 1] do 
+                        grid.[x, y] 
+            } 
+            |> Seq.fold (fun acc x -> match x with | Some e -> e.Draw()::acc | _ -> acc) []
+            |> Seq.iter draw
 
             for x in [0 .. columns - 1] do
                 for y in [0 .. raws - 1] do

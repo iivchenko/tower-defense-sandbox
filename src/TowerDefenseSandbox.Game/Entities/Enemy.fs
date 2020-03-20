@@ -31,7 +31,7 @@ and EnemyMessage =
     | EnemyCreatedMessage of EnemyCreatedMessage
     | EnemyKilledMessage of EnemyKilledMessage
 
-and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixel> -> Shape, draw: Shape -> unit, pushMessage: EnemyMessage -> unit) as this =
+and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixel> -> Shape, pushMessage: EnemyMessage -> unit) as this =
 
     let mutable life = info.Life
     let mutable center = info.Center
@@ -90,9 +90,7 @@ and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixe
                 orientation <-  Behavior.face center h
             | _ -> ()
 
-        member _.DrawOld (_: float32<second>) =
-
-            createBody center orientation radius |> draw
+        member _.Draw() = createBody center orientation radius
 
     member _.Effects with get () = effects
 
@@ -113,7 +111,7 @@ and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixe
 
         let info = { Life = 200; Speed = 50.0f<pixel/second>; Center = position; Path = path; Pixels = 10 }
 
-        Enemy(info, createBody, draw, pushMessage)
+        Enemy(info, createBody, pushMessage)
 
     static member CreateFast(position: Vector<pixel>, path: Vector<pixel> list, draw: Shape -> unit, pushMessage: EnemyMessage -> unit) =
 
@@ -123,7 +121,7 @@ and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixe
 
         let info = { Life = 100; Speed = 150.0f<pixel/second>; Center = position; Path = path; Pixels = 5 }
 
-        Enemy(info, createBody, draw, pushMessage)
+        Enemy(info, createBody, pushMessage)
 
     static member CreateHard(position: Vector<pixel>, path: Vector<pixel> list, draw: Shape -> unit, pushMessage: EnemyMessage -> unit) =
         
@@ -139,4 +137,4 @@ and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixe
 
         let info = { Life = 1000; Speed = 25.0f<pixel/second>; Center = position; Path = path; Pixels = 15 }
 
-        Enemy(info,createBody,  draw, pushMessage)
+        Enemy(info,createBody, pushMessage)

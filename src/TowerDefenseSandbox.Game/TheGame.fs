@@ -298,8 +298,6 @@ type TheGame () as this =
     let screenHeight = 1080
 
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch>
-    let mutable draw: Shape -> unit = (fun _ -> ())
-
     let mutable scene: IScene = EmptyScene() :> IScene
 
     interface ISceneManager with 
@@ -311,7 +309,6 @@ type TheGame () as this =
     override _.LoadContent() =
         this.Content.RootDirectory <- "Content"
         spriteBatch <- new SpriteBatch(this.GraphicsDevice)
-        draw <- Graphic.draw (MonoGameGraphic(spriteBatch))
 
     override this.Initialize () =
 
@@ -332,6 +329,7 @@ type TheGame () as this =
        
         let bus = MessageBus()
         let register = bus :> IMessageHandlerRegister
+        let draw = Graphic.draw (MonoGameGraphic(spriteBatch))
         register.Register (StartGameMessageHandler(this, draw, this.Content, screenWidth, screenHeight, this.Exit))
         register.Register (EditGameMessageHandler(this, draw, this.Content, screenWidth, screenHeight, this.Exit))
         register.Register (SettingsGameMessageHandler(this))

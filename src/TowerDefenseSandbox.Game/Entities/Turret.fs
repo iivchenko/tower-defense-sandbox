@@ -5,7 +5,7 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-type Boom (draw: Shape -> unit, center: Vector<pixel>, radius: float32<pixel>, entityProvider: IEntityProvider) =
+type Boom (center: Vector<pixel>, radius: float32<pixel>, entityProvider: IEntityProvider) =
     
     let k = radius / 3.0f
     let (Vector(x, y)) = center
@@ -29,11 +29,9 @@ type Boom (draw: Shape -> unit, center: Vector<pixel>, radius: float32<pixel>, e
             ttl <- ttl - delta
             radius <- radius + (k / 0.1f<second>) * delta
 
-        member _.DrawOld (time: float32<second>) =
+        member _.Draw() = Circle(x, y, radius, true, Color(byte 255, byte 0, byte 0, byte 50))
 
-            Circle(x, y, radius, true, Color(byte 255, byte 0, byte 0, byte 50)) |> draw
-
-type Bullet(draw: Vector<pixel> -> unit, entityProvider: IEntityProvider, center: Vector<pixel>, speed: float32<pixel/second>, getTargetPosition: unit -> Vector<pixel>, apply: Bullet -> unit) =
+type Bullet(draw: Vector<pixel> -> Shape, entityProvider: IEntityProvider, center: Vector<pixel>, speed: float32<pixel/second>, getTargetPosition: unit -> Vector<pixel>, apply: Bullet -> unit) =
 
     let radius = 2.5f<pixel>
     let mutable center = center
@@ -56,8 +54,7 @@ type Bullet(draw: Vector<pixel> -> unit, entityProvider: IEntityProvider, center
                 else 
                     ()
 
-        member _.DrawOld (_: float32<second>) =
-            draw center
+        member _.Draw() = draw center
 
 type TurretCreatedMessage(pixels: int) =
     
@@ -74,7 +71,6 @@ type Turret (
             info: TurretInfo,
             select: Enemy seq -> Enemy option, 
             fire: Vector<pixel> -> Enemy -> unit,
-            draw: Shape -> unit,
             pushMessge: TurretCreatedMessage -> unit,
             entityProvider: IEntityProvider) =
 
@@ -114,47 +110,41 @@ type Turret (
 
             nextReload <- nextReload - time
 
-        member _.DrawOld(_: float32<second>) =
+        member _.Draw() = Shape(body::view::[])
 
-            draw body
+    static member private Create(info: TurretInfo, select: Enemy seq -> Enemy option, fire: Vector<pixel> -> Enemy -> unit, pushMessage: TurretCreatedMessage -> unit, entityProvider: IEntityProvider) =  
+        Turret (info, select, fire, pushMessage, entityProvider)
 
-            #if DEBUG
-            draw view
-            #endif
-
-    static member private Create(info: TurretInfo, select: Enemy seq -> Enemy option, fire: Vector<pixel> -> Enemy -> unit, draw: Shape -> unit, pushMessage: TurretCreatedMessage -> unit, entityProvider: IEntityProvider) =  
-        Turret (info, select, fire, draw, pushMessage, entityProvider)
-
-    static member CreateRegular(position: Vector<pixel>, draw: Shape -> unit, pushMessage: TurretCreatedMessage -> unit, entityProvider: IEntityProvider) =
+    static member CreateRegular(position: Vector<pixel>, pushMessage: TurretCreatedMessage -> unit, entityProvider: IEntityProvider) =
         let select enemies = enemies |> Seq.tryHead
 
         let fire position (enemy: Enemy) = 
-            let draw (Vector(x, y)) = Circle(x, y, 2.5f<pixel>, false, Color.black) |> draw
+            let draw (Vector(x, y)) = Circle(x, y, 2.5f<pixel>, false, Color.black)
             Bullet(draw, entityProvider, position, 250.0f<pixel/second>, (fun _ -> enemy.Position), (fun _ -> DamageEffect 15 |> enemy.ApplyEffect)) |> entityProvider.RegisterEntity
         
         let info = {Position = position; Color = Color.black; ViewRadius = 100.0f<pixel>; Reload = 0.2f<second>; Pixels = 75}
-        Turret.Create (info, select, fire, draw, pushMessage, entityProvider)
+        Turret.Create (info, select, fire, pushMessage, entityProvider)
 
-    static member CreateSlow(position: Vector<pixel>, draw: Shape -> unit, pushMessage: TurretCreatedMessage -> unit, entityProvider: IEntityProvider) =
+    static member CreateSlow(position: Vector<pixel>, pushMessage: TurretCreatedMessage -> unit, entityProvider: IEntityProvider) =
         let select (enemies: Enemy seq) =
             enemies
             |> Seq.sortBy (fun x -> x.Effects)
             |> Seq.tryHead
 
         let fire position (enemy: Enemy)= 
-            let draw (Vector(x, y)) = Rectangle(x - 7.0f<pixel>, y - 7.0f<pixel>, 7.0f<pixel>, 7.0f<pixel>, true, Color.blue) |> draw
+            let draw (Vector(x, y)) = Rectangle(x - 7.0f<pixel>, y - 7.0f<pixel>, 7.0f<pixel>, 7.0f<pixel>, true, Color.blue)
             Bullet(draw, entityProvider, position, 150.0f<pixel/second>, (fun _ -> enemy.Position), (fun _ -> SlowDownEffect (5.0f<second>, 0.5f) |> enemy.ApplyEffect)) |> entityProvider.RegisterEntity
 
         let info = {Position = position; Color = Color.blue; ViewRadius = 100.0f<pixel>; Reload = 0.7f<second>; Pixels = 100}
-        Turret.Create (info, select, fire, draw, pushMessage, entityProvider)
+        Turret.Create (info, select, fire, pushMessage, entityProvider)
 
-    static member CreateSplash(position: Vector<pixel>, draw: Shape -> unit, pushMessage: TurretCreatedMessage -> unit, entityProvider: IEntityProvider) =
+    static member CreateSplash(position: Vector<pixel>, pushMessage: TurretCreatedMessage -> unit, entityProvider: IEntityProvider) =
         let select enemies = enemies |> Seq.tryHead
 
         let fire position (enemy: Enemy) = 
             let target = enemy.Position
-            let drawBullet (Vector(x, y)) = Circle(x, y, 2.5f<pixel>, false, Color.red) |> draw
-            Bullet(drawBullet, entityProvider, position, 250.0f<pixel/second>, (fun _ -> target), (fun bullet -> Boom(draw, bullet.Position, 100.0f<pixel>, entityProvider) |> entityProvider.RegisterEntity)) |> entityProvider.RegisterEntity
+            let drawBullet (Vector(x, y)) = Circle(x, y, 2.5f<pixel>, false, Color.red)
+            Bullet(drawBullet, entityProvider, position, 250.0f<pixel/second>, (fun _ -> target), (fun bullet -> Boom(bullet.Position, 100.0f<pixel>, entityProvider) |> entityProvider.RegisterEntity)) |> entityProvider.RegisterEntity
 
         let info = {Position = position; Color = Color.red; ViewRadius = 100.0f<pixel>; Reload = 1.0f<second>; Pixels = 120}
-        Turret.Create (info, select, fire, draw, pushMessage, entityProvider)
+        Turret.Create (info, select, fire, pushMessage, entityProvider)

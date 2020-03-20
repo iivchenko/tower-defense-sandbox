@@ -3,14 +3,14 @@
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open System.Collections.Generic
+open TowerDefenseSandbox.Engine
 
 type IEntity =
     abstract member Update: float32<second> -> unit
-    abstract member DrawOld: float32<second> -> unit
+    abstract member Draw: unit -> Shape
 
 type IEntityProvider =
     abstract member Update: float32<second> -> unit
-    abstract member Draw: float32<second> -> unit
     abstract member GetEntities: unit -> IEntity seq
     abstract member RegisterEntity: IEntity -> unit
     abstract member RemoveEntity: IEntity -> unit
@@ -24,10 +24,7 @@ type EntityProvider() =
     interface IEntityProvider with
 
         member _.Update(delta: float32<second>) = 
-            entities |> Seq.iter (fun x -> x.Update delta) 
-
-        member _.Draw(delta: float32<second>) = 
-            entities |> Seq.iter (fun x -> x.DrawOld delta) 
+            entities |> Seq.iter (fun x -> x.Update delta)
         
         member _.GetEntities () =
             entities :> IEnumerable<IEntity>
