@@ -11,10 +11,10 @@ module Color =
     let blue = Color(byte 0, byte 0, byte 255, byte 255)
 
 type Shape =
-| Circle of x: float32 * y: float32 * radius: float32 * fill: bool * color: Color
-| Rectangle of x: float32 * y: float32 * width: float32 * height: float32 * fill: bool * color: Color
-| Triangle of x: float32 * y: float32 * a1: Vector * a2: Vector * a3: Vector * color: Color
-| Polygon of x: float32 * y: float32 * points: Vector list * color: Color
+| Circle of x: float32<pixel> * y: float32<pixel> * radius: float32<pixel> * fill: bool * color: Color
+| Rectangle of x: float32<pixel> * y: float32<pixel> * width: float32<pixel> * height: float32<pixel> * fill: bool * color: Color
+| Triangle of x: float32<pixel> * y: float32<pixel> * a1: Vector<pixel> * a2: Vector<pixel> * a3: Vector<pixel> * color: Color
+| Polygon of x: float32<pixel> * y: float32<pixel> * points: Vector<pixel> list * color: Color
 | Shape of Shape list
 
 type IDrawSystem =

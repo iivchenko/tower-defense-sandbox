@@ -60,8 +60,8 @@ type GamePlayScene (
                     screenHeight: int) =
 
     let h3 = content.Load<SpriteFont>("Fonts\H3")
-    let cellWidth = 48.0f
-    let cellHeight = 45.0f
+    let cellWidth = 48.0f<pixel>
+    let cellHeight = 45.0f<pixel>
     let columns = screenWith / int cellWidth
     let raws = screenHeight / int cellHeight
 
@@ -125,7 +125,7 @@ type GamePlayScene (
                 entityProvider.RegisterEntity picker
             | Some cell ->
                 match cell with 
-                | :? TurretPicker as picker -> picker.Click(Vector(float32 x, float32 y), pixels)
+                | :? TurretPicker as picker -> picker.Click(Vector(float32 x * 1.0f<pixel>, float32 y * 1.0f<pixel>), pixels)
                 | _ -> ()
 
         register.Register (TurretCreatedMessageHandler(subPixels))

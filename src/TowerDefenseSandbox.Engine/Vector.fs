@@ -1,18 +1,25 @@
 ﻿namespace TowerDefenseSandbox.Engine
 
-type Vector = 
-    | Vector of x: float32 * y: float32
+
+type Vector<[<Measure>] 'u> = 
+    | Vector of x: float32<'u> * y: float32<'u>
     static member (+) (Vector (x1, y1), Vector (x2, y2)) = Vector (x1 + x2, y1 + y2)
     static member (-) (Vector (x1, y1), Vector (x2, y2)) = Vector (x1 - x2, y1 - y2)
     static member (*) (Vector (x, y), scalar) = Vector (x * scalar, y * scalar)
     static member (*) (scalar, Vector (x, y)) = Vector (x * scalar, y * scalar)
     static member (/) (Vector (x, y), scalar) = Vector (x / scalar, y / scalar)
 
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector =
 
     let init (x) (y) = Vector (x, y)
     let unwrap (Vector(x, y)) = (x, y)
-    let distance (Vector (x1, y1): Vector) (Vector(x2, y2): Vector) = pown (x2 - x1) 2 + pown (y2 - y1) 2 |> sqrt
-    let length (Vector(x, y)) = pown x 2 + pown y 2 |> sqrt
-    let normalize (v: Vector) = v / length v
-    let direction v1 v2 = v2 - v1 |> normalize
+    let distance (Vector (x1, y1)) (Vector(x2, y2)) = 
+        let xd = x2 - x1
+        let yd = y2 - y1
+        (xd * xd) + (yd * yd) |> sqrt
+
+    let length (Vector(x, y)) = (x * x) + (y * y) |> sqrt
+
+    let normalize v = v / length v
+    let direction (v1: Vector<_>) (v2: Vector<_>) = v2 - v1 |> normalize

@@ -5,7 +5,7 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-type Road (position: Vector, width: float32, height: float32, draw: Shape -> unit) = 
+type Road (position: Vector<pixel>, width: float32<pixel>, height: float32<pixel>, draw: Shape -> unit) = 
 
     let (Vector(x, y)) = position
     let body = Rectangle(x, y, width, height, true, Color.grey)

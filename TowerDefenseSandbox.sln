@@ -7,11 +7,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TowerDefenseSandbox.Game", 
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TowerDefenseSandbox.Engine", "src\TowerDefenseSandbox.Engine\TowerDefenseSandbox.Engine.fsproj", "{E42F5B3F-468B-463B-A264-823104507A36}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{22B677FC-7F0F-4A82-8AAF-7C6BC9980369}"
-EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TowerDefenseSandbox.Engine.UnitTests", "test\TowerDefenseSandbox.Engine.UnitTests\TowerDefenseSandbox.Engine.UnitTests.fsproj", "{B7226C65-7AC9-4EE4-8091-05917CED3571}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TowerDefenseSandbox.Engine.MonoGame", "src\TowerDefenseSandbox.Engine.MonoGame\TowerDefenseSandbox.Engine.MonoGame.fsproj", "{37088B2C-38E9-41B4-92F3-E9596ACFAFDA}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TowerDefenseSandbox.Engine.MonoGame", "src\TowerDefenseSandbox.Engine.MonoGame\TowerDefenseSandbox.Engine.MonoGame.fsproj", "{37088B2C-38E9-41B4-92F3-E9596ACFAFDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,10 +23,6 @@ Global
 		{E42F5B3F-468B-463B-A264-823104507A36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E42F5B3F-468B-463B-A264-823104507A36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E42F5B3F-468B-463B-A264-823104507A36}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B7226C65-7AC9-4EE4-8091-05917CED3571}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B7226C65-7AC9-4EE4-8091-05917CED3571}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B7226C65-7AC9-4EE4-8091-05917CED3571}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B7226C65-7AC9-4EE4-8091-05917CED3571}.Release|Any CPU.Build.0 = Release|Any CPU
 		{37088B2C-38E9-41B4-92F3-E9596ACFAFDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{37088B2C-38E9-41B4-92F3-E9596ACFAFDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37088B2C-38E9-41B4-92F3-E9596ACFAFDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -38,9 +30,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{B7226C65-7AC9-4EE4-8091-05917CED3571} = {22B677FC-7F0F-4A82-8AAF-7C6BC9980369}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6D337983-1F0A-4BC7-BBB8-77DE259E333B}

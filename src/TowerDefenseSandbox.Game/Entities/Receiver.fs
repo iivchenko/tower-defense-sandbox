@@ -5,14 +5,14 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
-type Receiver (position: Vector, draw: Shape -> unit, entityProvider: IEntityProvider) = 
+type Receiver (position: Vector<pixel>, draw: Shape -> unit, entityProvider: IEntityProvider) = 
 
     let (Vector(x, y)) = position
 
     let mutable life = 10
     let maxLife = life
 
-    let maxRadius = 25.0f
+    let maxRadius = 25.0f<pixel>
     let mutable radius = maxRadius
     let mutable body = Circle(x, y, radius, false, Color.coral) 
 

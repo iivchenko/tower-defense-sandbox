@@ -6,9 +6,9 @@ open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Game.Engine
 
 type TurretPicker (
-                    position: Vector, 
-                    width: float32, 
-                    height: float32, 
+                    position: Vector<pixel>, 
+                    width: float32<pixel>, 
+                    height: float32<pixel>, 
                     draw: Shape -> unit, 
                     parent: IEntity option [,], 
                     pushMessage: TurretCreatedMessage -> unit,
@@ -18,13 +18,13 @@ type TurretPicker (
 
     let center (column: int) (raw: int) = Vector.init ((float32 column) * width + width / 2.0f) ((float32 raw) * height + height / 2.0f)
 
-    member this.Click (clickPosition: Vector, pixels: int) = 
+    member this.Click (clickPosition: Vector<pixel>, pixels: int) = 
         let (Vector(_, y)) = position
         let (Vector(_, clickY)) = clickPosition
         let d = clickY - y
 
         match raw with 
-        | _ when d > 0.0f && d <= height / 3.0f && pixels >= 75 -> 
+        | _ when d > 0.0f<pixel> && d <= height / 3.0f && pixels >= 75 -> 
             let turret = Turret.CreateRegular(center column raw, draw, pushMessage, entityProvider) :> IEntity
             parent.[column, raw] <- Some turret
             entityProvider.RegisterEntity turret

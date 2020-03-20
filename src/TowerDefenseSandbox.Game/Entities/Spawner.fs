@@ -9,16 +9,16 @@ type EnemyFactory (draw: Shape -> unit, pushMessage: EnemyMessage -> unit) =
     
     let mutable path = []
 
-    member _.CreateRegular (center: Vector) =
+    member _.CreateRegular (center: Vector<pixel>) =
         Enemy.CreateRegular (center, path, draw, pushMessage)
 
-    member _.CreateFast (center: Vector) =
+    member _.CreateFast (center: Vector<pixel>) =
         Enemy.CreateFast (center, path, draw, pushMessage)
 
-    member _.CreateHard (center: Vector) =
+    member _.CreateHard (center: Vector<pixel>) =
         Enemy.CreateHard (center, path, draw, pushMessage)
 
-    member _.UpdatePath (newPath: Vector list) =
+    member _.UpdatePath (newPath: Vector<pixel> list) =
         path <- newPath
 
 type EnemyType = 
@@ -51,12 +51,12 @@ module Wave =
 
 type WavesOverMessage () = class end
 
-type Spawner (position: Vector, draw: Shape -> unit, factory: EnemyFactory, pushMessage: WavesOverMessage -> unit, entityProvider: IEntityProvider) =
+type Spawner (position: Vector<pixel>, draw: Shape -> unit, factory: EnemyFactory, pushMessage: WavesOverMessage -> unit, entityProvider: IEntityProvider) =
 
     [<Literal>] 
     let spawnTime = 1.0f<second>
 
-    let radius = 15.0f
+    let radius = 15.0f<pixel>
     let mutable nextSpawn = spawnTime
     let (Vector(x, y)) = position
     let body = Circle(x, y, radius, false, Color.aquamarine)
@@ -174,9 +174,6 @@ type Spawner (position: Vector, draw: Shape -> unit, factory: EnemyFactory, push
             WaveChunk(Standard, 0.3f<second>);
         ]);
     ]
-
-    let threshold = 0.5f<second>
-    let mutable nextEnemy = threshold
 
     let rec spawn enemy =
         match enemy with 
