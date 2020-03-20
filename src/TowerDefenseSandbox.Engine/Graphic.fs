@@ -18,7 +18,13 @@ type Shape =
 | Shape of Shape list
 
 type IDrawSystem =
-    abstract member Draw: Shape -> unit
+    abstract member Draw: Matrix -> Shape -> unit
 
 module Graphic =
-    let draw (system: IDrawSystem) (shape: Shape) = system.Draw (shape)
+
+    let identity = Matrix.identity()
+
+    let draw (system: IDrawSystem) (transformationMatrix: Matrix option) (shape: Shape) = 
+        match transformationMatrix with 
+        | Some(matrix) -> system.Draw matrix shape
+        | _ -> system.Draw identity shape

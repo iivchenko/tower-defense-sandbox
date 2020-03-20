@@ -329,7 +329,7 @@ type TheGame () as this =
        
         let bus = MessageBus()
         let register = bus :> IMessageHandlerRegister
-        let draw = Graphic.draw (MonoGameGraphic(spriteBatch))
+        let draw = Graphic.draw (MonoGameGraphic spriteBatch) None
         register.Register (StartGameMessageHandler(this, draw, this.Content, screenWidth, screenHeight, this.Exit))
         register.Register (EditGameMessageHandler(this, draw, this.Content, screenWidth, screenHeight, this.Exit))
         register.Register (SettingsGameMessageHandler(this))
@@ -346,12 +346,8 @@ type TheGame () as this =
     override _.Draw (gameTime: GameTime) =
         
         graphics.GraphicsDevice.Clear(Color.CornflowerBlue)
-
-        spriteBatch.Begin()
         
         scene.Draw (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
-
-        spriteBatch.End()
 
         Desktop.Render ()
 

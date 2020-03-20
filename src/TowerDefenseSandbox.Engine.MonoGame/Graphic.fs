@@ -5,10 +5,13 @@ open Microsoft.Xna.Framework.Graphics
 open MonoGame.Extended
 
 open TowerDefenseSandbox.Engine
+open System
 
 type MonoGameGraphic (spriteBatch: SpriteBatch) =
 
     let toVector2 (Vector(x, y): Vector<'u>) = Vector2(float32 x, float32 y)
+    let toXnaMatrix (Matrix(a11, a12, a21, a22)) = 
+        Microsoft.Xna.Framework.Matrix(a11, a12, 0.0f, 0.0f, a21, a22, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f) |> Nullable<Microsoft.Xna.Framework.Matrix>
 
     let rec draw (shape: Shape)  =
         match shape with 
@@ -31,5 +34,8 @@ type MonoGameGraphic (spriteBatch: SpriteBatch) =
 
     interface IDrawSystem with 
 
-        member _.Draw (shape: Shape) = draw shape
+        member _.Draw (transformationMatrix: Matrix) (shape: Shape) = 
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, toXnaMatrix transformationMatrix)
+            draw shape
+            spriteBatch.End()
            
