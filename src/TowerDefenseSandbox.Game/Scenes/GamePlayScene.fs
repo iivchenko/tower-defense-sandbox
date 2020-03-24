@@ -49,12 +49,33 @@ type GameExitMessage() = class end
 
 type GameOverMessage() = class end
 
+type CameraZoomMessage(scale: float32) = 
+    
+    member _.Scale = scale
+
+type CameraMoveMessage(position: Vector<pixel>) =
+
+    member _.Position = position
+
+type CameraMoveMessageHandler(camera: Camera) =
+
+    interface IMessageHandler<CameraMoveMessage> with 
+        member _.Handle(message: CameraMoveMessage) =
+            camera.Position <- camera.Position + message.Position
+
+type CameraZoomMessageHandler(camera: Camera) =
+
+    interface IMessageHandler<CameraZoomMessage> with 
+        member _.Handle(message: CameraZoomMessage) =
+            camera.Zoom <- camera.Zoom + message.Scale
+
 type GamePlayScene (
+                    camera: Camera,
                     input: IInputController,
                     entityProvider: IEntityProvider,
                     register: IMessageHandlerRegister, 
                     queue: IMessageQueue, 
-                    draw: Shape -> unit, 
+                    draw: CameraMatrix option -> Shape -> unit, 
                     content: ContentManager, 
                     screenWith: int, 
                     screenHeight: int) =
@@ -98,7 +119,7 @@ type GamePlayScene (
         | _ -> raise (System.Exception("Spawner not found!"))
 
     let center (column: int) (raw: int) = Vector.init ((float32 column) * cellWidth + cellWidth / 2.0f) ((float32 raw) * cellHeight + cellHeight / 2.0f)
-    let createEntity (t: int) (draw: Shape -> unit) column raw (entityProvider: IEntityProvider) (factory: EnemyFactory) =
+    let createEntity (t: int) column raw (entityProvider: IEntityProvider) (factory: EnemyFactory) =
         match t with 
         | 0 -> Spawner (center column raw, factory, (fun m -> queue.Push m), entityProvider) :> IEntity
         | 1 -> Road (Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight) :> IEntity
@@ -115,8 +136,11 @@ type GamePlayScene (
             pixelsLabel.Text <- sprintf "Pixels: %i" pixels
 
         let gameInteract x y =
-            let column = x / int cellWidth
-            let raw = y / int cellHeight
+
+            let (Vector(x, y)) = (Vector.init (float32 x) (float32 y)) * camera.Inverse
+
+            let column = x / cellWidth |> int
+            let raw = y / cellHeight |> int
 
             match grid.[column, raw] with
             | None -> 
@@ -125,15 +149,17 @@ type GamePlayScene (
                 entityProvider.RegisterEntity picker
             | Some cell ->
                 match cell with 
-                | :? TurretPicker as picker -> picker.Click(Vector(float32 x * 1.0f<pixel>, float32 y * 1.0f<pixel>), pixels)
+                | :? TurretPicker as picker -> picker.Click(Vector(x * 1.0f<pixel>, y * 1.0f<pixel>), pixels)
                 | _ -> ()
 
         register.Register (TurretCreatedMessageHandler(subPixels))
         register.Register (EnemyCreatedMessageHandler(entityProvider))
         register.Register (EnemyKilledMessageHandler(entityProvider, addPixels))
         register.Register (GamePlayInteractionMessageHandler(gameInteract))
+        register.Register (CameraZoomMessageHandler(camera))
+        register.Register (CameraMoveMessageHandler(camera))
 
-        let factory = EnemyFactory (draw, fun message -> 
+        let factory = EnemyFactory (fun message -> 
                                                     match message with 
                                                     | EnemyCreatedMessage m -> queue.Push m
                                                     | EnemyKilledMessage m -> queue.Push m)
@@ -141,7 +167,7 @@ type GamePlayScene (
 
         data 
             |> List.iter (fun (x, y, t) -> 
-                            let entity = createEntity t draw x y entityProvider factory
+                            let entity = createEntity t x y entityProvider factory
                             entityProvider.RegisterEntity entity
                             grid.[x, y] <- Some entity)
 
@@ -202,8 +228,8 @@ type GamePlayScene (
             |> Seq.rev
             |> Seq.fold (fun acc x -> x::acc) []
             |> (fun list -> Shape(list)) 
-            |> draw
+            |> draw (Some camera.Matrix)
 
             for x in [0 .. columns - 1] do
                 for y in [0 .. raws - 1] do
-                    Rectangle(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight, false, Color.black ) |> draw
+                    Rectangle(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight, false, Color.black ) |> draw (Some camera.Matrix)

@@ -18,13 +18,13 @@ type Shape =
 | Shape of Shape list
 
 type IDrawSystem =
-    abstract member Draw: Matrix -> Shape -> unit
+    abstract member Draw: CameraMatrix -> Shape -> unit
 
 module Graphic =
 
-    let identity = Matrix.identity()
+    let identity = Camera.identity()
 
-    let draw (system: IDrawSystem) (transformationMatrix: Matrix option) (shape: Shape) = 
+    let draw (system: IDrawSystem) (transformationMatrix: CameraMatrix option) (shape: Shape) = 
         match transformationMatrix with 
         | Some(matrix) -> system.Draw matrix shape
         | _ -> system.Draw identity shape

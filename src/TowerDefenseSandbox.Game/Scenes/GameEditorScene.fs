@@ -50,7 +50,7 @@ type UpdateEditMessageHandler(updateEdit: unit -> unit) =
         member _.Handle(_: UpdateEditMessage) =
             updateEdit()
 
-type GameEditorScene(input: IInputController, register: IMessageHandlerRegister, draw: Shape -> unit, screenWith: int, screenHeight: int) =
+type GameEditorScene(input: IInputController, register: IMessageHandlerRegister, draw: CameraMatrix option -> Shape -> unit, screenWith: int, screenHeight: int) =
 
     let cellWidth = 48.0f<pixel>
     let cellHeight = 45.0f<pixel>
@@ -84,7 +84,7 @@ type GameEditorScene(input: IInputController, register: IMessageHandlerRegister,
         let column = x / int cellWidth
         let raw = y / int cellHeight
         grid.[column, raw] <- match currentEdit with
-        | 0 -> Spawner (center column raw, new EnemyFactory((fun _ -> ()), (fun _ -> ())), (fun _ -> ()), new EntityProvider()) :> IEntity |> Some
+        | 0 -> Spawner (center column raw, new EnemyFactory((fun _ -> ())), (fun _ -> ()), new EntityProvider()) :> IEntity |> Some
         | 1 -> Road (Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight) :> IEntity |> Some
         | 2 -> Receiver (center column raw, new EntityProvider()) :> IEntity |> Some
 
@@ -117,8 +117,9 @@ type GameEditorScene(input: IInputController, register: IMessageHandlerRegister,
                         grid.[x, y] 
             } 
             |> Seq.fold (fun acc x -> match x with | Some e -> e.Draw()::acc | _ -> acc) []
-            |> Seq.iter draw
+            |> (fun x -> Shape(x))
+            |> draw None
 
             for x in [0 .. columns - 1] do
                 for y in [0 .. raws - 1] do
-                    Rectangle(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight, false, Color.black ) |> draw
+                    Rectangle(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight, false, Color.black ) |> draw None

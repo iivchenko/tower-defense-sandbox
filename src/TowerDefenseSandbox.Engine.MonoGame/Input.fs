@@ -5,17 +5,61 @@ open Microsoft.Xna.Framework.Input
 
 open TowerDefenseSandbox.Engine.Messaging
 open TowerDefenseSandbox.Engine.Input
+open TowerDefenseSandbox.Engine
 
  type MonoGameMouseInputController(queue: IMessageQueue) =
 
-    let mutable buttons = [ (Button.Left, ButtonState.Released); (Button.Middle, ButtonState.Released); (Button.Right, ButtonState.Released) ] |> Map.ofList
+    let mapState state = 
+        match state with 
+        | ButtonState.Pressed -> MouseButtonState.Pressed
+        | ButtonState.Released -> MouseButtonState.Released
+        | _ -> MouseButtonState.Released
+
+    let mutable buttons = 
+        [ 
+            (MouseButton.Left, MouseButtonState.Released); 
+            (MouseButton.Middle, MouseButtonState.Released);
+            (MouseButton.Right, MouseButtonState.Released) 
+        ] |> Map.ofList
+
+    let mutable wheele = Mouse.GetState().ScrollWheelValue
+
+    let mutable mousePose : Vector<pixel> = Vector.init (float32 (Mouse.GetState().X) * 1.0f<pixel>) (float32 (Mouse.GetState().Y) * 1.0f<pixel>)
+
     interface IInputController with 
         member _.Update (_: float32<second>) =
             let state = Mouse.GetState()
-            let buttons' = [ (Button.Left, buttons.[Button.Left], state.LeftButton); (Button.Middle, buttons.[Button.Middle], state.MiddleButton); (Button.Right, buttons.[Button.Right], state.RightButton) ]
+            let mouse = { X = state.X;  Y = state.Y; }
+
+            let buttons' = 
+                [ 
+                    (MouseButton.Left, buttons.[MouseButton.Left], mapState state.LeftButton); 
+                    (MouseButton.Middle, buttons.[MouseButton.Middle], mapState state.MiddleButton); 
+                    (MouseButton.Right, buttons.[MouseButton.Right], mapState state.RightButton) 
+                ]
+
             buttons <- buttons' |> List.map (fun (key, _, state'') -> key, state'') |> Map.ofList
             
-            buttons' |> List.iter(fun (button, state', state'') -> if state' = ButtonState.Pressed && state'' = ButtonState.Released then queue.Push(MouseButtonPressedMessage(button, state.X, state.Y)) else ())
+            buttons' |> List.iter(fun (button, state', state'') -> if state' <> state'' then queue.Push(MouseInputMessage(MouseButton(button, state'', mouse))) else ()) 
+
+            if wheele <> state.ScrollWheelValue 
+                then 
+                    let old = wheele
+                    wheele <- state.ScrollWheelValue
+                    queue.Push(MouseInputMessage(MouseScrollWheelChanged(float32 old, float32 state.ScrollWheelValue)))
+                else 
+                    ()
+
+            if mousePose <> (Vector.init (float32 (Mouse.GetState().X) * 1.0f<pixel>) (float32 (Mouse.GetState().Y) * 1.0f<pixel>))
+                then 
+                    let old = mousePose; 
+                    let x = float32 (Mouse.GetState().X) * 1.0f<pixel>
+                    let y = float32 (Mouse.GetState().Y) * 1.0f<pixel>
+                    mousePose <- Vector.init x y
+                    queue.Push(MouseInputMessage(MouseMoved(old, mousePose)))
+                else 
+                    ()
+
 
 type MonoGameKeyboardInputController(keys: Key list, queue: IMessageQueue) =
    

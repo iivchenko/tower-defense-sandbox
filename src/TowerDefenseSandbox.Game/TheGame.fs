@@ -19,7 +19,7 @@ open TowerDefenseSandbox.Game.Entities
 // Main Menu
 type StartGameMessageHandler (
                                 manager: ISceneManager,
-                                draw: Shape -> unit, 
+                                draw: CameraMatrix option -> Shape -> unit, 
                                 content: ContentManager, 
                                 screenWidth: int, 
                                 screenHeight: int,
@@ -28,6 +28,7 @@ type StartGameMessageHandler (
     interface IMessageHandler<StartGameMessage> with
     
         member _.Handle (_: StartGameMessage) =
+            let camera = Camera (0.5f, 10.0f)
             let entityProvider = new EntityProvider()
             let bus = MessageBus()
             let input = AggregatedInputController([MonoGameKeyboardInputController([Key.Esc], bus); MonoGameMouseInputController(bus)]) 
@@ -36,13 +37,13 @@ type StartGameMessageHandler (
             register.Register (KeyboardGamePlayMessageHandler(bus, manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameVictoryMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
-            register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))            
 
-            manager.Scene <- GamePlayScene(input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
+            manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
 
 and EditGameMessageHandler (
                            manager: ISceneManager,
-                           draw: Shape -> unit, 
+                           draw: CameraMatrix option -> Shape -> unit, 
                            content: ContentManager, 
                            screenWidth: int, 
                            screenHeight: int,
@@ -76,7 +77,7 @@ and ExitApplicationMessageHandler (exit: unit -> unit) =
 // Game Play
 and GameVictoryMessageHandler (
                                 manager: ISceneManager,
-                                draw: Shape -> unit, 
+                                draw: CameraMatrix option -> Shape -> unit, 
                                 content: ContentManager, 
                                 screenWidth: int, 
                                 screenHeight: int,
@@ -94,7 +95,7 @@ and GameVictoryMessageHandler (
 
 and GameOverMessageHandler (
                             manager: ISceneManager,
-                            draw: Shape -> unit, 
+                            draw: CameraMatrix option -> Shape -> unit, 
                             content: ContentManager, 
                             screenWidth: int, 
                             screenHeight: int,
@@ -112,7 +113,7 @@ and GameOverMessageHandler (
 
 and GameExitMessageHandler (   
                             manager: ISceneManager,
-                            draw: Shape -> unit, 
+                            draw: CameraMatrix option -> Shape -> unit, 
                             content: ContentManager, 
                             screenWidth: int, 
                             screenHeight: int,
@@ -132,17 +133,33 @@ and GameExitMessageHandler (
             manager.Scene <- MainMenuScene(bus, content)
 
 and MouseGamePlayMessageHandler(queue: IMessageQueue) =
-    interface IMessageHandler<MouseButtonPressedMessage> with
-        member _.Handle(message: MouseButtonPressedMessage) =
-            match message.Button with 
-            | Button.Left ->
-                queue.Push(GamePlayInteractionMessage(message.X, message.Y))
+
+    let mutable left = MouseButtonState.Released
+    let mutable drag = false
+    interface IMessageHandler<MouseInputMessage> with
+        member _.Handle(message: MouseInputMessage) =
+            match message.Event with 
+            |  (MouseButton(MouseButton.Left, MouseButtonState.Released, mouse)) when not drag ->
+                left <- MouseButtonState.Released
+                queue.Push(GamePlayInteractionMessage(mouse.X, mouse.Y))
+            |  (MouseButton(MouseButton.Left, MouseButtonState.Released, _)) when drag ->
+                left <- MouseButtonState.Released
+                drag <- false
+            |  (MouseButton(MouseButton.Left, MouseButtonState.Pressed, _)) ->
+                left <- MouseButtonState.Pressed
+            | (MouseMoved(position', position'')) when left = MouseButtonState.Pressed && not drag && Vector.length (position'' - position') > 5.0f<pixel> -> 
+                drag <- true;
+                queue.Push(CameraMoveMessage(position'' - position'))
+            | (MouseMoved(position', position'')) when left = MouseButtonState.Pressed && drag -> 
+                queue.Push(CameraMoveMessage(position'' - position'))
+            | (MouseScrollWheelChanged(value, value')) -> 
+                queue.Push(CameraZoomMessage((value' - value)/1000.0f))
             | _ -> ()
 
 and KeyboardGamePlayMessageHandler(
                                     bus: IMessageQueue,
                                     manager: ISceneManager,
-                                    draw: Shape -> unit, 
+                                    draw: CameraMatrix option -> Shape -> unit, 
                                     content: ContentManager, 
                                     screenWidth: int, 
                                     screenHeight: int,
@@ -167,7 +184,7 @@ and KeyboardGamePlayMessageHandler(
 and KeyboardGameEditorMessageHandler(
                                       bus: IMessageQueue,
                                       manager: ISceneManager,
-                                      draw: Shape -> unit, 
+                                      draw: CameraMatrix option -> Shape -> unit, 
                                       content: ContentManager, 
                                       screenWidth: int, 
                                       screenHeight: int,
@@ -191,21 +208,21 @@ and KeyboardGameEditorMessageHandler(
             | _ -> ()
 
 and MouseGameEditorMessageHandler(queue: IMessageQueue) =
-    interface IMessageHandler<MouseButtonPressedMessage> with
-        member _.Handle(message: MouseButtonPressedMessage) =
-            match message.Button with 
-            | Button.Left ->
-                queue.Push(PlaceEntityMessage(message.X, message.Y))
-            | Button.Middle -> 
+    interface IMessageHandler<MouseInputMessage> with
+        member _.Handle(message: MouseInputMessage) =
+            match message.Event with 
+            | (MouseButton(MouseButton.Left, MouseButtonState.Released, mouse)) ->
+                queue.Push(PlaceEntityMessage(mouse.X, mouse.Y))
+            | (MouseButton(MouseButton.Middle, MouseButtonState.Released, _)) -> 
                 queue.Push(UpdateEditMessage())
-            | Button.Right -> 
-                queue.Push(RemoveEntityMessage(message.X, message.Y))
+            |(MouseButton(MouseButton.Right, MouseButtonState.Released, mouse)) -> 
+                queue.Push(RemoveEntityMessage(mouse.X, mouse.Y))
             | _ -> ()
 
 // Game Victory
 and GameVictoryRestartMessageHandler (
                                         manager: ISceneManager,
-                                        draw: Shape -> unit, 
+                                        draw: CameraMatrix option -> Shape -> unit, 
                                         content: ContentManager, 
                                         screenWidth: int, 
                                         screenHeight: int,
@@ -214,6 +231,7 @@ and GameVictoryRestartMessageHandler (
     interface IMessageHandler<GameVictoryRestartMessage> with
         
         member _.Handle(_: GameVictoryRestartMessage) =
+            let camera = Camera (0.5f, 10.0f)
             let entityProvider = new EntityProvider()
             let bus = MessageBus()
             let input = AggregatedInputController([MonoGameKeyboardInputController([Key.Esc], bus); MonoGameMouseInputController(bus)]) 
@@ -224,11 +242,11 @@ and GameVictoryRestartMessageHandler (
             register.Register (GameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
 
-            manager.Scene <- GamePlayScene(input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
+            manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
 
 and GameVictoryExitMessageHandler (
                                     manager: ISceneManager,
-                                    draw: Shape -> unit, 
+                                    draw: CameraMatrix option -> Shape -> unit, 
                                     content: ContentManager, 
                                     screenWidth: int, 
                                     screenHeight: int,
@@ -249,7 +267,7 @@ and GameVictoryExitMessageHandler (
 // Game Over
 and RestartGameOverMessageHandler (
                                     manager: ISceneManager,
-                                    draw: Shape -> unit, 
+                                    draw: CameraMatrix option -> Shape -> unit, 
                                     content: ContentManager, 
                                     screenWidth: int, 
                                     screenHeight: int,
@@ -258,6 +276,7 @@ and RestartGameOverMessageHandler (
     interface IMessageHandler<RestartGameOverMessage> with
     
         member _.Handle (_: RestartGameOverMessage) =
+            let camera = Camera (0.5f, 10.0f)
             let entityProvider = new EntityProvider()
             let bus = MessageBus()
             let input = AggregatedInputController([MonoGameKeyboardInputController([Key.Esc], bus); MonoGameMouseInputController(bus)]) 
@@ -268,11 +287,11 @@ and RestartGameOverMessageHandler (
             register.Register (GameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
 
-            manager.Scene <- GamePlayScene(input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
+            manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
 
 and ExitGameOverMessageHandler(
                                 manager: ISceneManager,
-                                draw: Shape -> unit, 
+                                draw: CameraMatrix option -> Shape -> unit, 
                                 content: ContentManager, 
                                 screenWidth: int, 
                                 screenHeight: int,
@@ -329,7 +348,7 @@ type TheGame () as this =
        
         let bus = MessageBus()
         let register = bus :> IMessageHandlerRegister
-        let draw = Graphic.draw (MonoGameGraphic spriteBatch) None
+        let draw = Graphic.draw (MonoGameGraphic spriteBatch)
         register.Register (StartGameMessageHandler(this, draw, this.Content, screenWidth, screenHeight, this.Exit))
         register.Register (EditGameMessageHandler(this, draw, this.Content, screenWidth, screenHeight, this.Exit))
         register.Register (SettingsGameMessageHandler(this))

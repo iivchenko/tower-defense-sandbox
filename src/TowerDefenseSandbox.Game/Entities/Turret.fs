@@ -82,9 +82,7 @@ type Turret (
     let viewRadius = info.ViewRadius
     let reload = info.Reload
 
-    #if DEBUG
     let view = Circle(x, y, viewRadius, false, Color.aquamarine)
-    #endif
 
     let mutable nextReload = reload
 

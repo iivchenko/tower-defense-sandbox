@@ -12,7 +12,7 @@ type Vector<[<Measure>] 'u> =
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector =
 
-    let init (x) (y) = Vector (x, y)
+    let init x y = Vector (x, y)
     let unwrap (Vector(x, y)) = (x, y)
     let distance (Vector (x1, y1)) (Vector(x2, y2)) = 
         let xd = x2 - x1

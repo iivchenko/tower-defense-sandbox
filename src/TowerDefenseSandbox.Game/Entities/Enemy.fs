@@ -98,12 +98,12 @@ and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixe
 
         effects <- effect::effects
 
-    static member CreateRegular(position: Vector<pixel>, path: Vector<pixel> list, draw: Shape -> unit, pushMessage: EnemyMessage -> unit) =
+    static member CreateRegular(position: Vector<pixel>, path: Vector<pixel> list, pushMessage: EnemyMessage -> unit) =
 
         let createBody (Vector(x, y)) orientation radius =
             let transform = Matrix.rotation orientation
 
-            let a1 = (Vector.init  00.0f<pixel> radius) * transform
+            let a1 = (Vector.init  00.0f<pixel>  radius) * transform
             let a2 = (Vector.init -radius       -radius) * transform
             let a3 = (Vector.init  radius       -radius) * transform
 
@@ -113,7 +113,7 @@ and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixe
 
         Enemy(info, createBody, pushMessage)
 
-    static member CreateFast(position: Vector<pixel>, path: Vector<pixel> list, draw: Shape -> unit, pushMessage: EnemyMessage -> unit) =
+    static member CreateFast(position: Vector<pixel>, path: Vector<pixel> list, pushMessage: EnemyMessage -> unit) =
 
         let createBody (Vector(x, y): Vector<pixel>) orientation radius =
 
@@ -123,7 +123,7 @@ and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixe
 
         Enemy(info, createBody, pushMessage)
 
-    static member CreateHard(position: Vector<pixel>, path: Vector<pixel> list, draw: Shape -> unit, pushMessage: EnemyMessage -> unit) =
+    static member CreateHard(position: Vector<pixel>, path: Vector<pixel> list, pushMessage: EnemyMessage -> unit) =
         
         let createBody (Vector(x, y): Vector<pixel>) orientation radius =
             let transform = Matrix.rotation orientation

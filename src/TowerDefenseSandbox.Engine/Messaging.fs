@@ -26,7 +26,7 @@ type MessageBus () =
             match handlers.TryGetValue(typeof<'TMessage>) with 
             | (true, handlers) -> 
                 handlers |> List.iter (fun x -> (x :?> IMessageHandler<'TMessage>).Handle message)
-            | _ -> raise (Exception "No handlers")
+            | _ -> ()
 
     interface IMessageHandlerRegister with
         
