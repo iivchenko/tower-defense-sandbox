@@ -12,7 +12,6 @@ open TowerDefenseSandbox.Engine.Scene
 open TowerDefenseSandbox.Engine.MonoGame
 open TowerDefenseSandbox.Engine.MonoGame.Input
 open TowerDefenseSandbox.Engine.MonoGame.Graphic
-open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Scenes
 open TowerDefenseSandbox.Game.Entities
 

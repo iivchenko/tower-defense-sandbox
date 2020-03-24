@@ -1,14 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Winexe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <MonoGameContentReference Include="**\*.mgcb" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Engine\EntityProvider.fs" />
+    <Compile Include="Entities\EntityProvider.fs" />
     <Compile Include="Entities\Road.fs" />
     <Compile Include="Entities\Effects.fs" />
     <Compile Include="Entities\Enemy.fs" />
@@ -21,12 +17,6 @@
     <Compile Include="Scenes\GameVictoryScene.fs" />
     <Compile Include="Scenes\GameOverScene.fs" />
     <Compile Include="Scenes\MainMenuScene.fs" />
-    <Compile Include="TheGame.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Content\**" />
-    <None Remove="Content\bin\**" />
-    <None Remove="Content\obj\**" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TowerDefenseSandbox.Engine.MonoGame\TowerDefenseSandbox.Engine.MonoGame.fsproj" />

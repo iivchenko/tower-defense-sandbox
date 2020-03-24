@@ -3,7 +3,6 @@
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open TowerDefenseSandbox.Engine
-open TowerDefenseSandbox.Game.Engine
 
 type Receiver (position: Vector<pixel>, entityProvider: IEntityProvider) = 
 

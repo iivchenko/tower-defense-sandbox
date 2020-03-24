@@ -11,7 +11,6 @@ open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Engine.Input
 open TowerDefenseSandbox.Engine.Messaging
 open TowerDefenseSandbox.Engine.Scene
-open TowerDefenseSandbox.Game.Engine
 open TowerDefenseSandbox.Game.Entities
 
 type GamePlayInteractionMessage (x: int, y: int) =

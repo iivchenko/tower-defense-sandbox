@@ -3,7 +3,6 @@ namespace TowerDefenseSandbox.Game.Entities
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open TowerDefenseSandbox.Engine
-open TowerDefenseSandbox.Game.Engine
 
 type EnemyInfo =
     {Life: int

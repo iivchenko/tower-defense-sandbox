@@ -1,4 +1,4 @@
-﻿namespace TowerDefenseSandbox.Game.Engine
+﻿namespace TowerDefenseSandbox.Game.Entities
 
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 

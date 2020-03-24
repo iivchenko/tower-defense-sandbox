@@ -9,6 +9,8 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TowerDefenseSandbox.Engine"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TowerDefenseSandbox.Engine.MonoGame", "src\TowerDefenseSandbox.Engine.MonoGame\TowerDefenseSandbox.Engine.MonoGame.fsproj", "{37088B2C-38E9-41B4-92F3-E9596ACFAFDA}"
 EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TowerDefenseSandbox.Game.Windows", "src\TowerDefenseSandbox.Game.Windows\TowerDefenseSandbox.Game.Windows.fsproj", "{1DF699E6-23DF-4500-8AF0-AA65DC306472}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{37088B2C-38E9-41B4-92F3-E9596ACFAFDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37088B2C-38E9-41B4-92F3-E9596ACFAFDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37088B2C-38E9-41B4-92F3-E9596ACFAFDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DF699E6-23DF-4500-8AF0-AA65DC306472}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DF699E6-23DF-4500-8AF0-AA65DC306472}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DF699E6-23DF-4500-8AF0-AA65DC306472}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DF699E6-23DF-4500-8AF0-AA65DC306472}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
