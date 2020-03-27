@@ -162,7 +162,10 @@ type GamePlayScene (
                                                     match message with 
                                                     | EnemyCreatedMessage m -> queue.Push m
                                                     | EnemyKilledMessage m -> queue.Push m)
-        let data = JsonConvert.DeserializeObject<(int*int*int) list>(File.ReadAllText("level.json"));
+
+        use file = TowerDefenseSandbox.Engine.MonoGame.File.read "level.json"
+        use reader = new StreamReader(file)
+        let data = JsonConvert.DeserializeObject<(int*int*int) list>(reader.ReadToEnd());
 
         data 
             |> List.iter (fun (x, y, t) -> 

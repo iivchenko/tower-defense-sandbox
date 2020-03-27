@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="File.fs" />
     <Compile Include="Input.fs" />
     <Compile Include="Graphic.fs" />
   </ItemGroup>
