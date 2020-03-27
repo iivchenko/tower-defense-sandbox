@@ -55,7 +55,27 @@ type GameEditorScene(input: IInputController, register: IMessageHandlerRegister,
     let cellHeight = 45.0f<pixel>
     let columns = screenWith / int cellWidth
     let raws = screenHeight / int cellHeight
-    let grid = Array2D.create columns raws None
+
+    let center (column: int) (raw: int) = Vector.init ((float32 column) * cellWidth + cellWidth / 2.0f) ((float32 raw) * cellHeight + cellHeight / 2.0f)
+
+    let mapEntity column raw t = 
+        match t with
+               | 0 -> Spawner (center column raw, new EnemyFactory((fun _ -> ())), (fun _ -> ()), new EntityProvider()) :> IEntity |> Some
+               | 1 -> Road (Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight) :> IEntity |> Some
+               | 2 -> Receiver (center column raw, new EntityProvider()) :> IEntity |> Some
+
+    let loadGame () =
+          let grid = Array2D.create columns raws None
+
+          if File.Exists("level.json")
+            then 
+                let data = JsonConvert.DeserializeObject<(int * int * int) list>(File.ReadAllText("level.json"))
+                data |> List.iter(fun (column, raw, element) -> grid.[column, raw] <- mapEntity column raw element)
+            else          
+                ()
+          grid
+
+    let grid = loadGame()
 
     let mutable currentEdit = 0
 
@@ -63,9 +83,7 @@ type GameEditorScene(input: IInputController, register: IMessageHandlerRegister,
         match e with 
         | :? Spawner -> 0
         | :? Road -> 1
-        | :? Receiver -> 2
-
-    let center (column: int) (raw: int) = Vector.init ((float32 column) * cellWidth + cellWidth / 2.0f) ((float32 raw) * cellHeight + cellHeight / 2.0f)
+        | :? Receiver -> 2  
 
     let saveGame () = 
         let data =
@@ -79,7 +97,7 @@ type GameEditorScene(input: IInputController, register: IMessageHandlerRegister,
 
         File.WriteAllText("level.json", JsonConvert.SerializeObject(data));
 
-    let placeEntity x y = 
+    let placeEntity x y =  
         let column = x / int cellWidth
         let raw = y / int cellHeight
         grid.[column, raw] <- match currentEdit with

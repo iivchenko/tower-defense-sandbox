@@ -9,7 +9,6 @@ open TowerDefenseSandbox.Engine.Messaging
 open TowerDefenseSandbox.Engine.Scene
 
 type StartGameMessage() = class end
-type EditGameMessage() = class end
 type SettingsGameMessage() = class end
 type ExitApplicationMessage() = class end
 
@@ -18,7 +17,6 @@ type MainMenuScene (queue: IMessageQueue, content: ContentManager) =
     let version = "version: 0.1.0"
 
     let startGame _ = queue.Push(StartGameMessage())
-    let editGame _ = queue.Push(EditGameMessage())
     let editSettings _ = queue.Push(SettingsGameMessage())
     let exitGame _ = queue.Push(ExitApplicationMessage())
 
@@ -51,11 +49,6 @@ type MainMenuScene (queue: IMessageQueue, content: ContentManager) =
         newGameMenuItem.Id <- ""
         newGameMenuItem.Selected.Add(startGame)
 
-        let createLevelMenuItem = new MenuItem()
-        createLevelMenuItem.Text <- "Create Level"
-        createLevelMenuItem.Id <- ""
-        createLevelMenuItem.Selected.Add(editGame)
-
         let settingsMenuItem = new MenuItem()
         settingsMenuItem.Text <- "Settings"
         settingsMenuItem.Id <- ""
@@ -67,7 +60,6 @@ type MainMenuScene (queue: IMessageQueue, content: ContentManager) =
         exitMenuItem.Selected.Add(exitGame)
 
         menu.Items.Add(newGameMenuItem)
-        menu.Items.Add(createLevelMenuItem)
         menu.Items.Add(settingsMenuItem)
         menu.Items.Add(exitMenuItem)
 

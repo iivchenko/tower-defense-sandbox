@@ -9,7 +9,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TheGame.fs" />
-    <Compile Include="TheProgram.fs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Content\**" />

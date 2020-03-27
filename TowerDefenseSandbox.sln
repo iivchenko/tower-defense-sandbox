@@ -13,6 +13,8 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TowerDefenseSandbox.Game.Wi
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TowerDefenseSandbox.Game.Android", "src\TowerDefenseSandbox.Game.Android\TowerDefenseSandbox.Game.Android.fsproj", "{8946F5F9-245F-4359-9FB4-36F6DBB87F71}"
 EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TowerDefenseSandbox.Game.Editor", "src\TowerDefenseSandbox.Game.Editor\TowerDefenseSandbox.Game.Editor.fsproj", "{05C1D3C3-D489-4A70-BE12-E98CEE945865}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{8946F5F9-245F-4359-9FB4-36F6DBB87F71}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8946F5F9-245F-4359-9FB4-36F6DBB87F71}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8946F5F9-245F-4359-9FB4-36F6DBB87F71}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{05C1D3C3-D489-4A70-BE12-E98CEE945865}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05C1D3C3-D489-4A70-BE12-E98CEE945865}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05C1D3C3-D489-4A70-BE12-E98CEE945865}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05C1D3C3-D489-4A70-BE12-E98CEE945865}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
