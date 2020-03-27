@@ -39,6 +39,7 @@ NUGET
     MonoGame.Extended (3.7)
       Newtonsoft.Json (>= 11.0.2)
     MonoGame.Framework.DesktopGL.Core (3.8.0.2)
+    MonoGame.Framework.Portable (3.7.1.189)
     Myra (0.9.8.194)
       info.lundin.math.dll (>= 1.2.6)
       StbImageSharp (>= 2.22.2)
