@@ -289,8 +289,6 @@ type TheGame () as this =
     inherit Microsoft.Xna.Framework.Game()
 
     let graphics = new GraphicsDeviceManager(this)
-    let screenWidth = 1920 
-    let screenHeight = 1080
 
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch>
     let mutable scene: IScene = EmptyScene() :> IScene
@@ -308,12 +306,17 @@ type TheGame () as this =
     override this.Initialize () =
 
         base.Initialize()
+        
+        let screenWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width 
+        let screenHeight =  GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height
 
         graphics.PreferredBackBufferWidth <- screenWidth
         graphics.PreferredBackBufferHeight <- screenHeight
         
         #if RELEASE 
         graphics.IsFullScreen <- true
+        #else
+        this.Window.AllowUserResizing <- true
         #endif
 
         graphics.ApplyChanges();

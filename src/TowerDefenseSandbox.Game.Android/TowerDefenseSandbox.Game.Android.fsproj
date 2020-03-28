@@ -19,7 +19,7 @@
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     <Name>TowerDefenseSandbox.Game.Android</Name>
-    <SelectedDevice>pixel_2_pie_9_0_-_api_28</SelectedDevice>
+    <SelectedDevice>Xiaomi Mi 9T</SelectedDevice>
     <DefaultDevice>pixel_2_pie_9_0_-_api_28</DefaultDevice>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
