@@ -67,10 +67,8 @@ type TheGame () as this =
 
         graphics.PreferredBackBufferWidth <- screenWidth
         graphics.PreferredBackBufferHeight <- screenHeight
-        
-        #if RELEASE 
-        graphics.IsFullScreen <- true
-        #endif
+
+        this.Window.AllowUserResizing <- true
 
         graphics.ApplyChanges();
 
