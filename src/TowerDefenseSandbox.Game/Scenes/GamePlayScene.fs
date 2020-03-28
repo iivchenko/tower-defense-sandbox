@@ -80,8 +80,8 @@ type GamePlayScene (
                     screenHeight: int) =
 
     let h3 = content.Load<SpriteFont>("Fonts\H3")
-    let cellWidth = 48.0f<pixel>
-    let cellHeight = 45.0f<pixel>
+    let cellWidth = 50.0f<pixel>
+    let cellHeight = 50.0f<pixel>
     let columns = screenWith / int cellWidth
     let raws = screenHeight / int cellHeight
 

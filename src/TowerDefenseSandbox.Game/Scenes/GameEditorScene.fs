@@ -51,8 +51,8 @@ type UpdateEditMessageHandler(updateEdit: unit -> unit) =
 
 type GameEditorScene(input: IInputController, register: IMessageHandlerRegister, draw: CameraMatrix option -> Shape -> unit, screenWith: int, screenHeight: int) =
 
-    let cellWidth = 48.0f<pixel>
-    let cellHeight = 45.0f<pixel>
+    let cellWidth = 50.0f<pixel>
+    let cellHeight = 50.0f<pixel>
     let columns = screenWith / int cellWidth
     let raws = screenHeight / int cellHeight
 
