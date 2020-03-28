@@ -4,6 +4,7 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Content
+open Microsoft.Xna.Framework.Input.Touch
 open Myra
 open Myra.Graphics2D.UI
 
@@ -12,7 +13,6 @@ open TowerDefenseSandbox.Engine.Input
 open TowerDefenseSandbox.Engine.Messaging
 open TowerDefenseSandbox.Engine.Scene
 open TowerDefenseSandbox.Engine.MonoGame
-open TowerDefenseSandbox.Engine.MonoGame.Input
 open TowerDefenseSandbox.Engine.MonoGame.Graphic
 open TowerDefenseSandbox.Game.Scenes
 open TowerDefenseSandbox.Game.Entities
@@ -32,10 +32,8 @@ type StartGameMessageHandler (
             let camera = Camera (0.5f, 10.0f)
             let entityProvider = new EntityProvider()
             let bus = MessageBus()
-            let input = AggregatedInputController([MonoGameKeyboardInputController([Key.Esc], bus); MonoGameMouseInputController(bus)]) 
+            let input = AggregatedInputController([ MonoGameTouchInputController(bus) ]) 
             let register = bus :> IMessageHandlerRegister
-            register.Register (MouseGamePlayMessageHandler(bus))
-            register.Register (KeyboardGamePlayMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameVictoryMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))            
@@ -113,88 +111,58 @@ and GameExitMessageHandler (
 
             manager.Scene <- MainMenuScene(bus, content)
 
-and MouseGamePlayMessageHandler(queue: IMessageQueue) =
+and MonoGameTouchInputController(queue: IMessageQueue) =
 
-    let mutable left = MouseButtonState.Released
-    let mutable drag = false
-    interface IMessageHandler<MouseInputMessage> with
-        member _.Handle(message: MouseInputMessage) =
-            match message.Event with 
-            |  (MouseButton(MouseButton.Left, MouseButtonState.Released, mouse)) when not drag ->
-                left <- MouseButtonState.Released
-                queue.Push(GamePlayInteractionMessage(mouse.X, mouse.Y))
-            |  (MouseButton(MouseButton.Left, MouseButtonState.Released, _)) when drag ->
-                left <- MouseButtonState.Released
-                drag <- false
-            |  (MouseButton(MouseButton.Left, MouseButtonState.Pressed, _)) ->
-                left <- MouseButtonState.Pressed
-            | (MouseMoved(position', position'')) when left = MouseButtonState.Pressed && not drag && Vector.length (position'' - position') > 5.0f<pixel> -> 
-                drag <- true;
-                queue.Push(CameraMoveMessage(position'' - position'))
-            | (MouseMoved(position', position'')) when left = MouseButtonState.Pressed && drag -> 
-                queue.Push(CameraMoveMessage(position'' - position'))
-            | (MouseScrollWheelChanged(value, value')) -> 
-                queue.Push(CameraZoomMessage((value' - value)/1000.0f))
-            | _ -> ()
+    let mutable history = []
+    interface IInputController with 
+        member _.Update (_: float32<second>) = 
+            let touches = TouchPanel.GetState() |> Seq.map (fun touch -> (touch.Id, touch.State, touch.Position.X, touch.Position.Y)) |> Seq.toList
 
-and KeyboardGamePlayMessageHandler(
-                                    manager: ISceneManager,
-                                    draw: CameraMatrix option -> Shape -> unit, 
-                                    content: ContentManager, 
-                                    screenWidth: int, 
-                                    screenHeight: int,
-                                    exit: unit -> unit) =
-    
-    interface IMessageHandler<KeyPresedMessage> with 
+            match touches with 
+            | [] -> ()
+            | (id, state, x, y)::[] when state = TouchLocationState.Pressed -> 
+                history <- (id, state, x, y)::history
 
-        member _.Handle(message: KeyPresedMessage) = 
-            match message.Key with
-            | Key.Esc -> 
-                let bus = MessageBus()
-                let register = bus :> IMessageHandlerRegister
-                register.Register (StartGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
-                register.Register (SettingsGameMessageHandler(manager))
-                register.Register (ExitApplicationMessageHandler(exit))
+            | (id, state, x, y)::[] when state = TouchLocationState.Released -> 
 
-                manager.Scene <- MainMenuScene(bus, content)
-            | _ -> ()
+                if List.length history = 1 
+                    then 
+                        let h =  List.filter (fun (xid, _, _, _) -> xid = id) history |> List.tryExactlyOne
 
-// Game Edit
-and KeyboardGameEditorMessageHandler(
-                                      bus: IMessageQueue,
-                                      manager: ISceneManager,
-                                      draw: CameraMatrix option -> Shape -> unit, 
-                                      content: ContentManager, 
-                                      screenWidth: int, 
-                                      screenHeight: int,
-                                      exit: unit -> unit) =
-    
-    interface IMessageHandler<KeyPresedMessage> with 
+                        match h with
+                        | Some(hid, TouchLocationState.Pressed, _, _) -> 
+                            history <- List.filter (fun (xid, _, _, _) -> xid <> hid) history
+                            queue.Push(GamePlayInteractionMessage(int x, int y))
+                        | Some(hid, _, _, _) -> 
+                            history <- List.filter (fun (xid, _, _, _) -> xid <> hid) history
+                        | _ -> ()
+                    else
+                        history <- []
+            | (id, state, x, y)::[] when state = TouchLocationState.Moved ->
+                let h =  List.filter (fun (xid, _, _, _) -> xid = id) history |> List.tryExactlyOne
+                
+                match h with
+                | Some(hid, state', x', y') -> 
+                    let dif = Vector.init ((x - x') * 1.0f<pixel>) ((y - y') * 1.0f<pixel>)
+                    history <- List.filter (fun (xid, _, _, _) -> xid <> hid) history
+                    history <- (id, (if dif = (Vector.init 0.0f<pixel> 0.0f<pixel>) && state' = TouchLocationState.Pressed then TouchLocationState.Pressed else  TouchLocationState.Moved), x, y)::history
+                    queue.Push(CameraMoveMessage(dif))
+                | _ -> ()
+                
+            | (id1, state1, x1, y1)::(id2, state2, x2, y2)::[]  when state1 = TouchLocationState.Pressed || state2 = TouchLocationState.Pressed -> 
+                history <- (id1, TouchLocationState.Pressed , x1, y1)::(id2, TouchLocationState.Pressed, x2, y2)::[]
 
-        member _.Handle(message: KeyPresedMessage) = 
-            match message.Key with
-            | Key.Esc -> 
-                let bus = MessageBus()
-                let register = bus :> IMessageHandlerRegister
-                register.Register (StartGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
-                register.Register (SettingsGameMessageHandler(manager))
-                register.Register (ExitApplicationMessageHandler(exit))
+            | (id1, state1, x1, y1)::(id2, state2, x2, y2)::[]  when state1 = TouchLocationState.Moved || state2 = TouchLocationState.Moved ->
+                let (_, _, x1', y1') = List.filter (fun (id, _, _, _) -> id1 = id) history |> List.exactlyOne
+                let (_, _, x2', y2') = List.filter (fun (id, _, _, _) -> id2 = id) history |> List.exactlyOne
 
-                manager.Scene <- MainMenuScene(bus, content)
-            | Key.Enter -> 
-                bus.Push(SaveGameEditMessage())
-            | _ -> ()
+                let scale = (Vector.distance (Vector.init x1 y1) (Vector.init x2 y2)) - (Vector.distance (Vector.init x1' y1') (Vector.init x2' y2'))
+                history <- (id1, TouchLocationState.Pressed, x1, y1)::(id2, TouchLocationState.Pressed, x2, y2)::[]
 
-and MouseGameEditorMessageHandler(queue: IMessageQueue) =
-    interface IMessageHandler<MouseInputMessage> with
-        member _.Handle(message: MouseInputMessage) =
-            match message.Event with 
-            | (MouseButton(MouseButton.Left, MouseButtonState.Released, mouse)) ->
-                queue.Push(PlaceEntityMessage(mouse.X, mouse.Y))
-            | (MouseButton(MouseButton.Middle, MouseButtonState.Released, _)) -> 
-                queue.Push(UpdateEditMessage())
-            |(MouseButton(MouseButton.Right, MouseButtonState.Released, mouse)) -> 
-                queue.Push(RemoveEntityMessage(mouse.X, mouse.Y))
+                queue.Push(CameraZoomMessage(scale/250.0f))
+
+            | _ when List.length history > 0 -> 
+                history <- []
             | _ -> ()
 
 // Game Victory
@@ -212,10 +180,8 @@ and GameVictoryRestartMessageHandler (
             let camera = Camera (0.5f, 10.0f)
             let entityProvider = new EntityProvider()
             let bus = MessageBus()
-            let input = AggregatedInputController([MonoGameKeyboardInputController([Key.Esc], bus); MonoGameMouseInputController(bus)]) 
+            let input = AggregatedInputController([MonoGameTouchInputController(bus)]) 
             let register = bus :> IMessageHandlerRegister
-            register.Register (MouseGamePlayMessageHandler(bus))
-            register.Register (KeyboardGamePlayMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameVictoryMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
@@ -256,10 +222,8 @@ and RestartGameOverMessageHandler (
             let camera = Camera (0.5f, 10.0f)
             let entityProvider = new EntityProvider()
             let bus = MessageBus()
-            let input = AggregatedInputController([MonoGameKeyboardInputController([Key.Esc], bus); MonoGameMouseInputController(bus)]) 
+            let input = AggregatedInputController([MonoGameTouchInputController(bus)]) 
             let register = bus :> IMessageHandlerRegister
-            register.Register (MouseGamePlayMessageHandler(bus))
-            register.Register (KeyboardGamePlayMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameVictoryMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
