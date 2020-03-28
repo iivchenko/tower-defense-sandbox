@@ -1,7 +1,6 @@
 ﻿open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
-open Microsoft.Xna.Framework.Content
 open Myra
 open Myra.Graphics2D.UI
 
