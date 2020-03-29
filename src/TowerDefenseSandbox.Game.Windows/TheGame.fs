@@ -336,7 +336,9 @@ type TheGame () as this =
 
     override _.Update (gameTime: GameTime) =
 
-        scene.Update (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
+        match this.IsActive with 
+        | true -> scene.Update (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
+        | _ -> ()
 
         base.Update(gameTime)
 

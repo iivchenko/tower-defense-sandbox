@@ -11,8 +11,5 @@ type Road (position: Vector<pixel>, width: float32<pixel>, height: float32<pixel
 
     interface IEntity with
 
-        member _.Update (_: float32<second>) =
-            ()
-
+        member _.Update (_: float32<second>) = ()
         member _.Draw() = body
-
