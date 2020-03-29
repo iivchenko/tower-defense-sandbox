@@ -3,7 +3,6 @@
 open System.IO
 open Newtonsoft.Json
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
-open Myra.Graphics2D.UI
 
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Engine.Messaging
@@ -114,8 +113,6 @@ type GameEditorScene(input: IInputController, register: IMessageHandlerRegister,
         grid.[column, raw] <- None
 
     do
-        Desktop.Widgets.Clear()
-
         register.Register(SaveGameEditMessageHandler(saveGame))
         register.Register(PlaceEntityMessageHandler(placeEntity))
         register.Register(RemoveEntityMessageHandler(removeEntity))

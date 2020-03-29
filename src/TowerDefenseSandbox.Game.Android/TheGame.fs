@@ -6,7 +6,6 @@ open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Input.Touch
 open Myra
-open Myra.Graphics2D.UI
 
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Engine.Input
@@ -306,5 +305,3 @@ type TheGame () as this =
         graphics.GraphicsDevice.Clear(Color.CornflowerBlue)
         
         scene.Draw (float32 gameTime.ElapsedGameTime.TotalSeconds * 1.0f<second>)
-
-        Desktop.Render ()
