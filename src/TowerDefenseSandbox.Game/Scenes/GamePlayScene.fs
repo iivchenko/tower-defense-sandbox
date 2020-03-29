@@ -78,7 +78,7 @@ type GamePlayScene (
                     screenWith: int, 
                     screenHeight: int) =
 
-    let h3 = content.Load<SpriteFont>("Fonts\H3")
+    let font = content.Load<SpriteFont>("Fonts\HUD")
     let cellWidth = 50.0f<pixel>
     let cellHeight = 50.0f<pixel>
     let columns = screenWith / int cellWidth
@@ -214,7 +214,7 @@ type GamePlayScene (
                     Rectangle(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight, false, Color.black ) |> draw (Some camera.Matrix)
 
             let statusLable = sprintf "%s %s" lifes pixelsLabel
-            let size = h3.MeasureString(statusLable);
+            let size = font.MeasureString(statusLable);
 
             // TODO: F# refactoring make int, float, pixle friends
-            draw None (Text((float32 screenWith) * 1.0f<pixel> - size.X * 1.0f<pixel> - 20.0f<pixel>, 20.0f<pixel>, statusLable, h3, Color.white))
+            draw None (Text((float32 screenWith) * 1.0f<pixel> - size.X * 1.0f<pixel> - 20.0f<pixel>, 20.0f<pixel>, statusLable, font, Color.white))
