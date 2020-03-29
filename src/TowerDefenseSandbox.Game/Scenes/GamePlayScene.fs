@@ -83,7 +83,8 @@ type GamePlayScene (
     let cellHeight = 50.0f<pixel>
     let columns = screenWith / int cellWidth
     let raws = screenHeight / int cellHeight
-
+    
+    let mutable gameSpeedCoefficient = 1.0f
     let mutable lifes = ""
     let mutable pixelsLabel = ""
     let mutable pixels = 100
@@ -186,7 +187,7 @@ type GamePlayScene (
 
             input.Update delta
 
-            entityProvider.Update delta
+            entityProvider.Update (delta * gameSpeedCoefficient)
 
             entityProvider.Flush ()
 

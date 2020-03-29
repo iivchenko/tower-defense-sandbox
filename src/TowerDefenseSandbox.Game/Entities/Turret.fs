@@ -90,7 +90,7 @@ type Turret (
 
     interface IEntity with
 
-        member _.Update(time: float32<second>) = 
+        member _.Update(delta: float32<second>) = 
 
             let enemies = 
                 entityProvider.GetEntities()
@@ -105,7 +105,7 @@ type Turret (
                 nextReload <- reload
             | _ -> ()
 
-            nextReload <- nextReload - time
+            nextReload <- nextReload - delta
 
         member _.Draw() = Shape(body::view::[])
 
