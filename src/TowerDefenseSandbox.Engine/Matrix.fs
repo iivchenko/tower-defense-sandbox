@@ -35,3 +35,10 @@ module Matrix =
                 cos angle,  sin angle,
                 -sin angle, cos angle
             )
+
+    let scale (scale: float32) = 
+        Matrix
+            (
+                scale, 0.0f,
+                0.0f,  scale
+            )

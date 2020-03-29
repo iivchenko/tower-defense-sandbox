@@ -37,9 +37,9 @@ type StartGameMessageHandler (
             register.Register (KeyboardGamePlayMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameVictoryMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
-            register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))            
+            register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
 
-            manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
+            manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight, 1.0f)
 
 and SettingsGameMessageHandler (manager: ISceneManager) =
     
@@ -219,7 +219,7 @@ and GameVictoryRestartMessageHandler (
             register.Register (GameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
 
-            manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
+            manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight, 1.0f)
 
 and GameVictoryExitMessageHandler (
                                     manager: ISceneManager,
@@ -263,7 +263,7 @@ and RestartGameOverMessageHandler (
             register.Register (GameOverMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
             register.Register (GameExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
 
-            manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight)
+            manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight, 1.0f)
 
 and ExitGameOverMessageHandler(
                                 manager: ISceneManager,
