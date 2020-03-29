@@ -5,7 +5,6 @@ open Newtonsoft.Json
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Graphics
-open Myra.Graphics2D.UI
 
 open TowerDefenseSandbox.Engine
 open TowerDefenseSandbox.Engine.Input
@@ -85,8 +84,8 @@ type GamePlayScene (
     let columns = screenWith / int cellWidth
     let raws = screenHeight / int cellHeight
 
-    let lifes = new Label()
-    let pixelsLabel = new Label()
+    let mutable lifes = ""
+    let mutable pixelsLabel = ""
     let mutable pixels = 100
 
     let grid: IEntity option [,] = Array2D.init columns raws (fun _ _ -> None)
@@ -128,11 +127,11 @@ type GamePlayScene (
 
         let addPixels p =
             pixels <- pixels + p
-            pixelsLabel.Text <- sprintf "Pixels: %i" pixels
+            pixelsLabel <- sprintf "Pixels: %i" pixels
 
         let subPixels p =
             pixels <- pixels - p
-            pixelsLabel.Text <- sprintf "Pixels: %i" pixels
+            pixelsLabel <- sprintf "Pixels: %i" pixels
 
         let gameInteract x y =
 
@@ -178,32 +177,10 @@ type GamePlayScene (
             |> List.rev 
             |> List.map (fun (x, y) -> Vector.init (float32 x * cellWidth + cellWidth / 2.0f) (float32 y * cellHeight + cellHeight / 2.0f))
             |> factory.UpdatePath
-    
-        Desktop.Widgets.Clear()
-
-        let panel = new HorizontalStackPanel()
-        panel.HorizontalAlignment <- HorizontalAlignment.Right
-        panel.VerticalAlignment <- VerticalAlignment.Top
         
-        lifes.Text <- "Life: 0"
-        lifes.Font <- h3
-        lifes.HorizontalAlignment <- HorizontalAlignment.Right
-        lifes.VerticalAlignment <- VerticalAlignment.Center 
-        lifes.PaddingRight <- 20
-        lifes.PaddingTop <- 20
+        lifes <- "Life: 0"
+        pixelsLabel <- sprintf "Pixels: %i" pixels       
 
-        pixelsLabel.Text <- sprintf "Pixels: %i" pixels
-        pixelsLabel.Font <- h3
-        pixelsLabel.HorizontalAlignment <- HorizontalAlignment.Right
-        pixelsLabel.VerticalAlignment <- VerticalAlignment.Center 
-        pixelsLabel.PaddingRight <- 20
-        pixelsLabel.PaddingTop <- 20
-
-        panel.Widgets.Add(lifes)
-        panel.Widgets.Add(pixelsLabel)
-
-        Desktop.Widgets.Add(panel)
-        
     interface IScene with 
         member _.Update (delta: float32<second>) =
 
@@ -219,7 +196,7 @@ type GamePlayScene (
                     | None -> ()
                     | Some cell ->
                         match cell with 
-                        | :? Receiver as receiver when receiver.Life > 0 -> lifes.Text <- sprintf "Life: %i" receiver.Life
+                        | :? Receiver as receiver when receiver.Life > 0 -> lifes <- sprintf "Life: %i" receiver.Life
                         | :? Receiver as receiver when receiver.Life <= 0 -> queue.Push(GameOverMessage())
                         | _ -> ()
 
@@ -235,3 +212,9 @@ type GamePlayScene (
             for x in [0 .. columns - 1] do
                 for y in [0 .. raws - 1] do
                     Rectangle(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight, false, Color.black ) |> draw (Some camera.Matrix)
+
+            let statusLable = sprintf "%s %s" lifes pixelsLabel
+            let size = h3.MeasureString(statusLable);
+
+            // TODO: F# refactoring make int, float, pixle friends
+            draw None (Text((float32 screenWith) * 1.0f<pixel> - size.X * 1.0f<pixel> - 20.0f<pixel>, 20.0f<pixel>, statusLable, h3, Color.white))

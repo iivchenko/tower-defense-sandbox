@@ -34,6 +34,8 @@ type MonoGameGraphic (spriteBatch: SpriteBatch) =
         | Polygon (x, y, points, Color(r, g, b, a)) ->
             let poligon = Shapes.Polygon(List.map toVector2 points)
             spriteBatch.DrawPolygon(Vector2(float32 x, float32 y), poligon, Microsoft.Xna.Framework.Color(r, g, b, a))
+        | Text(x, y, text, font, Color(r, g, b, a)) -> 
+            spriteBatch.DrawString(font, text, Vector2(float32 x, float32 y),  Microsoft.Xna.Framework.Color(r, g, b, a))
         | Shape(shapes) -> shapes |> List.iter draw
 
     interface IDrawSystem with 
