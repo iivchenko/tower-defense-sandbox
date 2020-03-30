@@ -68,64 +68,6 @@ type CameraZoomMessageHandler(camera: Camera) =
         member _.Handle(message: CameraZoomMessage) =
             camera.Zoom <- camera.Zoom + message.Scale
 
-module HUD = 
-
-    type PlayButton = | Pause | Slow | Play | Fast
-
-    type PlayButtonsInfo = 
-        { Position: Vector<pixel>
-          Button: PlayButton
-          Scale: float32 }
-
-    let drawPlayButtons state  = 
-
-        let scale = state.Scale
-        let transform = Matrix.scale scale
-        let (Vector(x, y)) = state.Position
-        let foo = state.Button
-        let pause = Shape
-                        ([  
-                            Rectangle(x + 00.0f<pixel> * scale, y + 00.0f<pixel> * scale, 10.0f<pixel> * scale, 30.0f<pixel> * scale, false, if foo = Pause then Color.red else Color.white); 
-                            Rectangle(x + 15.0f<pixel> * scale, y + 00.0f<pixel> * scale, 10.0f<pixel> * scale, 30.0f<pixel> * scale, false, if foo = Pause then Color.red else Color.white) 
-                        ])
-
-        let x = x + 35.0f<pixel> * scale
-        let slow = Triangle(x, y, Vector(20.0f<pixel>, 00.0f<pixel>) * transform, Vector(20.0f<pixel>, 30.0f<pixel>) * transform, Vector(00.0f<pixel>, 15.0f<pixel>) * transform, if foo = Slow then Color.red else Color.white)
-
-        let x = x + 35.0f<pixel> * scale
-        let play = Triangle(x, y, Vector(00.0f<pixel>, 00.0f<pixel>) * transform, Vector(00.0f<pixel>, 30.0f<pixel>) * transform, Vector(20.0f<pixel>, 15.0f<pixel>) * transform, if foo = Play then Color.red else Color.white)
-        
-        let x = x + 35.0f<pixel> * scale
-        let fast1 = Triangle(x, y, Vector(00.0f<pixel>, 00.0f<pixel>) * transform, Vector(00.0f<pixel>, 30.0f<pixel>) * transform, Vector(20.0f<pixel>, 15.0f<pixel>) * transform, if foo = Fast then Color.red else Color.white)
-        let x = x + 15.0f<pixel> * scale
-        let fast2 = Triangle(x, y, Vector(00.0f<pixel>, 00.0f<pixel>) * transform, Vector(00.0f<pixel>, 30.0f<pixel>) * transform, Vector(20.0f<pixel>, 15.0f<pixel>) * transform, if foo = Fast then Color.red else Color.white)
-        let fast = Shape([ fast1; fast2 ])
-
-        Shape([ pause; slow; play; fast ])
-
-    let isInPlayButtons state (Vector(x, y)) =
-        let scale = state.Scale
-        let (Vector(px, py)) = state.Position
-        let inBound x y (x', y', width, height) = x >= x' && x <= x' + width && y >= y' && y <= y' + height
-
-        inBound x y (px, py, 140.0f<pixel> * scale, 30.0f<pixel> * scale)
-
-    let update (Vector(x, y)) state =
-        let scale = state.Scale
-        let (Vector(xp, yp)) = state.Position
-        let inBound x y (x', y', width, height) = x >= x' && x <= x' + width && y >= y' && y <= y' + height
-
-        { 
-            state with 
-                Button = if inBound x y (xp + 0.0f<pixel>, yp + 0.0f<pixel>, 35.0f<pixel> * scale, 30.0f<pixel> * scale)
-                            then Pause 
-                            else if inBound x y (xp + 35.0f<pixel> * scale, yp + 00.0f<pixel> * scale, 35.0f<pixel> * scale, 30.0f<pixel> * scale) 
-                                then Slow
-                                else if inBound x y (xp + 70.0f<pixel> * scale, yp + 00.0f<pixel> * scale, 35.0f<pixel> * scale, 30.0f<pixel> * scale) 
-                                    then Play
-                                    else Fast
-        }
-
 type GamePlayScene (
                     camera: Camera,
                     input: IInputController,
@@ -134,21 +76,20 @@ type GamePlayScene (
                     queue: IMessageQueue, 
                     draw: CameraMatrix option -> Shape -> unit, 
                     content: ContentManager, 
-                    screenWith: int, 
+                    screenWidth: int, 
                     screenHeight: int, 
                     playButtonScale: float32) =
 
     let font = content.Load<SpriteFont>("Fonts\HUD")
     let cellWidth = 50.0f<pixel>
     let cellHeight = 50.0f<pixel>
-    let columns = screenWith / int cellWidth
+    let columns = screenWidth / int cellWidth
     let raws = screenHeight / int cellHeight
     
     let mutable gameSpeedCoefficient = 1.0f
-    let mutable lifes = ""
-    let mutable pixelsLabel = ""
+    let mutable lifes = 0
     let mutable pixels = 100
-    let mutable playButtons : HUD.PlayButtonsInfo = { Button = HUD.PlayButton.Play; Position = (Vector(25.0f<pixel>, 25.0f<pixel>)); Scale = playButtonScale }
+    let mutable playButtons : GamePlaySceneHud.PlayButtonsInfo = { Button = GamePlaySceneHud.PlayButton.Play; Position = (Vector(25.0f<pixel>, 25.0f<pixel>)); Scale = playButtonScale }
 
     let grid: IEntity option [,] = Array2D.init columns raws (fun _ _ -> None)
 
@@ -189,18 +130,16 @@ type GamePlayScene (
 
         let addPixels p =
             pixels <- pixels + p
-            pixelsLabel <- sprintf "Pixels: %i" pixels
 
         let subPixels p =
             pixels <- pixels - p
-            pixelsLabel <- sprintf "Pixels: %i" pixels
 
         let gameInteract (x: int) (y: int) =
 
             let pos = Vector.init ((float32 x) * 1.0f<pixel>) ((float32 y) * 1.0f<pixel>)
-            if HUD.isInPlayButtons playButtons pos
+            if GamePlaySceneHud.isInPlayButtons playButtons pos
                 then
-                    playButtons <- HUD.update pos playButtons
+                    playButtons <- GamePlaySceneHud.update pos playButtons
                 else
                     let (Vector(x, y)) = (Vector.init (float32 x) (float32 y)) * camera.Inverse
                     let column = x / cellWidth |> int
@@ -242,10 +181,7 @@ type GamePlayScene (
             |> createPath 
             |> List.rev 
             |> List.map (fun (x, y) -> Vector.init (float32 x * cellWidth + cellWidth / 2.0f) (float32 y * cellHeight + cellHeight / 2.0f))
-            |> factory.UpdatePath
-        
-        lifes <- "Life: 0"
-        pixelsLabel <- sprintf "Pixels: %i" pixels       
+            |> factory.UpdatePath  
 
     interface IScene with 
         member _.Update (delta: float32<second>) =
@@ -253,13 +189,12 @@ type GamePlayScene (
             input.Update delta
 
             gameSpeedCoefficient <- match playButtons.Button with 
-                                    | HUD.Pause -> 0.0f
-                                    | HUD.Slow -> 0.1f
-                                    | HUD.Play -> 1.0f
-                                    | HUD.Fast -> 2.0f
+                                    | GamePlaySceneHud.Pause -> 0.0f
+                                    | GamePlaySceneHud.Slow -> 0.1f
+                                    | GamePlaySceneHud.Play -> 1.0f
+                                    | GamePlaySceneHud.Fast -> 2.0f
 
             entityProvider.Update (delta * gameSpeedCoefficient)
-
             entityProvider.Flush ()
 
             for x in [0..(columns) - 1] do 
@@ -268,7 +203,7 @@ type GamePlayScene (
                     | None -> ()
                     | Some cell ->
                         match cell with 
-                        | :? Receiver as receiver when receiver.Life > 0 -> lifes <- sprintf "Life: %i" receiver.Life
+                        | :? Receiver as receiver when receiver.Life > 0 -> lifes <- receiver.Life
                         | :? Receiver as receiver when receiver.Life <= 0 -> queue.Push(GameOverMessage())
                         | _ -> ()
 
@@ -285,9 +220,7 @@ type GamePlayScene (
                 for y in [0 .. raws - 1] do
                     Rectangle(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight, false, Color.black ) |> draw (Some camera.Matrix)
 
-            let statusLable = sprintf "%s %s" lifes pixelsLabel
-            let size = font.MeasureString(statusLable);
-
-            draw None (HUD.drawPlayButtons playButtons)
-            // TODO: F# refactoring make int, float, pixle friends
-            draw None (Text((float32 screenWith) * 1.0f<pixel> - size.X * 1.0f<pixel> - 20.0f<pixel>, 20.0f<pixel>, statusLable, font, Color.white))
+            [ 
+                GamePlaySceneHud.drawPlayButtons playButtons; 
+                GamePlaySceneHud.drawStatusLable screenWidth font pixels lifes 
+            ] |> Shape |> draw None
