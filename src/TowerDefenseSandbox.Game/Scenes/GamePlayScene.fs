@@ -10,6 +10,7 @@ open Fame
 open Fame.Input
 open Fame.Messaging
 open Fame.Scene
+open Fame.Graphics
 open TowerDefenseSandbox.Game.Entities
 
 type GamePlayInteractionMessage (x: int, y: int) =

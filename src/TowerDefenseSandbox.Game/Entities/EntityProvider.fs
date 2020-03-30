@@ -3,7 +3,7 @@
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open System.Collections.Generic
-open Fame
+open Fame.Graphics
 
 type IEntity =
     abstract member Update: float32<second> -> unit

@@ -4,16 +4,19 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="File.fs" />
     <Compile Include="Units.fs" />
     <Compile Include="Vector.fs" />
     <Compile Include="Matrix.fs" />
-    <Compile Include="Scene.fs" />
-    <Compile Include="Messaging.fs" />
-    <Compile Include="Input.fs" />
     <Compile Include="Behavior.fs" />
-    <Compile Include="Camera.fs" />
-    <Compile Include="Graphic.fs" />
+    <Compile Include="File.fs" />
+    <Compile Include="Messaging.fs" />
+    <Compile Include="Scene.fs" />
+    <Compile Include="Input\Input.fs" />
+    <Compile Include="Input\KeyboardController.fs" />
+    <Compile Include="Input\MouseController.fs" />
+    <Compile Include="Graphics\Color.fs" />
+    <Compile Include="Graphics\Camera.fs" />
+    <Compile Include="Graphics\Graphic.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MonoGame.Extended" Version="3.7.0" />

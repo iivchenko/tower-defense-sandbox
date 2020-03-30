@@ -10,6 +10,7 @@ open Fame
 open Fame.Input
 open Fame.Messaging
 open Fame.Scene
+open Fame.Graphics
 open TowerDefenseSandbox.Game.Scenes
 open TowerDefenseSandbox.Game.Entities
 
@@ -28,7 +29,7 @@ type StartGameMessageHandler (
             let camera = Camera (0.5f, 10.0f)
             let entityProvider = new EntityProvider()
             let bus = MessageBus()
-            let input = AggregatedInputController([MonoGameKeyboardInputController([Key.Esc], bus); MonoGameMouseInputController(bus)]) 
+            let input = AggregatedInputController([KeyboardController([Key.Esc], bus); MouseController(bus)]) 
             let register = bus :> IMessageHandlerRegister
             register.Register (MouseGamePlayMessageHandler(bus))
             register.Register (KeyboardGamePlayMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
@@ -208,7 +209,7 @@ and GameVictoryRestartMessageHandler (
             let camera = Camera (0.5f, 10.0f)
             let entityProvider = new EntityProvider()
             let bus = MessageBus()
-            let input = AggregatedInputController([MonoGameKeyboardInputController([Key.Esc], bus); MonoGameMouseInputController(bus)]) 
+            let input = AggregatedInputController([KeyboardController([Key.Esc], bus); MouseController(bus)]) 
             let register = bus :> IMessageHandlerRegister
             register.Register (MouseGamePlayMessageHandler(bus))
             register.Register (KeyboardGamePlayMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
@@ -252,7 +253,7 @@ and RestartGameOverMessageHandler (
             let camera = Camera (0.5f, 10.0f)
             let entityProvider = new EntityProvider()
             let bus = MessageBus()
-            let input = AggregatedInputController([MonoGameKeyboardInputController([Key.Esc], bus); MonoGameMouseInputController(bus)]) 
+            let input = AggregatedInputController([KeyboardController([Key.Esc], bus); MouseController(bus)]) 
             let register = bus :> IMessageHandlerRegister
             register.Register (MouseGamePlayMessageHandler(bus))
             register.Register (KeyboardGamePlayMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
@@ -323,7 +324,7 @@ type TheGame () as this =
        
         let bus = MessageBus()
         let register = bus :> IMessageHandlerRegister
-        let draw = Graphic.draw (MonoGameGraphic spriteBatch)
+        let draw = Graphic.draw spriteBatch
         register.Register (StartGameMessageHandler(this, draw, this.Content, screenWidth, screenHeight, this.Exit))
         register.Register (SettingsGameMessageHandler(this))
         register.Register (ExitApplicationMessageHandler(this.Exit))

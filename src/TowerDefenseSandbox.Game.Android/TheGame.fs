@@ -11,6 +11,7 @@ open Fame
 open Fame.Input
 open Fame.Messaging
 open Fame.Scene
+open Fame.Graphics
 open TowerDefenseSandbox.Game.Entities
 open TowerDefenseSandbox.Game.Scenes
 
@@ -285,7 +286,7 @@ type TheGame () as this =
        
         let bus = MessageBus()
         let register = bus :> IMessageHandlerRegister
-        let draw = Graphic.draw (MonoGameGraphic spriteBatch)
+        let draw = Graphic.draw spriteBatch
         register.Register (StartGameMessageHandler(this, draw, this.Content, screenWidth, screenHeight, this.Exit))
         register.Register (SettingsGameMessageHandler(this))
         register.Register (ExitApplicationMessageHandler(this.Exit))

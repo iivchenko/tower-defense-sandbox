@@ -8,6 +8,7 @@ open Fame
 open Fame.Input
 open Fame.Messaging
 open Fame.Scene
+open Fame.Graphics
 open TowerDefenseSandbox.Game.Scenes
 
 // Game Edit
@@ -73,8 +74,8 @@ type TheGame () as this =
         MyraEnvironment.Game <- this
 
         let bus = MessageBus()
-        let draw = Graphic.draw (MonoGameGraphic spriteBatch)
-        let input = AggregatedInputController([MonoGameKeyboardInputController([Key.Esc; Key.Enter], bus); MonoGameMouseInputController(bus)])
+        let draw = Graphic.draw spriteBatch
+        let input = AggregatedInputController([KeyboardController([Key.Esc; Key.Enter], bus); MouseController(bus)])
         let register = bus :> IMessageHandlerRegister
         register.Register (KeyboardGameEditorMessageHandler(bus, this.Exit))
         register.Register (MouseGameEditorMessageHandler(bus))

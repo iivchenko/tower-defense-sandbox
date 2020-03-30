@@ -1,4 +1,6 @@
-﻿namespace Fame
+﻿namespace Fame.Graphics
+
+open Fame
 
 type CameraMatrix =
     | CameraMatrix of a11: float32 * a12: float32 * a13: float32 * a21: float32 * a22: float32 * a23: float32 * a31: float32 * a32: float32 * a33: float32
@@ -21,7 +23,7 @@ type CameraMatrix =
             )
 
 module internal Camera = 
-    
+
     let identity () = 
            CameraMatrix
                (

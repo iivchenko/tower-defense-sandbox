@@ -8,6 +8,7 @@ open Fame
 open Fame.Messaging
 open Fame.Input
 open Fame.Scene
+open Fame.Graphics
 open TowerDefenseSandbox.Game.Entities
 
 type ExitGameEditorMessage() = class end

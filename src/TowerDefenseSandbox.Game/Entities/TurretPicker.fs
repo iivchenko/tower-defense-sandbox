@@ -3,6 +3,7 @@
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open Fame
+open Fame.Graphics
 
 type TurretPicker (
                     position: Vector<pixel>, 

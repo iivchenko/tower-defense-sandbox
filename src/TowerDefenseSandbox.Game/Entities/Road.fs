@@ -3,6 +3,7 @@
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open Fame
+open Fame.Graphics
 
 type Road (position: Vector<pixel>, width: float32<pixel>, height: float32<pixel>) = 
 
