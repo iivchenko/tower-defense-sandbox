@@ -119,13 +119,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TowerDefenseSandbox.Engine.MonoGame\TowerDefenseSandbox.Engine.MonoGame.fsproj">
-      <Name>TowerDefenseSandbox.Engine.MonoGame</Name>
-      <Project>{37088b2c-38e9-41b4-92f3-e9596acfafda}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\TowerDefenseSandbox.Engine\TowerDefenseSandbox.Engine.fsproj">
-      <Name>TowerDefenseSandbox.Engine</Name>
+    <ProjectReference Include="..\Fame\Fame.fsproj">
+      <Name>Fame</Name>
       <Project>{e42f5b3f-468b-463b-a264-823104507a36}</Project>
       <Private>True</Private>
     </ProjectReference>

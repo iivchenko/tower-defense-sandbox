@@ -4,10 +4,10 @@ open System.IO
 open Newtonsoft.Json
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
-open TowerDefenseSandbox.Engine
-open TowerDefenseSandbox.Engine.Messaging
-open TowerDefenseSandbox.Engine.Input
-open TowerDefenseSandbox.Engine.Scene
+open Fame
+open Fame.Messaging
+open Fame.Input
+open Fame.Scene
 open TowerDefenseSandbox.Game.Entities
 
 type ExitGameEditorMessage() = class end

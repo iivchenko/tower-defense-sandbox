@@ -2,7 +2,7 @@
 
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
-open TowerDefenseSandbox.Engine
+open Fame
 
 type Boom (center: Vector<pixel>, radius: float32<pixel>, entityProvider: IEntityProvider) =
     

@@ -7,14 +7,12 @@ open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Input.Touch
 open Myra
 
-open TowerDefenseSandbox.Engine
-open TowerDefenseSandbox.Engine.Input
-open TowerDefenseSandbox.Engine.Messaging
-open TowerDefenseSandbox.Engine.Scene
-open TowerDefenseSandbox.Engine.MonoGame
-open TowerDefenseSandbox.Engine.MonoGame.Graphic
-open TowerDefenseSandbox.Game.Scenes
+open Fame
+open Fame.Input
+open Fame.Messaging
+open Fame.Scene
 open TowerDefenseSandbox.Game.Entities
+open TowerDefenseSandbox.Game.Scenes
 
 // Main Menu
 type StartGameMessageHandler (

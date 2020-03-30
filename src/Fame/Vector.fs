@@ -1,4 +1,4 @@
-﻿namespace TowerDefenseSandbox.Engine
+﻿namespace Fame
 
 type Vector<[<Measure>] 'u> = 
     | Vector of x: float32<'u> * y: float32<'u>

@@ -1,4 +1,4 @@
-﻿namespace TowerDefenseSandbox.Engine.Messaging
+﻿namespace Fame.Messaging
 
 open System
 open System.Collections.Generic

@@ -6,10 +6,10 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Graphics
 
-open TowerDefenseSandbox.Engine
-open TowerDefenseSandbox.Engine.Input
-open TowerDefenseSandbox.Engine.Messaging
-open TowerDefenseSandbox.Engine.Scene
+open Fame
+open Fame.Input
+open Fame.Messaging
+open Fame.Scene
 open TowerDefenseSandbox.Game.Entities
 
 type GamePlayInteractionMessage (x: int, y: int) =

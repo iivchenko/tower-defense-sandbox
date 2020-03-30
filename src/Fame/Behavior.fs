@@ -1,8 +1,6 @@
-﻿namespace TowerDefenseSandbox.Engine
+﻿namespace Fame
 
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
-
-open TowerDefenseSandbox.Engine
 
 module Behavior =
     

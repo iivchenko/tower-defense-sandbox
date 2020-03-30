@@ -3,7 +3,7 @@
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open System.Collections.Generic
-open TowerDefenseSandbox.Engine
+open Fame
 
 type IEntity =
     abstract member Update: float32<second> -> unit

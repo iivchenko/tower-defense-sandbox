@@ -1,4 +1,4 @@
-﻿namespace TowerDefenseSandbox.Engine.Scene
+﻿namespace Fame.Scene
 
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 

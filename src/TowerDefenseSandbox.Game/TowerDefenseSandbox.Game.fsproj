@@ -19,8 +19,7 @@
     <Compile Include="Scenes\MainMenuScene.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TowerDefenseSandbox.Engine.MonoGame\TowerDefenseSandbox.Engine.MonoGame.fsproj" />
-    <ProjectReference Include="..\TowerDefenseSandbox.Engine\TowerDefenseSandbox.Engine.fsproj" />
+    <ProjectReference Include="..\Fame\Fame.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -5,8 +5,8 @@ open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Graphics
 open Myra.Graphics2D.UI
 
-open TowerDefenseSandbox.Engine.Messaging
-open TowerDefenseSandbox.Engine.Scene
+open Fame.Messaging
+open Fame.Scene
 
 type GameVictoryRestartMessage() = class end
 type GameVictoryExitMessage() = class end

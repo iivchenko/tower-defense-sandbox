@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="File.fs" />
     <Compile Include="Units.fs" />
     <Compile Include="Vector.fs" />
     <Compile Include="Matrix.fs" />
@@ -13,6 +14,9 @@
     <Compile Include="Behavior.fs" />
     <Compile Include="Camera.fs" />
     <Compile Include="Graphic.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Extended" Version="3.7.0" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

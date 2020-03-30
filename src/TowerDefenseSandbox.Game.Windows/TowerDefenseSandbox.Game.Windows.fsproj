@@ -17,7 +17,6 @@
     <None Remove="Content\obj\**" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TowerDefenseSandbox.Engine.MonoGame\TowerDefenseSandbox.Engine.MonoGame.fsproj" />
     <ProjectReference Include="..\TowerDefenseSandbox.Engine\TowerDefenseSandbox.Engine.fsproj" />
     <ProjectReference Include="..\TowerDefenseSandbox.Game\TowerDefenseSandbox.Game.fsproj" />
   </ItemGroup>

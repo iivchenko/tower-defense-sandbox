@@ -1,4 +1,4 @@
-﻿namespace TowerDefenseSandbox.Engine
+﻿namespace Fame
 
 type Matrix = 
     | Matrix of a11: float32 * a12: float32 * a21: float32 * a22: float32

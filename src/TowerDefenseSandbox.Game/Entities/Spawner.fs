@@ -2,7 +2,7 @@
 
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
-open TowerDefenseSandbox.Engine
+open Fame
 
 type EnemyFactory (pushMessage: EnemyMessage -> unit) = 
     

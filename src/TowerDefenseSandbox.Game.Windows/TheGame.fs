@@ -6,13 +6,10 @@ open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Content
 open Myra
 
-open TowerDefenseSandbox.Engine
-open TowerDefenseSandbox.Engine.Input
-open TowerDefenseSandbox.Engine.Messaging
-open TowerDefenseSandbox.Engine.Scene
-open TowerDefenseSandbox.Engine.MonoGame
-open TowerDefenseSandbox.Engine.MonoGame.Input
-open TowerDefenseSandbox.Engine.MonoGame.Graphic
+open Fame
+open Fame.Input
+open Fame.Messaging
+open Fame.Scene
 open TowerDefenseSandbox.Game.Scenes
 open TowerDefenseSandbox.Game.Entities
 
