@@ -167,7 +167,7 @@ type GamePlayScene (
                                                     | EnemyCreatedMessage m -> queue.Push m
                                                     | EnemyKilledMessage m -> queue.Push m)
 
-        use file = TowerDefenseSandbox.Engine.MonoGame.File.read "level.json"
+        use file = File.read "level.json"
         use reader = new StreamReader(file)
         let data = JsonConvert.DeserializeObject<(int*int*int) list>(reader.ReadToEnd());
 
@@ -195,7 +195,6 @@ type GamePlayScene (
                                     | GamePlaySceneHud.Fast -> 2.0f
 
             entityProvider.Update (delta * gameSpeedCoefficient)
-            entityProvider.Flush ()
 
             for x in [0..(columns) - 1] do 
                 for y in [0..(raws) - 1] do 

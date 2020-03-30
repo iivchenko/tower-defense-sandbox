@@ -38,14 +38,6 @@ type StartGameMessageHandler (
 
             manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight, 3.0f)
 
-and SettingsGameMessageHandler (manager: ISceneManager) =
-    
-    interface IMessageHandler<SettingsGameMessage> with
-    
-        member _.Handle (_: SettingsGameMessage) =
-
-            manager.Scene <- EmptyScene()
-
 and ExitApplicationMessageHandler (exit: unit -> unit) =
     
     interface IMessageHandler<ExitApplicationMessage> with
@@ -104,7 +96,6 @@ and GameExitMessageHandler (
             let bus = MessageBus()
             let register = bus :> IMessageHandlerRegister
             register.Register (StartGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
-            register.Register (SettingsGameMessageHandler(manager))
             register.Register (ExitApplicationMessageHandler(exit))
 
             manager.Scene <- MainMenuScene(bus, content)
@@ -200,7 +191,6 @@ and GameVictoryExitMessageHandler (
             let bus = MessageBus()
             let register = bus :> IMessageHandlerRegister
             register.Register (StartGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
-            register.Register (SettingsGameMessageHandler(manager))
             register.Register (ExitApplicationMessageHandler(exit))
 
             manager.Scene <- MainMenuScene(bus, content)
@@ -242,7 +232,6 @@ and ExitGameOverMessageHandler(
             let bus = MessageBus()
             let register = bus :> IMessageHandlerRegister
             register.Register (StartGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
-            register.Register (SettingsGameMessageHandler(manager))
             register.Register (ExitApplicationMessageHandler(exit))
 
             manager.Scene <- MainMenuScene(bus, content)
@@ -288,7 +277,6 @@ type TheGame () as this =
         let register = bus :> IMessageHandlerRegister
         let draw = Graphic.draw spriteBatch
         register.Register (StartGameMessageHandler(this, draw, this.Content, screenWidth, screenHeight, this.Exit))
-        register.Register (SettingsGameMessageHandler(this))
         register.Register (ExitApplicationMessageHandler(this.Exit))
 
         scene <- MainMenuScene(bus, this.Content)

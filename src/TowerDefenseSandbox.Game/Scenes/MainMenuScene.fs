@@ -9,7 +9,6 @@ open Fame.Messaging
 open Fame.Scene
 
 type StartGameMessage() = class end
-type SettingsGameMessage() = class end
 type ExitApplicationMessage() = class end
 
 type MainMenuScene (queue: IMessageQueue, content: ContentManager) =
@@ -17,7 +16,6 @@ type MainMenuScene (queue: IMessageQueue, content: ContentManager) =
     let version = "version: 0.2.0"
 
     let startGame _ = queue.Push(StartGameMessage())
-    let editSettings _ = queue.Push(SettingsGameMessage())
     let exitGame _ = queue.Push(ExitApplicationMessage())
 
     let h1 = content.Load<SpriteFont>("Fonts\H1")
@@ -49,18 +47,12 @@ type MainMenuScene (queue: IMessageQueue, content: ContentManager) =
         newGameMenuItem.Id <- ""
         newGameMenuItem.Selected.Add(startGame)
 
-        let settingsMenuItem = new MenuItem()
-        settingsMenuItem.Text <- "Settings"
-        settingsMenuItem.Id <- ""
-        settingsMenuItem.Selected.Add(editSettings)
-
         let exitMenuItem = new MenuItem()
         exitMenuItem.Text <- "Exit"
         exitMenuItem.Id <- ""
         exitMenuItem.Selected.Add(exitGame)
 
         menu.Items.Add(newGameMenuItem)
-        menu.Items.Add(settingsMenuItem)
         menu.Items.Add(exitMenuItem)
 
         let versionLabel = new Label()

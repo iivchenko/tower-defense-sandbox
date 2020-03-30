@@ -14,7 +14,6 @@ type IEntityProvider =
     abstract member GetEntities: unit -> IEntity seq
     abstract member RegisterEntity: IEntity -> unit
     abstract member RemoveEntity: IEntity -> unit
-    abstract member Flush: unit -> unit
 
 type EntityProvider() = 
     let addEntities = List<IEntity>()
@@ -25,6 +24,12 @@ type EntityProvider() =
 
         member _.Update(delta: float32<second>) = 
             entities |> Seq.iter (fun x -> x.Update delta)
+
+            removeEntities |> Seq.iter (fun x -> entities.Remove(x) |> ignore)
+            addEntities |> Seq.iter (fun x -> entities.Add(x) |> ignore)
+
+            removeEntities.Clear()
+            addEntities.Clear()
         
         member _.GetEntities () =
             entities :> IEnumerable<IEntity>
@@ -34,10 +39,3 @@ type EntityProvider() =
 
         member _.RemoveEntity(entity: IEntity): unit = 
             removeEntities.Add(entity)
-
-        member _.Flush() =
-            removeEntities |> Seq.iter (fun x -> entities.Remove(x) |> ignore)
-            addEntities |> Seq.iter (fun x -> entities.Add(x) |> ignore)
-
-            removeEntities.Clear()
-            addEntities.Clear()
