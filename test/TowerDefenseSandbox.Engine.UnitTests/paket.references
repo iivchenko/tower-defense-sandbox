@@ -1,5 +1,0 @@
-nuget FSharp.Core
-nuget nunit
-nuget FsUnit
-nuget NUnit3TestAdapter
-nuget Microsoft.NET.Test.Sdk
