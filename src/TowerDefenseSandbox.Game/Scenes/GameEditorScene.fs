@@ -127,14 +127,21 @@ type GameEditorScene(input: IInputController, register: IMessageHandlerRegister,
         member _.Draw(_: float32<second>) = 
 
             seq {
-                for x in [0..columns - 1] do 
-                    for y in [0..raws - 1] do 
-                        grid.[x, y] 
+                for x in [0..columns - 1] do
+                    for y in [0..raws - 1] do
+                        yield grid.[x, y] 
             } 
             |> Seq.fold (fun acc x -> match x with | Some e -> e.Draw()::acc | _ -> acc) []
-            |> (fun x -> Shape(x))
+            |> Shape
             |> draw None
 
-            for x in [0 .. columns - 1] do
-                for y in [0 .. raws - 1] do
-                    Rectangle(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight, false, Color.black ) |> draw None
+            let gridIter = seq {
+                for x in seq { 0 .. columns - 1 } do
+                    for y in seq { 0 .. raws - 1 } do
+                        yield (x, y)
+            }
+            
+            query {
+                for (x, y) in gridIter do
+                select (Rectangle(float32 x * cellWidth, float32 y * cellHeight, cellWidth, cellHeight, false, Color.black))
+            } |> Seq.fold (fun acc next -> next::acc ) [] |> Shape |> draw None
