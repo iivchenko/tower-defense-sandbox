@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Winexe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <AssemblyName>td-sandbox</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <MonoGameContentReference Include="**\*.mgcb" />
