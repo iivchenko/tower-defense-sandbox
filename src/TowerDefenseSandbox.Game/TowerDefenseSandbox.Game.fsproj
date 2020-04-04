@@ -16,6 +16,7 @@
     <Compile Include="Scenes\GamePlay\GamePlayScene.fs" />
     <Compile Include="Scenes\GameVictoryScene.fs" />
     <Compile Include="Scenes\GameOverScene.fs" />
+    <Compile Include="Scenes\GamePlaySetupScene.fs" />
     <Compile Include="Scenes\MainMenuScene.fs" />
   </ItemGroup>
   <ItemGroup>

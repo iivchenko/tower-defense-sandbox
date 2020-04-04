@@ -26,6 +26,32 @@ type StartGameMessageHandler (
     interface IMessageHandler<StartGameMessage> with
     
         member _.Handle (_: StartGameMessage) =
+
+            let bus = MessageBus()
+            let register = bus :> IMessageHandlerRegister
+            register.Register(GamePlaySetupStartGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register(GamePlaySetupExitMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+
+            manager.Scene <- GamePlaySetupScene(bus, content)
+
+and ExitApplicationMessageHandler (exit: unit -> unit) =
+    
+    interface IMessageHandler<ExitApplicationMessage> with
+    
+        member _.Handle (_: ExitApplicationMessage) = exit()
+
+// Game Play Setup
+and GamePlaySetupStartGameMessageHandler (
+                                            manager: ISceneManager,
+                                            draw: CameraMatrix option -> Shape -> unit, 
+                                            content: ContentManager, 
+                                            screenWidth: int, 
+                                            screenHeight: int,
+                                            exit: unit -> unit) =
+    
+    interface IMessageHandler<GamePlaySetupStartGameMessage> with 
+        
+        member _.Handle(_: GamePlaySetupStartGameMessage) = 
             let camera = Camera (0.5f, 10.0f)
             let entityProvider = new EntityProvider()
             let bus = MessageBus()
@@ -39,11 +65,23 @@ type StartGameMessageHandler (
 
             manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, draw, content, screenWidth, screenHeight, 1.0f)
 
-and ExitApplicationMessageHandler (exit: unit -> unit) =
+and GamePlaySetupExitMessageHandler (
+                                        manager: ISceneManager,
+                                        draw: CameraMatrix option -> Shape -> unit, 
+                                        content: ContentManager, 
+                                        screenWidth: int, 
+                                        screenHeight: int,
+                                        exit: unit -> unit) =
     
-    interface IMessageHandler<ExitApplicationMessage> with
-    
-        member _.Handle (_: ExitApplicationMessage) = exit()
+    interface IMessageHandler<GamePlaySetupExitMessage> with 
+        
+        member _.Handle(_: GamePlaySetupExitMessage) =
+            let bus = MessageBus()
+            let register = bus :> IMessageHandlerRegister
+            register.Register (StartGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
+            register.Register (ExitApplicationMessageHandler(exit))
+
+            manager.Scene <- MainMenuScene(bus, content)
 
 // Game Play
 and GameVictoryMessageHandler (
