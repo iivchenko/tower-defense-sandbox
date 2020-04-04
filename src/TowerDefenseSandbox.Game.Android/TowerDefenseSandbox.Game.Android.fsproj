@@ -81,7 +81,6 @@
     <None Include="Properties\AndroidManifest.xml" />
     <Compile Include="Properties\AssemblyInfo.fs" />
     <AndroidAsset Include="Assets\AboutAssets.txt" />
-    <AndroidAsset Include="Assets\level.json" />
     <Content Include="packages.config" />
     <Compile Include="TheGame.fs" />
     <Compile Include="TheActivity.fs" />
