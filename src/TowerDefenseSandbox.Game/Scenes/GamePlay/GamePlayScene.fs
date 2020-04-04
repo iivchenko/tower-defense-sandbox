@@ -1,7 +1,5 @@
 ﻿namespace TowerDefenseSandbox.Game.Scenes
 
-open System.IO
-open Newtonsoft.Json
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Graphics
@@ -68,6 +66,11 @@ type CameraZoomMessageHandler(camera: Camera) =
         member _.Handle(message: CameraZoomMessage) =
             camera.Zoom <- camera.Zoom + message.Scale
 
+type MapInfo = 
+    { ScreenWidth:  int
+      ScreenHeight: int
+      Maze:         (int * int) list }
+
 type GamePlayScene (
                     camera: Camera,
                     input: IInputController,
@@ -76,22 +79,21 @@ type GamePlayScene (
                     queue: IMessageQueue, 
                     draw: CameraMatrix option -> Shape -> unit, 
                     content: ContentManager, 
-                    screenWidth: int, 
-                    screenHeight: int, 
+                    mapInfo: MapInfo,
                     playButtonScale: float32) =
 
     let font = content.Load<SpriteFont>("Fonts\HUD")
     let cellWidth = 50.0f<pixel>
     let cellHeight = 50.0f<pixel>
-    let columns = screenWidth / int cellWidth
-    let raws = screenHeight / int cellHeight
+    let mutable columns = 0
+    let mutable raws = 0
     
     let mutable gameSpeedCoefficient = 1.0f
     let mutable lifes = 0
     let mutable pixels = 100
     let mutable playButtons : GamePlaySceneHud.PlayButtonsInfo = { Button = GamePlaySceneHud.PlayButton.Play; Position = (Vector(25.0f<pixel>, 25.0f<pixel>)); Scale = playButtonScale }
 
-    let grid: IEntity option [,] = Array2D.init columns raws (fun _ _ -> None)
+    let mutable grid: IEntity option [,] = Array2D.init columns raws (fun _ _ -> None)
 
     let pushTurretMessage (message: TurretCreatedMessage) = queue.Push message
 
@@ -167,15 +169,36 @@ type GamePlayScene (
                                                     | EnemyCreatedMessage m -> queue.Push m
                                                     | EnemyKilledMessage m -> queue.Push m)
 
-        use file = File.read "level.json"
-        use reader = new StreamReader(file)
-        let data = JsonConvert.DeserializeObject<(int*int*int) list>(reader.ReadToEnd());
+        let maze = mapInfo.Maze
 
-        data 
-            |> List.iter (fun (x, y, t) -> 
-                            let entity = createEntity t x y entityProvider factory
-                            entityProvider.RegisterEntity entity
-                            grid.[x, y] <- Some entity)
+        let minX = maze |> List.filter (fun (x, _) -> x <= 0) |> List.map (fun (x, _) -> x) |> List.min |> (+) -1
+        let minY = maze |> List.filter (fun (_, y) -> y <= 0) |> List.map (fun (_, y) -> y) |> List.min |> (+) -1
+
+        let maze = maze |> List.map (fun (x, y) -> x - minX, y - minY)
+        
+        columns <- maze |> List.map (fun (x, _) -> x) |> List.max |> (+) 2
+        raws    <- maze |> List.map (fun (_, y) -> y) |> List.max |> (+) 2
+        grid <- Array2D.init columns raws (fun _ _ -> None)
+
+        let ((x, y)::maze) = maze
+
+        let entity = createEntity 0 x y entityProvider factory
+        entityProvider.RegisterEntity entity
+        grid.[x, y] <- Some entity
+
+        let rec buildGrid maze = 
+            match maze with 
+            | (x, y)::[] -> 
+                let entity = createEntity 2 x y entityProvider factory
+                entityProvider.RegisterEntity entity
+                grid.[x, y] <- Some entity
+            | (x, y)::tail -> 
+                let entity = createEntity 1 x y entityProvider factory
+                entityProvider.RegisterEntity entity
+                grid.[x, y] <- Some entity
+                buildGrid tail
+
+        buildGrid maze
 
         grid 
             |> createPath 
@@ -221,5 +244,5 @@ type GamePlayScene (
 
             [ 
                 GamePlaySceneHud.drawPlayButtons playButtons; 
-                GamePlaySceneHud.drawStatusLable screenWidth font pixels lifes 
+                GamePlaySceneHud.drawStatusLable mapInfo.ScreenWidth font pixels lifes 
             ] |> Shape |> draw None

@@ -8,14 +8,14 @@ open Microsoft.Xna.Framework.Graphics
 open Fame.Messaging
 open Fame.Scene
 
-type StartGameMessage() = class end
+type MainMenuStartGameMessage() = class end
 type ExitApplicationMessage() = class end
 
 type MainMenuScene (queue: IMessageQueue, content: ContentManager) =
 
     let version = "version: 0.3.0"
 
-    let startGame _ = queue.Push(StartGameMessage())
+    let startGame _ = queue.Push(MainMenuStartGameMessage())
     let exitGame _ = queue.Push(ExitApplicationMessage())
 
     let h1 = content.Load<SpriteFont>("Fonts\H1")

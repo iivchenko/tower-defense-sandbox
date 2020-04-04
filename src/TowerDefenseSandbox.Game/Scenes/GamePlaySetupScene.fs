@@ -5,21 +5,25 @@ open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Graphics
 open Myra.Graphics2D.UI
 
+open Fame
 open Fame.Messaging
 open Fame.Scene
 open System
+open TowerDefenseSandbox.Game
 
-type GamePlaySetupStartGameMessage() = class end
+type GamePlaySetupStartGameMessage(maze: (int * int) list) =
+    member _.Maze = maze
+
 type GamePlaySetupExitMessage() = class end
 
 type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager) =
 
     let h3 = content.Load<SpriteFont>("Fonts\H3")
 
-    let start _ = queue.Push(GamePlaySetupStartGameMessage())
     let exit _ = queue.Push(GamePlaySetupExitMessage())
 
     do
+
         Desktop.Widgets.Clear()
 
         let panel = new VerticalStackPanel()
@@ -28,32 +32,19 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager) =
 
         let lengthLabel = Label()
         lengthLabel.Text <- "Length: "
+        lengthLabel.Font <- h3
 
         let lengthSpin = SpinButton()
         lengthSpin.Value <- Nullable(3.0f)
         lengthSpin.Increment <- 1.0f
         lengthSpin.Minimum <- Nullable(3.0f)
+        lengthSpin.PaddingLeft <- 50
 
         let lengthPanel = new HorizontalSplitPane()
         lengthPanel.Widgets.Add(lengthLabel)
         lengthPanel.Widgets.Add(lengthSpin)
 
-        let curvingLabel = Label()
-        curvingLabel.Text <- "Curving (%): "
-        curvingLabel.PaddingRight <- 45
-
-        let curvingSpin = SpinButton()
-        curvingSpin.Value <- Nullable(25.0f)
-        curvingSpin.Increment <- 1.0f
-        curvingSpin.Minimum <- Nullable(0.0f)
-        curvingSpin.Maximum <- Nullable(100.0f)
-
-        let curvingPanel = new HorizontalSplitPane()
-        curvingPanel.Widgets.Add(curvingLabel)
-        curvingPanel.Widgets.Add(curvingSpin)
-
         panel.Widgets.Add(lengthPanel)
-        panel.Widgets.Add(curvingPanel)
 
         let menu = new HorizontalMenu()
         menu.HorizontalAlignment <- HorizontalAlignment.Right
@@ -65,9 +56,11 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager) =
         menu.PaddingRight <- 25
               
         let startGameMenuItem = new MenuItem()
-        startGameMenuItem.Text <- "Restart"
+        startGameMenuItem.Text <- "Start"
         startGameMenuItem.Id <- ""
-        startGameMenuItem.Selected.Add(start)
+        startGameMenuItem.Selected.Add((fun _ -> 
+                                                let maze = Maze.create (Random.random) (lengthSpin.Value.Value |> int)
+                                                queue.Push(GamePlaySetupStartGameMessage(maze))))
 
         let exitGameMenuItem = new MenuItem()
         exitGameMenuItem.Text <- "Exit"
