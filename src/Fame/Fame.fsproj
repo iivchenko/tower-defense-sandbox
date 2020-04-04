@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Random.fs" />
     <Compile Include="Units.fs" />
     <Compile Include="Vector.fs" />
     <Compile Include="Matrix.fs" />
