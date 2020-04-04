@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Maze.fs" />
     <Compile Include="Entities\EntityProvider.fs" />
     <Compile Include="Entities\Road.fs" />
     <Compile Include="Entities\Effects.fs" />
