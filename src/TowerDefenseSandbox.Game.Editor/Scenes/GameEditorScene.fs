@@ -1,4 +1,4 @@
-﻿namespace TowerDefenseSandbox.Game.Scenes
+﻿namespace TowerDefenseSandbox.Game.Editor.Scenes
 
 open System.IO
 open Newtonsoft.Json
@@ -71,7 +71,7 @@ type GameEditorScene(input: IInputController, register: IMessageHandlerRegister,
             then 
                 let data = JsonConvert.DeserializeObject<(int * int * int) list>(File.ReadAllText("level.json"))
                 data |> List.iter(fun (column, raw, element) -> grid.[column, raw] <- mapEntity column raw element)
-            else          
+            else
                 ()
           grid
 

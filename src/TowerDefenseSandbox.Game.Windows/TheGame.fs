@@ -146,43 +146,6 @@ and KeyboardGamePlayMessageHandler(
                 manager.Scene <- MainMenuScene(bus, content)
             | _ -> ()
 
-// Game Edit
-and KeyboardGameEditorMessageHandler(
-                                      bus: IMessageQueue,
-                                      manager: ISceneManager,
-                                      draw: CameraMatrix option -> Shape -> unit, 
-                                      content: ContentManager, 
-                                      screenWidth: int, 
-                                      screenHeight: int,
-                                      exit: unit -> unit) =
-    
-    interface IMessageHandler<KeyPresedMessage> with 
-
-        member _.Handle(message: KeyPresedMessage) = 
-            match message.Key with
-            | Key.Esc -> 
-                let bus = MessageBus()
-                let register = bus :> IMessageHandlerRegister
-                register.Register (StartGameMessageHandler(manager, draw, content, screenWidth, screenHeight, exit))
-                register.Register (ExitApplicationMessageHandler(exit))
-
-                manager.Scene <- MainMenuScene(bus, content)
-            | Key.Enter -> 
-                bus.Push(SaveGameEditMessage())
-            | _ -> ()
-
-and MouseGameEditorMessageHandler(queue: IMessageQueue) =
-    interface IMessageHandler<MouseInputMessage> with
-        member _.Handle(message: MouseInputMessage) =
-            match message.Event with 
-            | (MouseButton(MouseButton.Left, MouseButtonState.Released, mouse)) ->
-                queue.Push(PlaceEntityMessage(mouse.X, mouse.Y))
-            | (MouseButton(MouseButton.Middle, MouseButtonState.Released, _)) -> 
-                queue.Push(UpdateEditMessage())
-            |(MouseButton(MouseButton.Right, MouseButtonState.Released, mouse)) -> 
-                queue.Push(RemoveEntityMessage(mouse.X, mouse.Y))
-            | _ -> ()
-
 // Game Victory
 and GameVictoryRestartMessageHandler (
                                         manager: ISceneManager,

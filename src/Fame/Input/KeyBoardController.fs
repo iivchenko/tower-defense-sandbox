@@ -9,6 +9,7 @@ open Microsoft.Xna.Framework.Input
 type Key =
     | Esc
     | Enter
+    | Space
     | None
 
  type KeyPresedMessage (key: Key) = 
@@ -21,12 +22,14 @@ type KeyboardController(keys: Key list, queue: IMessageQueue) =
        match key with
        | Key.Esc -> Keys.Escape
        | Key.Enter -> Keys.Enter
+       | Key.Space -> Keys.Space
        | _ -> Keys.None
 
    let asKey key = 
        match key with 
        | Keys.Escape -> Key.Esc
        | Keys.Enter -> Key.Enter
+       | Keys.Space -> Key.Space
    let mutable keys = keys |> List.map map |> List.map (fun key -> (key, KeyState.Up))
        
    interface IInputController with
