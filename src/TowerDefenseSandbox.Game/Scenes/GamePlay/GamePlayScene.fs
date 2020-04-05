@@ -282,5 +282,5 @@ type GamePlayScene (
 
             [ 
                 GamePlaySceneHud.drawPlayButtons playButtons; 
-                GamePlaySceneHud.drawStatusLable mapInfo.ScreenWidth font pixels lifes 
+                GamePlaySceneHud.drawStatusLable mapInfo.ScreenWidth font pixels lifes waveNumber
             ] |> Shape |> draw None
