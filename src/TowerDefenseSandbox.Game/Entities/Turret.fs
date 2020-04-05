@@ -118,22 +118,23 @@ type Turret (
 
         let fire position (enemy: Enemy) = 
             let draw (Vector(x, y)) = Circle(x, y, 2.5f<pixel>, false, Color.black)
-            Bullet(draw, entityProvider, position, 250.0f<pixel/second>, (fun _ -> enemy.Position), (fun _ -> DamageEffect 15 |> enemy.ApplyEffect)) |> entityProvider.RegisterEntity
+            Bullet(draw, entityProvider, position, 400.0f<pixel/second>, (fun _ -> enemy.Position), (fun _ -> DamageEffect 10 |> enemy.ApplyEffect)) |> entityProvider.RegisterEntity
         
-        let info = {Position = position; Color = Color.black; ViewRadius = 100.0f<pixel>; Reload = 0.2f<second>; Pixels = 75}
+        let info = {Position = position; Color = Color.black; ViewRadius = 100.0f<pixel>; Reload = 0.1f<second>; Pixels = 75}
         Turret.Create (info, select, fire, pushMessage, entityProvider)
 
     static member CreateSlow(position: Vector<pixel>, pushMessage: TurretCreatedMessage -> unit, entityProvider: IEntityProvider) =
         let select (enemies: Enemy seq) =
             enemies
             |> Seq.sortBy (fun x -> x.Effects)
+            |> Seq.filter (fun x -> x.Effects |> List.exists (fun y -> match y with | SlowDownEffect _ -> true | _ -> false) |> not)
             |> Seq.tryHead
 
         let fire position (enemy: Enemy)= 
             let draw (Vector(x, y)) = Rectangle(x - 7.0f<pixel>, y - 7.0f<pixel>, 7.0f<pixel>, 7.0f<pixel>, true, Color.blue)
-            Bullet(draw, entityProvider, position, 150.0f<pixel/second>, (fun _ -> enemy.Position), (fun _ -> SlowDownEffect (5.0f<second>, 0.5f) |> enemy.ApplyEffect)) |> entityProvider.RegisterEntity
+            Bullet(draw, entityProvider, position, 300.0f<pixel/second>, (fun _ -> enemy.Position), (fun _ -> SlowDownEffect (5.0f<second>, 0.5f) |> enemy.ApplyEffect)) |> entityProvider.RegisterEntity
 
-        let info = {Position = position; Color = Color.blue; ViewRadius = 100.0f<pixel>; Reload = 0.7f<second>; Pixels = 100}
+        let info = {Position = position; Color = Color.blue; ViewRadius = 100.0f<pixel>; Reload = 1.0f<second>; Pixels = 100}
         Turret.Create (info, select, fire, pushMessage, entityProvider)
 
     static member CreateSplash(position: Vector<pixel>, pushMessage: TurretCreatedMessage -> unit, entityProvider: IEntityProvider) =
