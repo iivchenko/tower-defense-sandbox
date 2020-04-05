@@ -80,9 +80,9 @@ and GamePlaySetupExitMessageHandler () =
 // Game Play
 and GameVictoryMessageHandler () =
     
-    interface IMessageHandler<WavesOverMessage> with
+    interface IMessageHandler<GameVictoryMessage> with
     
-        member _.Handle (_: WavesOverMessage) =
+        member _.Handle (_: GameVictoryMessage) =
             let bus = MessageBus()
             let register = bus :> IMessageHandlerRegister
             register.Register (GameVictoryRestartMessageHandler())

@@ -35,7 +35,7 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager) =
         lengthLabel.Font <- h3
 
         let lengthSpin = SpinButton()
-        lengthSpin.Value <- Nullable(3.0f)
+        lengthSpin.Value <- Nullable(25.0f)
         lengthSpin.Increment <- 1.0f
         lengthSpin.Minimum <- Nullable(3.0f)
         lengthSpin.PaddingLeft <- 50

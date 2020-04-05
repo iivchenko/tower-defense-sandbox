@@ -9,6 +9,8 @@ open Fame.Input
 open Fame.Messaging
 open Fame.Scene
 open Fame.Graphics
+
+open TowerDefenseSandbox.Game
 open TowerDefenseSandbox.Game.Entities
 
 type GamePlayInteractionMessage (x: int, y: int) =
@@ -46,6 +48,8 @@ type GameExitMessage() = class end
 
 type GameOverMessage() = class end
 
+type GameVictoryMessage() = class end
+
 type CameraZoomMessage(scale: float32) = 
     
     member _.Scale = scale
@@ -82,18 +86,29 @@ type GamePlayScene (
                     mapInfo: MapInfo,
                     playButtonScale: float32) =
 
+    // Content
     let font = content.Load<SpriteFont>("Fonts\HUD")
-    let cellWidth = 50.0f<pixel>
-    let cellHeight = 50.0f<pixel>
-    let mutable columns = 0
-    let mutable raws = 0
-    
+
+    // Game Play
     let mutable gameSpeedCoefficient = 1.0f
     let mutable lifes = 0
     let mutable pixels = 100
     let mutable playButtons : GamePlaySceneHud.PlayButtonsInfo = { Button = GamePlaySceneHud.PlayButton.Play; Position = (Vector(25.0f<pixel>, 25.0f<pixel>)); Scale = playButtonScale }
 
-    let mutable grid: IEntity option [,] = Array2D.init columns raws (fun _ _ -> None)
+    // Map
+    let cellWidth = 50.0f<pixel>
+    let cellHeight = 50.0f<pixel>
+    let mutable columns = 0
+    let mutable raws = 0
+    let mutable grid: IEntity option [,] = Array2D.init columns raws (fun _ _ -> None)    
+    let mutable spawner = Unchecked.defaultof<Spawner>
+
+    // AI
+    let mutable waveNumber = 0
+    let mutable wave = []
+    let mutable actionDelay = 0.0f<second>
+    let mutable chunkSizeMin = 1
+    let mutable chunkSizeMax = 5
 
     let pushTurretMessage (message: TurretCreatedMessage) = queue.Push message
 
@@ -124,7 +139,7 @@ type GamePlayScene (
     let center (column: int) (raw: int) = Vector.init ((float32 column) * cellWidth + cellWidth / 2.0f) ((float32 raw) * cellHeight + cellHeight / 2.0f)
     let createEntity (t: int) column raw (entityProvider: IEntityProvider) (factory: EnemyFactory) =
         match t with 
-        | 0 -> Spawner (center column raw, factory, (fun m -> queue.Push m), entityProvider) :> IEntity
+        | 0 -> Spawner (center column raw, factory) :> IEntity
         | 1 -> Road (Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight) :> IEntity
         | 2 -> Receiver (center column raw, entityProvider) :> IEntity
 
@@ -185,6 +200,7 @@ type GamePlayScene (
         let entity = createEntity 0 x y entityProvider factory
         entityProvider.RegisterEntity entity
         grid.[x, y] <- Some entity
+        spawner <- entity :?> Spawner
 
         let rec buildGrid maze = 
             match maze with 
@@ -216,6 +232,28 @@ type GamePlayScene (
                                     | GamePlaySceneHud.Slow -> 0.1f
                                     | GamePlaySceneHud.Play -> 1.0f
                                     | GamePlaySceneHud.Fast -> 2.0f
+
+                                            
+            if waveNumber > 30 then queue.Push(GameVictoryMessage()) else ()
+
+            match actionDelay with 
+            | _ when actionDelay <= 0.0f<second> -> 
+                match wave with 
+                | [] when entityProvider.GetEntities() |> Seq.filter (fun x -> x.GetType() = typeof<Enemy>) |> Seq.length = 0 ->
+                    waveNumber <- waveNumber + 1
+                    let k = waveNumber |> float32 |> sqrt
+                    wave <- Wave.create (Random.random) ((k * (float32 waveNumber) + 10.0f) |> int |> (*) 1<pixel>) (chunkSizeMin * (int k)) (chunkSizeMax * (int k))
+                | head::tail ->
+                    match head with 
+                    | Create enemyType -> 
+                        spawner.Spawn enemyType
+                    | Delay time ->
+                        actionDelay <- time
+
+                    wave <- tail
+                | _ -> ()
+            | _ -> 
+                actionDelay <- actionDelay - delta
 
             entityProvider.Update (delta * gameSpeedCoefficient)
 
