@@ -13,11 +13,6 @@ type MouseButton =
     | Middle
     | Right
 
-[<RequireQualifiedAccess>]
-type MouseButtonState = 
-    | Released
-    | Pressed
-
 type MousePosition = 
     { X: int
       Y: int }

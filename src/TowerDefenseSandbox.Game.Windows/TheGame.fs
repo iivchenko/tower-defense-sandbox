@@ -35,7 +35,7 @@ type MainMenuStartGameMessageHandler () =
             register.Register(GamePlaySetupStartGameMessageHandler())
             register.Register(GamePlaySetupExitMessageHandler())
 
-            GlobalContext.manager.Scene <- GamePlaySetupScene(bus, GlobalContext.content)
+            GlobalContext.manager.Scene <- GamePlaySetupScene(bus, GlobalContext.content, (float32 GlobalContext.screenWidth) * 1.0f<pixel>, (float32 GlobalContext.screenHeight) * 1.0f<pixel>, GlobalContext.draw)
 
 and ExitApplicationMessageHandler () =
     

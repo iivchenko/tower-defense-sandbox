@@ -4,7 +4,6 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Content
-open Microsoft.Xna.Framework.Input.Touch
 open Myra
 
 open Fame
@@ -36,7 +35,7 @@ type MainMenuStartGameMessageHandler () =
             register.Register(GamePlaySetupStartGameMessageHandler())
             register.Register(GamePlaySetupExitMessageHandler())
 
-            GlobalContext.manager.Scene <- GamePlaySetupScene(bus, GlobalContext.content)
+            GlobalContext.manager.Scene <- GamePlaySetupScene(bus, GlobalContext.content, (float32 GlobalContext.screenWidth) * 1.0f<pixel>, (float32 GlobalContext.screenHeight) * 1.0f<pixel>, GlobalContext.draw)
 
 and ExitApplicationMessageHandler () =
     
@@ -119,7 +118,7 @@ and MonoGameTouchInputController(queue: IMessageQueue) =
     let mutable history = []
     interface IInputController with 
         member _.Update (_: float32<second>) = 
-            let touches = TouchPanel.GetState() |> Seq.map (fun touch -> (touch.Id, touch.State, touch.Position.X, touch.Position.Y)) |> Seq.toList
+            let touches = TouchInput.state() |> Seq.map (fun touch -> (touch.Id, touch.State, touch.X, touch.Y)) |> Seq.toList
 
             match touches with 
             | [] -> ()
@@ -146,7 +145,7 @@ and MonoGameTouchInputController(queue: IMessageQueue) =
                 
                 match h with
                 | Some(hid, state', x', y') -> 
-                    let dif = Vector.init ((x - x') * 1.0f<pixel>) ((y - y') * 1.0f<pixel>)
+                    let dif = Vector.init (x - x') (y - y')
                     history <- List.filter (fun (xid, _, _, _) -> xid <> hid) history
                     history <- (id, (if dif = (Vector.init 0.0f<pixel> 0.0f<pixel>) && state' = TouchLocationState.Pressed then TouchLocationState.Pressed else  TouchLocationState.Moved), x, y)::history
                     queue.Push(CameraMoveMessage(dif))
@@ -162,7 +161,7 @@ and MonoGameTouchInputController(queue: IMessageQueue) =
                 let scale = (Vector.distance (Vector.init x1 y1) (Vector.init x2 y2)) - (Vector.distance (Vector.init x1' y1') (Vector.init x2' y2'))
                 history <- (id1, TouchLocationState.Pressed, x1, y1)::(id2, TouchLocationState.Pressed, x2, y2)::[]
 
-                queue.Push(CameraZoomMessage(scale/250.0f))
+                queue.Push(CameraZoomMessage(scale/250.0f<pixel>))
 
             | _ when List.length history > 0 -> 
                 history <- []

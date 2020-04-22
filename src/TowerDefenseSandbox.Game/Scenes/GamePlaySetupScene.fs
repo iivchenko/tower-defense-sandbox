@@ -3,80 +3,130 @@
 open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open Microsoft.Xna.Framework.Content
 open Microsoft.Xna.Framework.Graphics
-open Myra.Graphics2D.UI
 
 open Fame
+open Fame.Input
 open Fame.Messaging
 open Fame.Scene
-open System
 open TowerDefenseSandbox.Game
+open Fame.Graphics
 
 type GamePlaySetupStartGameMessage(maze: (int * int) list) =
     member _.Maze = maze
 
 type GamePlaySetupExitMessage() = class end
 
-type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager) =
+type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWidth: float32<pixel>, screenHeight: float32<pixel>, draw: CameraMatrix option -> Shape -> unit) =
 
+    let h1 = content.Load<SpriteFont>("Fonts\H1")
     let h3 = content.Load<SpriteFont>("Fonts\H3")
 
-    let exit _ = queue.Push(GamePlaySetupExitMessage())
+    let mutable left = MouseButtonState.Released
+    let mutable mazeLength = 25
 
-    do
+    let size (font: SpriteFont) (text: string) = font.MeasureString(text)
+    let sizeH3 = size h3
+    let sizeH1 = size h1
+    let button (Vector(x, y)) text = Text(x, y, text, h3, Color.white)
+    let intersect (Vector(x, y)) shape = 
+        match shape with 
+        | Text(sx, sy, text, font, _) ->
+            let ss = size font text
+            x > sx && x < sx + ss.X * 1.0f<pixel> && y > sy && y < sy + ss.Y * 1.0f<pixel>
+        | _ -> false            
 
-        Desktop.Widgets.Clear()
+    let backButtonUi = 
+        let backText = "Back"       
+        let backSize = size h3 backText       
+        let backX  = screenWidth  - backSize.X  * 1.0f<pixel> - 15.0f<pixel>
+        let backY  = screenHeight - backSize.Y  * 1.0f<pixel> - 100.0f<pixel>
+       
+        button (Vector(backX,  backY)) backText
 
-        let panel = new VerticalStackPanel()
-        panel.HorizontalAlignment <- HorizontalAlignment.Center
-        panel.VerticalAlignment <- VerticalAlignment.Center
+    let startButtonUi =
+        let startText = "Start"
+        let startSize = size h3 startText
+        let (Text(backX, backY, _, _, _)) = backButtonUi
+        let startX = backX - startSize.X * 1.0f<pixel> - 30.0f<pixel>
+        let startY = backY
+        
+        button (Vector(startX, startY)) startText
 
-        let lengthLabel = Label()
-        lengthLabel.Text <- "Length: "
-        lengthLabel.Font <- h3
+    let navigationUi = Shape(backButtonUi::startButtonUi::[])
 
-        let lengthSpin = SpinButton()
-        lengthSpin.Value <- Nullable(25.0f)
-        lengthSpin.Increment <- 1.0f
-        lengthSpin.Minimum <- Nullable(3.0f)
-        lengthSpin.PaddingLeft <- 50
+    let mazeLengthLabelUi () = 
+        let text = sprintf "Length: %i" mazeLength
+        let textSize = sizeH3 text
+        let x = (screenWidth / 2.0f)  - textSize.X  * 1.0f<pixel>
+        let y = (screenHeight / 2.0f) - textSize.Y  * 1.0f<pixel>
 
-        let lengthPanel = new HorizontalSplitPane()
-        lengthPanel.Widgets.Add(lengthLabel)
-        lengthPanel.Widgets.Add(lengthSpin)
+        button (Vector(x, y)) text
 
-        panel.Widgets.Add(lengthPanel)
+    let mazeLengthIncButtonUi () =
+        let text = "+"
+        let (Text(mx, my, mt, mf, _)) = mazeLengthLabelUi ()
+        let ms = mf.MeasureString(mt)
+        let x = mx + ms.X * 1.0f<pixel> + 10.0f<pixel>
+        let y = my      
 
-        let menu = new HorizontalMenu()
-        menu.HorizontalAlignment <- HorizontalAlignment.Right
-        menu.VerticalAlignment <- VerticalAlignment.Bottom    
-        menu.LabelHorizontalAlignment <- HorizontalAlignment.Center
-        menu.LabelFont <- h3
-        menu.Background <- Myra.Graphics2D.Brushes.SolidBrush(new Microsoft.Xna.Framework.Color(0, 0, 0, 0)) 
-        menu.PaddingBottom <- 25
-        menu.PaddingRight <- 25
-              
-        let startGameMenuItem = new MenuItem()
-        startGameMenuItem.Text <- "Start"
-        startGameMenuItem.Id <- ""
-        startGameMenuItem.Selected.Add((fun _ -> 
-                                                let maze = Maze.create (Random.random) (lengthSpin.Value.Value |> int)
-                                                queue.Push(GamePlaySetupStartGameMessage(maze))))
+        button (Vector(x, y)) text
 
-        let exitGameMenuItem = new MenuItem()
-        exitGameMenuItem.Text <- "Exit"
-        exitGameMenuItem.Id <- ""
-        exitGameMenuItem.Selected.Add(exit)
+    let mazeLengthDecButtonUi () = 
+        let text = "-"
+        let textSize = sizeH1 text
+        let (Text(mx, my, _, _, _)) = mazeLengthLabelUi ()
+        let x = mx - textSize.X * 1.0f<pixel> - 10.0f<pixel>
+        let y = my      
 
-        menu.Items.Add(startGameMenuItem)
-        menu.Items.Add(exitGameMenuItem)
+        button (Vector(x, y)) text
 
-        Desktop.Widgets.Add(panel)
-        Desktop.Widgets.Add(menu)
+    let ui () = Shape(navigationUi::mazeLengthLabelUi()::[])
 
     interface IScene with
 
-       member _.Update (_: float32<second>) =
-          ()
+        member _.Update (_: float32<second>) =
+            match MouseInput.state () with 
+            | { Position = position; LeftButton = state } when state = MouseButtonState.Released && left = MouseButtonState.Pressed -> 
+                left <- state
+                if (intersect position startButtonUi)
+                then 
+                    let maze = Maze.create (Random.random) mazeLength
+                    queue.Push(GamePlaySetupStartGameMessage(maze))
+                elif (intersect position backButtonUi)
+                    then 
+                        queue.Push(GamePlaySetupExitMessage())
+                elif (intersect position (mazeLengthIncButtonUi()))
+                    then
+                        mazeLength <- mazeLength + 1
+                elif (intersect position (mazeLengthDecButtonUi())) 
+                    then 
+                        mazeLength <- if mazeLength = 3 then 3 else mazeLength - 1
+                else
+                    ()
+
+            | { LeftButton = state } -> 
+                left <- state
+            | _ -> ()
+
+            match TouchInput.state() with 
+            | { Id = _; State = state; X = x; Y = y }::[] when state = TouchLocationState.Released ->
+                let position = Vector.init x y
+                if (intersect position startButtonUi)
+                then 
+                    let maze = Maze.create (Random.random) mazeLength
+                    queue.Push(GamePlaySetupStartGameMessage(maze))
+                elif (intersect position backButtonUi)
+                    then 
+                        queue.Push(GamePlaySetupExitMessage())
+                elif (intersect position (mazeLengthIncButtonUi()))
+                    then
+                        mazeLength <- mazeLength + 1
+                elif (intersect position (mazeLengthDecButtonUi())) 
+                    then 
+                        mazeLength <- if mazeLength = 3 then 3 else mazeLength - 1
+                else
+                    ()
+            | _ -> ()
 
         member _.Draw (_: float32<second>) =
-            Desktop.Render ()
+            draw None ((Shape(ui()::mazeLengthIncButtonUi()::mazeLengthDecButtonUi()::[])))
