@@ -11,6 +11,11 @@ open Fame.Scene
 open TowerDefenseSandbox.Game
 open Fame.Graphics
 
+type GameDifficult =
+    | Easy
+    | Normal
+    | Hard
+
 type GamePlaySetupStartGameMessage(maze: (int * int) list) =
     member _.Maze = maze
 
@@ -23,11 +28,16 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWi
 
     let mutable left = MouseButtonState.Released
     let mutable mazeLength = 25
+    let mutable waves = 30
+    let mutable difficult = GameDifficult.Normal
+    let mutable lifes = 10
 
+    let placeholderSize = h3.MeasureString "MMMMMMMMMMMM"
     let size (font: SpriteFont) (text: string) = font.MeasureString(text)
     let sizeH3 = size h3
     let sizeH1 = size h1
     let button (Vector(x, y)) text = Text(x, y, text, h3, Color.white)
+
     let intersect (Vector(x, y)) shape = 
         match shape with 
         | Text(sx, sy, text, font, _) ->
@@ -57,30 +67,109 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWi
     let mazeLengthLabelUi () = 
         let text = sprintf "Length: %i" mazeLength
         let textSize = sizeH3 text
-        let x = (screenWidth / 2.0f)  - textSize.X  * 1.0f<pixel>
-        let y = (screenHeight / 2.0f) - textSize.Y  * 1.0f<pixel>
+        let x = (screenWidth / 2.0f) - (textSize.X / 2.0f) * 1.0f<pixel>
+        let y = (screenHeight / 2.0f) - 2.0f<pixel> * placeholderSize.Y 
 
         button (Vector(x, y)) text
 
-    let mazeLengthIncButtonUi () =
+    let mazeLengthIncButtonUi =
         let text = "+"
-        let (Text(mx, my, mt, mf, _)) = mazeLengthLabelUi ()
-        let ms = mf.MeasureString(mt)
-        let x = mx + ms.X * 1.0f<pixel> + 10.0f<pixel>
-        let y = my      
+        let x = (screenWidth / 2.0f) + (placeholderSize.X / 2.0f) * 1.0f<pixel>
+        let y = (screenHeight / 2.0f) - 2.0f<pixel> * placeholderSize.Y 
 
         button (Vector(x, y)) text
 
-    let mazeLengthDecButtonUi () = 
+    let mazeLengthDecButtonUi = 
         let text = "-"
-        let textSize = sizeH1 text
-        let (Text(mx, my, _, _, _)) = mazeLengthLabelUi ()
-        let x = mx - textSize.X * 1.0f<pixel> - 10.0f<pixel>
-        let y = my      
+        let x = (screenWidth / 2.0f) - (placeholderSize.X / 2.0f) * 1.0f<pixel>
+        let y = (screenHeight / 2.0f) - 2.0f<pixel> * placeholderSize.Y 
 
         button (Vector(x, y)) text
 
-    let ui () = Shape(navigationUi::mazeLengthLabelUi()::[])
+    let (wavesDecButtonUi, wavesLabelUi, wavesIncButtonUi) = 
+        let wavesText = fun () -> sprintf "Waves: %i" waves
+        let wavesTextSize = wavesText >> sizeH3 
+        let wavesX = fun () -> (screenWidth / 2.0f)  - (wavesTextSize().X / 2.0f) * 1.0f<pixel>
+        let wavesY = fun () -> (screenHeight / 2.0f) - 1.0f<pixel> * placeholderSize.Y 
+
+        let wavesLabelUi = fun () -> button (Vector(wavesX(), wavesY())) (wavesText())
+
+        let wavesDecButtonUi =
+            let text = "-"
+            let x = (screenWidth / 2.0f) - (placeholderSize.X / 2.0f) * 1.0f<pixel>
+            let y = (screenHeight / 2.0f) - 1.0f<pixel> * placeholderSize.Y 
+
+            button (Vector(x, y)) text
+
+        let wavesIncButtonUi =
+            let text = "+"
+            let x = (screenWidth / 2.0f) + (placeholderSize.X / 2.0f) * 1.0f<pixel>
+            let y = (screenHeight / 2.0f) - 1.0f<pixel> * placeholderSize.Y 
+
+            button (Vector(x, y)) text
+
+        (wavesDecButtonUi, wavesLabelUi, wavesIncButtonUi)
+    
+    let waveControllerUi () = Shape(wavesDecButtonUi::wavesLabelUi()::wavesIncButtonUi::[]) 
+
+    let (difficultDecButtonUi, difficultLabelUi, difficultIncButtonUi) = 
+        let difficultText = fun () -> 
+            match difficult with
+            | Easy ->  "Easy" 
+            | Normal -> "Normal"
+            | Hard -> "Hard"
+
+        let difficultTextSize = difficultText >> sizeH3 
+        let difficultX = fun () -> (screenWidth / 2.0f)  - (difficultTextSize().X / 2.0f) * 1.0f<pixel>
+        let difficultY = fun () -> (screenHeight / 2.0f) + 1.0f<pixel> * placeholderSize.Y 
+
+        let difficultLabelUi = fun () -> button (Vector(difficultX(), difficultY())) (difficultText())
+
+        let difficultDecButtonUi =
+            let text = "-"
+            let x = (screenWidth / 2.0f) - (placeholderSize.X / 2.0f) * 1.0f<pixel>
+            let y = (screenHeight / 2.0f) + 1.0f<pixel> * placeholderSize.Y 
+
+            button (Vector(x, y)) text
+
+        let difficultIncButtonUi =
+            let text = "+"
+            let x = (screenWidth / 2.0f) + (placeholderSize.X / 2.0f) * 1.0f<pixel>
+            let y = (screenHeight / 2.0f) + 1.0f<pixel> * placeholderSize.Y 
+
+            button (Vector(x, y)) text
+
+        (difficultDecButtonUi, difficultLabelUi, difficultIncButtonUi)
+       
+    let difficultControllerUi () = Shape(difficultDecButtonUi::difficultLabelUi()::difficultIncButtonUi::[]) 
+
+    let (lifeDecButtonUi, lifeLabelUi, lifeIncButtonUi) = 
+        let text = fun () -> sprintf "Lifes: %i" lifes
+        let textSize = text >> sizeH3 
+        let x = fun () -> (screenWidth / 2.0f)  - (textSize().X / 2.0f) * 1.0f<pixel>
+        let y = fun () -> (screenHeight / 2.0f) + 2.0f<pixel> * placeholderSize.Y 
+
+        let lifeLabelUi = fun () -> button (Vector(x(), y())) (text())
+
+        let lifeDecButtonUi =
+            let text = "-"
+            let x = (screenWidth / 2.0f) - (placeholderSize.X / 2.0f) * 1.0f<pixel>
+            let y = (screenHeight / 2.0f) + 2.0f<pixel> * placeholderSize.Y 
+
+            button (Vector(x, y)) text
+
+        let lifeIncButtonUi =
+            let text = "+"
+            let x = (screenWidth / 2.0f) + (placeholderSize.X / 2.0f) * 1.0f<pixel>
+            let y = (screenHeight / 2.0f) + 2.0f<pixel> * placeholderSize.Y 
+
+            button (Vector(x, y)) text
+
+        (lifeDecButtonUi, lifeLabelUi, lifeIncButtonUi)
+    
+    let lifeControllerUi () = Shape(lifeDecButtonUi::lifeLabelUi()::lifeIncButtonUi::[]) 
+
+    let ui () = Shape(navigationUi::mazeLengthLabelUi()::lifeControllerUi()::[])
 
     interface IScene with
 
@@ -95,12 +184,36 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWi
                 elif (intersect position backButtonUi)
                     then 
                         queue.Push(GamePlaySetupExitMessage())
-                elif (intersect position (mazeLengthIncButtonUi()))
+                elif (intersect position mazeLengthIncButtonUi)
                     then
-                        mazeLength <- mazeLength + 1
-                elif (intersect position (mazeLengthDecButtonUi())) 
+                        mazeLength <- if mazeLength = 999 then 999 else mazeLength + 1
+                elif (intersect position mazeLengthDecButtonUi) 
                     then 
                         mazeLength <- if mazeLength = 3 then 3 else mazeLength - 1
+                elif (intersect position wavesDecButtonUi) 
+                    then 
+                        waves <- if waves = 15 then 15 else waves - 1
+                elif (intersect position wavesIncButtonUi) 
+                    then 
+                        waves <- if waves = 999 then 999 else waves + 1
+                elif (intersect position difficultDecButtonUi) 
+                    then 
+                        difficult <- match difficult with 
+                                     | Easy -> Easy
+                                     | Normal -> Easy
+                                     | Hard -> Normal
+                elif (intersect position difficultIncButtonUi) 
+                    then 
+                       difficult <- match difficult with 
+                                    | Easy -> Normal
+                                    | Normal -> Hard
+                                    | Hard -> Hard
+                elif (intersect position lifeDecButtonUi) 
+                    then 
+                        lifes <- if lifes = 1 then 1 else lifes - 1
+                elif (intersect position lifeIncButtonUi) 
+                    then 
+                        lifes <- if lifes = 999 then 999 else lifes + 1
                 else
                     ()
 
@@ -118,15 +231,39 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWi
                 elif (intersect position backButtonUi)
                     then 
                         queue.Push(GamePlaySetupExitMessage())
-                elif (intersect position (mazeLengthIncButtonUi()))
+                elif (intersect position mazeLengthIncButtonUi)
                     then
-                        mazeLength <- mazeLength + 1
-                elif (intersect position (mazeLengthDecButtonUi())) 
+                        mazeLength <- if mazeLength = 999 then 999 else mazeLength + 1
+                elif (intersect position mazeLengthDecButtonUi) 
                     then 
                         mazeLength <- if mazeLength = 3 then 3 else mazeLength - 1
+                elif (intersect position wavesDecButtonUi) 
+                    then 
+                        waves <- if waves = 15 then 15 else waves - 1
+                elif (intersect position wavesIncButtonUi) 
+                    then 
+                        waves <- if waves = 999 then 999 else waves + 1
+                elif (intersect position difficultDecButtonUi) 
+                    then 
+                        difficult <- match difficult with 
+                                    | Easy -> Easy
+                                    | Normal -> Easy
+                                    | Hard -> Normal
+                elif (intersect position difficultIncButtonUi) 
+                    then 
+                        difficult <- match difficult with 
+                                    | Easy -> Normal
+                                    | Normal -> Hard
+                                    | Hard -> Hard
+                elif (intersect position lifeDecButtonUi) 
+                    then 
+                        lifes <- if lifes = 1 then 1 else lifes - 1
+                elif (intersect position lifeIncButtonUi) 
+                    then 
+                        lifes <- if lifes = 999 then 999 else lifes + 1
                 else
                     ()
             | _ -> ()
 
         member _.Draw (_: float32<second>) =
-            draw None ((Shape(ui()::mazeLengthIncButtonUi()::mazeLengthDecButtonUi()::[])))
+            draw None ((Shape(ui()::mazeLengthIncButtonUi::mazeLengthDecButtonUi::waveControllerUi()::difficultControllerUi()::[])))
