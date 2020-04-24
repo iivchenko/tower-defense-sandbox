@@ -5,12 +5,12 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open Fame
 open Fame.Graphics
 
-type Receiver (position: Vector<pixel>, entityProvider: IEntityProvider) = 
+type Receiver (position: Vector<pixel>, entityProvider: IEntityProvider, lifes: int) = 
 
     let (Vector(x, y)) = position
 
-    let mutable life = 10
-    let maxLife = life
+    let mutable life = lifes
+    let maxLife = lifes
 
     let maxRadius = 25.0f<pixel>
     let mutable radius = maxRadius

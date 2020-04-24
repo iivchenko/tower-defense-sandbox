@@ -18,6 +18,8 @@ module GlobalContext =
     let mutable screenHeight = 0
     let mutable screenWidth = 0
     let mutable maze = []
+    let mutable waves = 0
+    let mutable lifes = 0
     let mutable manager = Unchecked.defaultof<ISceneManager>
     let mutable content =  Unchecked.defaultof<ContentManager>
     let mutable draw = (fun (camera: CameraMatrix option) (shape: Shape) -> ())
@@ -60,7 +62,7 @@ and GamePlaySetupStartGameMessageHandler () =
             
             GlobalContext.maze <- message.Maze
 
-            let mapInfo = { ScreenWidth = GlobalContext.screenWidth; ScreenHeight = GlobalContext.screenHeight; Maze = message.Maze }
+            let mapInfo = { ScreenWidth = GlobalContext.screenWidth; ScreenHeight = GlobalContext.screenHeight; Maze = message.Maze; Waves = message.Waves; Lifes = message.Lifes }
             GlobalContext.manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, GlobalContext.draw, GlobalContext.content, mapInfo, 3.0f)
 
 and GamePlaySetupExitMessageHandler () =
@@ -185,7 +187,9 @@ and GameVictoryRestartMessageHandler () =
             let mapInfo = { 
                 ScreenWidth = GlobalContext.screenWidth; 
                 ScreenHeight = GlobalContext.screenHeight; 
-                Maze = GlobalContext.maze }
+                Maze = GlobalContext.maze
+                Waves = GlobalContext.waves 
+                Lifes = GlobalContext.lifes }
 
             GlobalContext.manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, GlobalContext.draw, GlobalContext.content, mapInfo, 3.0f)
 
@@ -219,7 +223,9 @@ and RestartGameOverMessageHandler () =
             let mapInfo = { 
                 ScreenWidth = GlobalContext.screenWidth
                 ScreenHeight = GlobalContext.screenHeight
-                Maze = GlobalContext.maze }
+                Maze = GlobalContext.maze 
+                Waves = GlobalContext.waves
+                Lifes = GlobalContext.lifes }
 
             GlobalContext.manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, GlobalContext.draw, GlobalContext.content, mapInfo, 3.0f)
 

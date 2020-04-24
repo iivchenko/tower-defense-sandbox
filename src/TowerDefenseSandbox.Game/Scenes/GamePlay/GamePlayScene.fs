@@ -73,7 +73,9 @@ type CameraZoomMessageHandler(camera: Camera) =
 type MapInfo = 
     { ScreenWidth:  int
       ScreenHeight: int
-      Maze:         (int * int) list }
+      Maze:         (int * int) list
+      Waves:        int
+      Lifes:        int }
 
 type GamePlayScene (
                     camera: Camera,
@@ -141,7 +143,7 @@ type GamePlayScene (
         match t with 
         | 0 -> Spawner (center column raw, factory) :> IEntity
         | 1 -> Road (Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight) :> IEntity
-        | 2 -> Receiver (center column raw, entityProvider) :> IEntity
+        | 2 -> Receiver (center column raw, entityProvider, mapInfo.Lifes) :> IEntity
 
     do
 
@@ -232,9 +234,8 @@ type GamePlayScene (
                                     | GamePlaySceneHud.Slow -> 0.1f
                                     | GamePlaySceneHud.Play -> 1.0f
                                     | GamePlaySceneHud.Fast -> 2.0f
-
                                             
-            if waveNumber > 30 then queue.Push(GameVictoryMessage()) else ()
+            if waveNumber > mapInfo.Waves then queue.Push(GameVictoryMessage()) else ()
 
             match actionDelay with 
             | _ when actionDelay <= 0.0f<second> -> 

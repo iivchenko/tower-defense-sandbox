@@ -16,8 +16,10 @@ type GameDifficult =
     | Normal
     | Hard
 
-type GamePlaySetupStartGameMessage(maze: (int * int) list) =
+type GamePlaySetupStartGameMessage(maze: (int * int) list, waves: int, lifes: int) =
     member _.Maze = maze
+    member _.Waves = waves
+    member _.Lifes = lifes
 
 type GamePlaySetupExitMessage() = class end
 
@@ -180,7 +182,7 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWi
                 if (intersect position startButtonUi)
                 then 
                     let maze = Maze.create (Random.random) mazeLength
-                    queue.Push(GamePlaySetupStartGameMessage(maze))
+                    queue.Push(GamePlaySetupStartGameMessage(maze, waves, lifes))
                 elif (intersect position backButtonUi)
                     then 
                         queue.Push(GamePlaySetupExitMessage())
@@ -227,7 +229,7 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWi
                 if (intersect position startButtonUi)
                 then 
                     let maze = Maze.create (Random.random) mazeLength
-                    queue.Push(GamePlaySetupStartGameMessage(maze))
+                    queue.Push(GamePlaySetupStartGameMessage(maze, waves, lifes))
                 elif (intersect position backButtonUi)
                     then 
                         queue.Push(GamePlaySetupExitMessage())
