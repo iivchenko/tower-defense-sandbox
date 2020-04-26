@@ -13,7 +13,7 @@ type ExitApplicationMessage() = class end
 
 type MainMenuScene (queue: IMessageQueue, content: ContentManager) =
 
-    let version = "version: 0.3.0"
+    let version = "version: 0.4.0"
 
     let startGame _ = queue.Push(MainMenuStartGameMessage())
     let exitGame _ = queue.Push(ExitApplicationMessage())
