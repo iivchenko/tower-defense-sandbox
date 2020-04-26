@@ -4,13 +4,7 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open Fame
 open Fame.Graphics
-
-type EnemyInfo =
-    {Life: int
-     Center: Vector<pixel>
-     Speed: float32<pixel/second>
-     Path: Vector<pixel> list
-     Pixels: int}
+open TowerDefenseSandbox.Game
 
 type IEnemyMessage = interface end
 
@@ -31,11 +25,11 @@ and EnemyMessage =
     | EnemyCreatedMessage of EnemyCreatedMessage
     | EnemyKilledMessage of EnemyKilledMessage
 
-and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixel> -> Shape, pushMessage: EnemyMessage -> unit) as this =
+and Enemy (info: EnemyInfo, center: Vector<pixel>, path: Vector<pixel> list, wave: int, createBody: Vector<pixel> -> float32 -> float32<pixel> -> Shape, pushMessage: EnemyMessage -> unit) as this =
 
-    let mutable life = info.Life
-    let mutable center = info.Center
-    let mutable path = info.Path
+    let mutable life = info.Life + info.Life * wave / 100
+    let mutable center = center
+    let mutable path = path
     let mutable effects: Effect list = []
     let mutable orientation = 0.0f
 
@@ -98,7 +92,7 @@ and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixe
 
         effects <- effect::effects
 
-    static member CreateRegular(position: Vector<pixel>, path: Vector<pixel> list, pushMessage: EnemyMessage -> unit) =
+    static member CreateRegular(position: Vector<pixel>, path: Vector<pixel> list, wave: int, pushMessage: EnemyMessage -> unit) =
 
         let createBody (Vector(x, y)) orientation radius =
             let transform = Matrix.rotation orientation
@@ -109,21 +103,15 @@ and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixe
 
             Triangle (x, y, a1, a2, a3, Color.red)
 
-        let info = { Life = 300; Speed = 50.0f<pixel/second>; Center = position; Path = path; Pixels = 10 }
+        Enemy(GameBalance.regularEnemyInfo, position, path, wave, createBody, pushMessage)
 
-        Enemy(info, createBody, pushMessage)
+    static member CreateFast(position: Vector<pixel>, path: Vector<pixel> list, wave: int, pushMessage: EnemyMessage -> unit) =
 
-    static member CreateFast(position: Vector<pixel>, path: Vector<pixel> list, pushMessage: EnemyMessage -> unit) =
+        let createBody (Vector(x, y): Vector<pixel>) orientation radius = Circle (x, y, radius, false, Color.red)
 
-        let createBody (Vector(x, y): Vector<pixel>) orientation radius =
+        Enemy(GameBalance.fastEnemyInfo, position, path, wave, createBody, pushMessage)
 
-            Circle (x, y, radius, false, Color.red)
-
-        let info = { Life = 100; Speed = 150.0f<pixel/second>; Center = position; Path = path; Pixels = 5 }
-
-        Enemy(info, createBody, pushMessage)
-
-    static member CreateHard(position: Vector<pixel>, path: Vector<pixel> list, pushMessage: EnemyMessage -> unit) =
+    static member CreateHard(position: Vector<pixel>, path: Vector<pixel> list, wave: int, pushMessage: EnemyMessage -> unit) =
         
         let createBody (Vector(x, y): Vector<pixel>) orientation radius =
             let transform = Matrix.rotation orientation
@@ -135,6 +123,4 @@ and Enemy (info: EnemyInfo, createBody: Vector<pixel> -> float32 -> float32<pixe
 
             Polygon (x, y, a1::a2::a3::a4::[], Color.red)
 
-        let info = { Life = 2000; Speed = 25.0f<pixel/second>; Center = position; Path = path; Pixels = 15 }
-
-        Enemy(info,createBody, pushMessage)
+        Enemy(GameBalance.hardEnemyInfo, position, path, wave, createBody, pushMessage)

@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GameBalance.fs" />
     <Compile Include="Maze.fs" />
     <Compile Include="Wave.fs" />
     <Compile Include="Entities\EntityProvider.fs" />

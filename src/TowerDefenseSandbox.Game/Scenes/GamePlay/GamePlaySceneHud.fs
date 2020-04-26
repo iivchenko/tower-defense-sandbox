@@ -60,8 +60,8 @@ let update (Vector(x, y)) state =
                                 else Fast
     }
 
-let drawStatusLable screenWith (font: SpriteFont) pixels lifes wave = 
+let drawStatusLable screenWith (font: SpriteFont) pixels lifes wave regularTurretPrice slowTurretPrice splashTurretPrice = 
 
-    let statusLabel = sprintf "Pixels: %i\n Life: %i\n Wave: %i" pixels lifes wave
+    let statusLabel = sprintf "Pixels: %i\n Life: %i\n Wave: %i\nRegular: %i\nSlow: %i\nSplash: %i" pixels lifes wave regularTurretPrice slowTurretPrice splashTurretPrice
     let size = font.MeasureString(statusLabel);
     Text((float32 screenWith) * 1.0f<pixel> - size.X * 1.0f<pixel> - 20.0f<pixel>, 20.0f<pixel>, statusLabel, font, Color.white)

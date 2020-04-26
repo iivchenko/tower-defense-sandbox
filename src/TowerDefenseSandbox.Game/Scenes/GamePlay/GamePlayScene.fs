@@ -69,13 +69,18 @@ type CameraZoomMessageHandler(camera: Camera) =
     interface IMessageHandler<CameraZoomMessage> with 
         member _.Handle(message: CameraZoomMessage) =
             camera.Zoom <- camera.Zoom + message.Scale
+type GameDifficult =
+    | Easy
+    | Normal
+    | Hard
 
 type MapInfo = 
     { ScreenWidth:  int
       ScreenHeight: int
       Maze:         (int * int) list
       Waves:        int
-      Lifes:        int }
+      Lifes:        int
+      Difficult:    GameDifficult }
 
 type GamePlayScene (
                     camera: Camera,
@@ -94,7 +99,7 @@ type GamePlayScene (
     // Game Play
     let mutable gameSpeedCoefficient = 1.0f
     let mutable lifes = 0
-    let mutable pixels = 100
+    let mutable pixels = 130
     let mutable playButtons : GamePlaySceneHud.PlayButtonsInfo = { Button = GamePlaySceneHud.PlayButton.Play; Position = (Vector(25.0f<pixel>, 25.0f<pixel>)); Scale = playButtonScale }
 
     // Map
@@ -109,10 +114,11 @@ type GamePlayScene (
     let mutable waveNumber = 0
     let mutable wave = []
     let mutable actionDelay = 0.0f<second>
-    let mutable chunkSizeMin = 1
-    let mutable chunkSizeMax = 5
-
-    let pushTurretMessage (message: TurretCreatedMessage) = queue.Push message
+    let mutable enemyPixelGrowthCoefficient = 0.0f
+    let mutable turretRisePriceCoefficient = 0.0f
+    let mutable regularTurretBasePrice = GameBalance.regularTurretPrice
+    let mutable slowTurretBasePrice = GameBalance.slowTurretPrice
+    let mutable splashTurretBasePrice = GameBalance.splashTurretPrice
 
     let createPath (grid: IEntity option [,]) =
         let rec findSpawner (grid: IEntity option [,]) x y raws columns =
@@ -166,12 +172,36 @@ type GamePlayScene (
 
                     match grid.[column, raw] with
                     | None -> 
-                        let picker = TurretPicker(Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight, grid, pushTurretMessage, entityProvider, column, raw) :> IEntity
+                        let picker = TurretPicker(Vector.init (float32 column * cellWidth) (float32 raw * cellHeight), cellWidth, cellHeight, raw) :> IEntity
                         grid.[column, raw] <- Some picker
                         entityProvider.RegisterEntity picker
                     | Some cell ->
                         match cell with 
-                        | :? TurretPicker as picker -> picker.Click(Vector(x * 1.0f<pixel>, y * 1.0f<pixel>), pixels)
+                        | :? TurretPicker as picker -> 
+                          
+                            match picker.Click(Vector(x * 1.0f<pixel>, y * 1.0f<pixel>)) with
+                            | Regular when pixels >= regularTurretBasePrice -> 
+                                let turret = Turret.CreateRegular(center column raw, entityProvider) :> IEntity
+                                grid.[column, raw] <- Some turret
+                                entityProvider.RegisterEntity turret
+                                entityProvider.RemoveEntity picker
+                                pixels <- pixels - regularTurretBasePrice
+                                regularTurretBasePrice <- regularTurretBasePrice |> float32 |> (*) turretRisePriceCoefficient |> int
+                            | Slow when pixels >= slowTurretBasePrice -> 
+                                let turret = Turret.CreateSlow(center column raw, entityProvider) :> IEntity
+                                grid.[column, raw] <- Some turret
+                                entityProvider.RegisterEntity turret
+                                entityProvider.RemoveEntity picker
+                                pixels <- pixels - slowTurretBasePrice
+                                slowTurretBasePrice <- slowTurretBasePrice |> float32 |> (*) turretRisePriceCoefficient |> int
+                            | Splash when pixels >= splashTurretBasePrice -> 
+                                let turret = Turret.CreateSplash(center column raw, entityProvider) :> IEntity
+                                grid.[column, raw] <- Some turret
+                                entityProvider.RegisterEntity turret
+                                entityProvider.RemoveEntity picker
+                                pixels <- pixels - splashTurretBasePrice
+                                splashTurretBasePrice <- splashTurretBasePrice |> float32 |> (*) turretRisePriceCoefficient |> int
+                            | _ -> ()
                         | _ -> ()
 
         register.Register (TurretCreatedMessageHandler(subPixels))
@@ -222,7 +252,18 @@ type GamePlayScene (
             |> createPath 
             |> List.rev 
             |> List.map (fun (x, y) -> Vector.init (float32 x * cellWidth + cellWidth / 2.0f) (float32 y * cellHeight + cellHeight / 2.0f))
-            |> factory.UpdatePath  
+            |> factory.UpdatePath
+
+        match mapInfo.Difficult with 
+        | Easy -> 
+            enemyPixelGrowthCoefficient <- 1.85f
+            turretRisePriceCoefficient  <- 1.0f
+        | Normal ->
+            enemyPixelGrowthCoefficient <- 2.0f
+            turretRisePriceCoefficient  <- 1.05f
+        | Hard ->
+            enemyPixelGrowthCoefficient <- 2.2f
+            turretRisePriceCoefficient  <- 1.1f
 
     interface IScene with 
         member _.Update (delta: float32<second>) =
@@ -241,20 +282,24 @@ type GamePlayScene (
             | _ when actionDelay <= 0.0f<second> -> 
                 match wave with 
                 | [] when entityProvider.GetEntities() |> Seq.filter (fun x -> x.GetType() = typeof<Enemy>) |> Seq.length = 0 ->
+
                     waveNumber <- waveNumber + 1
-                    let k = waveNumber |> float32 |> sqrt
-                    wave <- Wave.create (Random.random) ((k * (float32 waveNumber) + 10.0f) |> int |> (*) 1<pixel>) (chunkSizeMin * (int k)) (chunkSizeMax * (int k))
+
+                    let k = (waveNumber |> float32) ** enemyPixelGrowthCoefficient |> int |> (*) 1<pixel>
+                    let pixels = if k < 15<pixel> then 15<pixel> else k
+                    wave <- Wave.create (Random.random) pixels 1 waveNumber
+                        
                 | head::tail ->
                     match head with 
                     | Create enemyType -> 
-                        spawner.Spawn enemyType
+                        spawner.Spawn (enemyType, waveNumber)
                     | Delay time ->
                         actionDelay <- time
 
                     wave <- tail
                 | _ -> ()
             | _ -> 
-                actionDelay <- actionDelay - delta
+                actionDelay <- actionDelay - delta * gameSpeedCoefficient
 
             entityProvider.Update (delta * gameSpeedCoefficient)
 
@@ -283,5 +328,5 @@ type GamePlayScene (
 
             [ 
                 GamePlaySceneHud.drawPlayButtons playButtons; 
-                GamePlaySceneHud.drawStatusLable mapInfo.ScreenWidth font pixels lifes waveNumber
+                GamePlaySceneHud.drawStatusLable mapInfo.ScreenWidth font pixels lifes waveNumber regularTurretBasePrice slowTurretBasePrice splashTurretBasePrice
             ] |> Shape |> draw None

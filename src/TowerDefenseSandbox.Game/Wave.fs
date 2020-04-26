@@ -4,28 +4,17 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 
 open Fame
 
-type EnemyType = 
-    | Standard
-    | Fast
-    | Hard
-
 type WaveAction =
     | Create of enemy: EnemyType
     | Delay of delay: float32<second>
 
 module Wave =
 
-    let private prices = 
-        Map.empty
-           .Add(EnemyType.Standard, 10<pixel>)
-           .Add(EnemyType.Fast,      5<pixel>)
-           .Add(EnemyType.Hard,     30<pixel>)
-
     let private random f =
-        match f 0 5 with 
-        | 0 | 1 -> EnemyType.Standard
-        | 2 | 3 -> EnemyType.Fast
-        | 4 -> EnemyType.Hard
+        match f 0 6 with 
+        | 0 | 1 | 2  -> EnemyType.Standard
+        | 3 | 4 -> EnemyType.Fast
+        | 5 -> EnemyType.Hard
 
     let rec private createChunk r pixel size chunk =
         match size with 
@@ -33,7 +22,7 @@ module Wave =
             (chunk, pixel)
         | _ -> 
             let enemy = random r
-            let price = prices.[enemy]
+            let price = GameBalance.enemyPrices.[enemy]
 
             if price <= pixel 
                 then 
@@ -47,6 +36,7 @@ module Wave =
             wave
         | _ -> 
             let (chunk, pixel) = createChunk random pixel (random chunkSizeMin chunkSizeMax + 1) []
-            createIn random pixel chunkSizeMin chunkSizeMax wave@[Delay 1.0f<second>]@chunk
+            let delay = (float32 <| random 1 6) * 1.0f<second>
+            createIn random pixel chunkSizeMin chunkSizeMax chunk@[Delay delay]@wave
 
     let create random pixel chunkSizeMin chunkSizeMax = createIn random pixel chunkSizeMin chunkSizeMax []

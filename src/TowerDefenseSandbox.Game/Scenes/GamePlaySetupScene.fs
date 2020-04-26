@@ -11,15 +11,11 @@ open Fame.Scene
 open TowerDefenseSandbox.Game
 open Fame.Graphics
 
-type GameDifficult =
-    | Easy
-    | Normal
-    | Hard
-
-type GamePlaySetupStartGameMessage(maze: (int * int) list, waves: int, lifes: int) =
+type GamePlaySetupStartGameMessage(maze: (int * int) list, waves: int, lifes: int, difficult: GameDifficult) =
     member _.Maze = maze
     member _.Waves = waves
     member _.Lifes = lifes
+    member _.Difficult = difficult
 
 type GamePlaySetupExitMessage() = class end
 
@@ -30,7 +26,7 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWi
 
     let mutable left = MouseButtonState.Released
     let mutable mazeLength = 25
-    let mutable waves = 30
+    let mutable waves = 15
     let mutable difficult = GameDifficult.Normal
     let mutable lifes = 10
 
@@ -45,11 +41,11 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWi
         | Text(sx, sy, text, font, _) ->
             let ss = size font text
             x > sx && x < sx + ss.X * 1.0f<pixel> && y > sy && y < sy + ss.Y * 1.0f<pixel>
-        | _ -> false            
+        | _ -> false
 
     let backButtonUi = 
-        let backText = "Back"       
-        let backSize = size h3 backText       
+        let backText = "Back"
+        let backSize = size h3 backText
         let backX  = screenWidth  - backSize.X  * 1.0f<pixel> - 15.0f<pixel>
         let backY  = screenHeight - backSize.Y  * 1.0f<pixel> - 100.0f<pixel>
        
@@ -119,7 +115,7 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWi
             match difficult with
             | Easy ->  "Easy" 
             | Normal -> "Normal"
-            | Hard -> "Hard"
+            | GameDifficult.Hard -> "Hard"
 
         let difficultTextSize = difficultText >> sizeH3 
         let difficultX = fun () -> (screenWidth / 2.0f)  - (difficultTextSize().X / 2.0f) * 1.0f<pixel>
@@ -182,7 +178,7 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWi
                 if (intersect position startButtonUi)
                 then 
                     let maze = Maze.create (Random.random) mazeLength
-                    queue.Push(GamePlaySetupStartGameMessage(maze, waves, lifes))
+                    queue.Push(GamePlaySetupStartGameMessage(maze, waves, lifes, difficult))
                 elif (intersect position backButtonUi)
                     then 
                         queue.Push(GamePlaySetupExitMessage())
@@ -203,13 +199,13 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWi
                         difficult <- match difficult with 
                                      | Easy -> Easy
                                      | Normal -> Easy
-                                     | Hard -> Normal
+                                     | GameDifficult.Hard -> Normal
                 elif (intersect position difficultIncButtonUi) 
                     then 
                        difficult <- match difficult with 
                                     | Easy -> Normal
-                                    | Normal -> Hard
-                                    | Hard -> Hard
+                                    | Normal -> GameDifficult.Hard
+                                    | GameDifficult.Hard -> GameDifficult.Hard
                 elif (intersect position lifeDecButtonUi) 
                     then 
                         lifes <- if lifes = 1 then 1 else lifes - 1
@@ -229,7 +225,7 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWi
                 if (intersect position startButtonUi)
                 then 
                     let maze = Maze.create (Random.random) mazeLength
-                    queue.Push(GamePlaySetupStartGameMessage(maze, waves, lifes))
+                    queue.Push(GamePlaySetupStartGameMessage(maze, waves, lifes, difficult))
                 elif (intersect position backButtonUi)
                     then 
                         queue.Push(GamePlaySetupExitMessage())
@@ -250,13 +246,13 @@ type GamePlaySetupScene (queue: IMessageQueue, content: ContentManager, screenWi
                         difficult <- match difficult with 
                                     | Easy -> Easy
                                     | Normal -> Easy
-                                    | Hard -> Normal
+                                    | GameDifficult.Hard -> Normal
                 elif (intersect position difficultIncButtonUi) 
                     then 
                         difficult <- match difficult with 
                                     | Easy -> Normal
-                                    | Normal -> Hard
-                                    | Hard -> Hard
+                                    | Normal -> GameDifficult.Hard
+                                    | GameDifficult.Hard -> GameDifficult.Hard
                 elif (intersect position lifeDecButtonUi) 
                     then 
                         lifes <- if lifes = 1 then 1 else lifes - 1

@@ -5,40 +5,25 @@ open Microsoft.FSharp.Data.UnitSystems.SI.UnitNames
 open Fame
 open Fame.Graphics
 
+open TowerDefenseSandbox.Game
+
 type TurretPicker (
                     position: Vector<pixel>, 
                     width: float32<pixel>, 
                     height: float32<pixel>, 
-                    parent: IEntity option [,], 
-                    pushMessage: TurretCreatedMessage -> unit,
-                    entityProvider: IEntityProvider, 
-                    column: int, 
                     raw: int) =
 
     let center (column: int) (raw: int) = Vector.init ((float32 column) * width + width / 2.0f) ((float32 raw) * height + height / 2.0f)
 
-    member this.Click (clickPosition: Vector<pixel>, pixels: int) = 
+    member this.Click (clickPosition: Vector<pixel>) = 
         let (Vector(_, y)) = position
         let (Vector(_, clickY)) = clickPosition
         let d = clickY - y
 
         match raw with 
-        | _ when d > 0.0f<pixel> && d <= height / 3.0f && pixels >= 75 -> 
-            let turret = Turret.CreateRegular(center column raw, pushMessage, entityProvider) :> IEntity
-            parent.[column, raw] <- Some turret
-            entityProvider.RegisterEntity turret
-            entityProvider.RemoveEntity this
-        | _ when d > height / 3.0f && d <= height / 3.0f * 2.0f && pixels >= 100 -> 
-            let turret = Turret.CreateSlow(center column raw, pushMessage, entityProvider) :> IEntity
-            parent.[column, raw] <- Some turret
-            entityProvider.RegisterEntity turret
-            entityProvider.RemoveEntity this
-        | _ when pixels >= 120->
-            let turret = Turret.CreateSplash(center column raw, pushMessage, entityProvider) :> IEntity
-            parent.[column, raw] <- Some turret
-            entityProvider.RegisterEntity turret
-            entityProvider.RemoveEntity this
-        | _ -> ()
+        | _ when d > 0.0f<pixel> && d <= height / 3.0f -> TurretType.Regular
+        | _ when d > height / 3.0f && d <= height / 3.0f * 2.0f -> TurretType.Slow
+        | _ -> TurretType.Splash
 
     interface IEntity with
 

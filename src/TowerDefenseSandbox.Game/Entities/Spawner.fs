@@ -11,14 +11,14 @@ type EnemyFactory (pushMessage: EnemyMessage -> unit) =
     
     let mutable path = []
 
-    member _.CreateRegular (center: Vector<pixel>) =
-        Enemy.CreateRegular (center, path, pushMessage)
+    member _.CreateRegular (center: Vector<pixel>, wave: int) =
+        Enemy.CreateRegular (center, path, wave, pushMessage)
 
-    member _.CreateFast (center: Vector<pixel>) =
-        Enemy.CreateFast (center, path, pushMessage)
+    member _.CreateFast (center: Vector<pixel>, wave: int) =
+        Enemy.CreateFast (center, path, wave, pushMessage)
 
-    member _.CreateHard (center: Vector<pixel>) =
-        Enemy.CreateHard (center, path, pushMessage)
+    member _.CreateHard (center: Vector<pixel>, wave: int) =
+        Enemy.CreateHard (center, path, wave, pushMessage)
 
     member _.UpdatePath (newPath: Vector<pixel> list) =
         path <- newPath
@@ -37,21 +37,21 @@ type Spawner (position: Vector<pixel>, factory: EnemyFactory) =
     let frequency = 25.0f<1/second>
     let mutable k = 0.0f
 
-    let rec spawn enemy =
+    let rec spawn enemy wave =
         match enemy with 
-        | Standard -> factory.CreateRegular position |> ignore
-        | Fast -> factory.CreateFast position |> ignore
-        | Hard -> factory.CreateHard position |> ignore
-    member _.Spawn (enemyType: EnemyType) = enemy <- Some enemyType
+        | Standard -> factory.CreateRegular (position, wave) |> ignore
+        | Fast     -> factory.CreateFast    (position, wave) |> ignore
+        | Hard     -> factory.CreateHard    (position, wave) |> ignore
+    member _.Spawn (enemyType: EnemyType, wave: int) = enemy <- Some (enemyType, wave)
 
     interface IEntity with
 
         member _.Update (delta: float32<second>) =
             match enemy with 
             | None -> ()
-            | Some enemyTpe -> 
+            | Some (enemyTpe, wave) -> 
                 enemy <- None
-                spawn enemyTpe
+                spawn enemyTpe wave
 
             if k <= maxK then k <- k + factor * frequency * delta else k <- 0.0f
             

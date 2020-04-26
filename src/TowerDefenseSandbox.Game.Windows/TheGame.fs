@@ -20,6 +20,7 @@ module GlobalContext =
     let mutable maze = []
     let mutable waves = 0
     let mutable lifes = 0
+    let mutable difficult = GameDifficult.Easy
     let mutable manager = Unchecked.defaultof<ISceneManager>
     let mutable content =  Unchecked.defaultof<ContentManager>
     let mutable draw = (fun (camera: CameraMatrix option) (shape: Shape) -> ())
@@ -65,8 +66,15 @@ and GamePlaySetupStartGameMessageHandler () =
             GlobalContext.maze <- message.Maze
             GlobalContext.waves <- message.Waves
             GlobalContext.lifes <- message.Lifes
+            GlobalContext.difficult <- message.Difficult
 
-            let mapInfo = { ScreenWidth = GlobalContext.screenWidth; ScreenHeight = GlobalContext.screenHeight; Maze = message.Maze; Waves = message.Waves; Lifes = message.Lifes }
+            let mapInfo = { 
+                        ScreenWidth = GlobalContext.screenWidth; 
+                        ScreenHeight = GlobalContext.screenHeight; 
+                        Maze = message.Maze; 
+                        Waves = message.Waves; 
+                        Lifes = message.Lifes;
+                        Difficult = message.Difficult}
             GlobalContext.manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, GlobalContext.draw, GlobalContext.content, mapInfo, 1.0f)
 
 and GamePlaySetupExitMessageHandler () =
@@ -180,7 +188,8 @@ and GameVictoryRestartMessageHandler () =
                 ScreenHeight = GlobalContext.screenHeight; 
                 Maze = GlobalContext.maze 
                 Waves = GlobalContext.waves 
-                Lifes = GlobalContext.lifes }
+                Lifes = GlobalContext.lifes 
+                Difficult = GlobalContext.difficult}
 
             GlobalContext.manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, GlobalContext.draw, GlobalContext.content, mapInfo, 1.0f)
 
@@ -218,7 +227,8 @@ and RestartGameOverMessageHandler () =
                 ScreenHeight = GlobalContext.screenHeight
                 Maze = GlobalContext.maze
                 Waves = GlobalContext.waves 
-                Lifes = GlobalContext.lifes }
+                Lifes = GlobalContext.lifes
+                Difficult = GlobalContext.difficult }
 
             GlobalContext.manager.Scene <- GamePlayScene(camera, input, entityProvider, bus, bus, GlobalContext.draw, GlobalContext.content, mapInfo, 1.0f)
 
