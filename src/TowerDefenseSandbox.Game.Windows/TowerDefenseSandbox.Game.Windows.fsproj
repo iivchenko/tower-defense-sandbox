@@ -18,7 +18,7 @@
     <None Remove="Content\obj\**" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TowerDefenseSandbox.Engine\TowerDefenseSandbox.Engine.fsproj" />
+    <ProjectReference Include="..\Fame\Fame.fsproj" />
     <ProjectReference Include="..\TowerDefenseSandbox.Game\TowerDefenseSandbox.Game.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
